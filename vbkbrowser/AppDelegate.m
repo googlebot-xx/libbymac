@@ -7,6 +7,7 @@
 //
 
 #import "AppDelegate.h"
+#import "mainWin.h"
 
 @interface AppDelegate ()
 
@@ -17,12 +18,26 @@
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
     // Insert code here to initialize your application
+    [mainwin checkkey];
 }
 
 
 - (void)applicationWillTerminate:(NSNotification *)aNotification {
     // Insert code here to tear down your application
+    [[NSURLCache sharedURLCache] removeAllCachedResponses];
 }
 
+- (BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication *)theApplication {
+    return YES;
+}
+
+
+- (void)awakeFromNib
+{
+    if (!mainwin) {
+        mainwin = [[mainWin alloc] init];
+        
+    }
+}
 
 @end

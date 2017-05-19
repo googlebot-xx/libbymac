@@ -8,8 +8,11 @@
 
 #import <Cocoa/Cocoa.h>
 
+@class mainWin;
 @interface AppDelegate : NSObject <NSApplicationDelegate>
-
+{
+    mainWin *mainwin;
+}
 
 @end
 

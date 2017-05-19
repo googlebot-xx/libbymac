@@ -11,6 +11,16 @@
 		00872C5C1EC2245C00542D22 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 00872C5B1EC2245C00542D22 /* main.m */; };
 		00872C5E1EC2245C00542D22 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 00872C5D1EC2245C00542D22 /* Assets.xcassets */; };
 		00872C611EC2245C00542D22 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 00872C5F1EC2245C00542D22 /* MainMenu.xib */; };
+		00872C6B1EC225DE00542D22 /* mainWin.m in Sources */ = {isa = PBXBuildFile; fileRef = 00872C691EC225DE00542D22 /* mainWin.m */; };
+		00872C6C1EC225DE00542D22 /* mainWin.xib in Resources */ = {isa = PBXBuildFile; fileRef = 00872C6A1EC225DE00542D22 /* mainWin.xib */; };
+		00872C6F1EC2288100542D22 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 00872C6E1EC2288100542D22 /* WebKit.framework */; };
+		00B7F1991EC9D38F00C14D6A /* webdelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 00B7F1981EC9D38F00C14D6A /* webdelegate.m */; };
+		00B7F1A21ECDE31700C14D6A /* BuyController.m in Sources */ = {isa = PBXBuildFile; fileRef = 00B7F19A1ECDE31700C14D6A /* BuyController.m */; };
+		00B7F1A31ECDE31700C14D6A /* RegController.m in Sources */ = {isa = PBXBuildFile; fileRef = 00B7F19D1ECDE31700C14D6A /* RegController.m */; };
+		00B7F1A41ECDE31700C14D6A /* BuyController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 00B7F19F1ECDE31700C14D6A /* BuyController.xib */; };
+		00B7F1A51ECDE31700C14D6A /* AboutController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 00B7F1A01ECDE31700C14D6A /* AboutController.xib */; };
+		00B7F1A61ECDE31700C14D6A /* AboutController.m in Sources */ = {isa = PBXBuildFile; fileRef = 00B7F1A11ECDE31700C14D6A /* AboutController.m */; };
+		00B7F1A91ECDE36E00C14D6A /* RegController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 00B7F1A81ECDE36E00C14D6A /* RegController.xib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -21,6 +31,22 @@
 		00872C5D1EC2245C00542D22 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		00872C601EC2245C00542D22 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		00872C621EC2245C00542D22 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		00872C681EC225DE00542D22 /* mainWin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mainWin.h; sourceTree = "<group>"; };
+		00872C691EC225DE00542D22 /* mainWin.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = mainWin.m; sourceTree = "<group>"; };
+		00872C6A1EC225DE00542D22 /* mainWin.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = mainWin.xib; sourceTree = "<group>"; };
+		00872C6E1EC2288100542D22 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
+		00B7F1971EC9D38F00C14D6A /* webdelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = webdelegate.h; sourceTree = "<group>"; };
+		00B7F1981EC9D38F00C14D6A /* webdelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = webdelegate.m; sourceTree = "<group>"; };
+		00B7F19A1ECDE31700C14D6A /* BuyController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BuyController.m; sourceTree = "<group>"; };
+		00B7F19B1ECDE31700C14D6A /* BuyController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BuyController.h; sourceTree = "<group>"; };
+		00B7F19C1ECDE31700C14D6A /* const.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = const.h; sourceTree = "<group>"; };
+		00B7F19D1ECDE31700C14D6A /* RegController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RegController.m; sourceTree = "<group>"; };
+		00B7F19E1ECDE31700C14D6A /* RegController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RegController.h; sourceTree = "<group>"; };
+		00B7F19F1ECDE31700C14D6A /* BuyController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = BuyController.xib; sourceTree = "<group>"; };
+		00B7F1A01ECDE31700C14D6A /* AboutController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = AboutController.xib; sourceTree = "<group>"; };
+		00B7F1A11ECDE31700C14D6A /* AboutController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AboutController.m; sourceTree = "<group>"; };
+		00B7F1A71ECDE36E00C14D6A /* AboutController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AboutController.h; sourceTree = "<group>"; };
+		00B7F1A81ECDE36E00C14D6A /* RegController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = RegController.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -28,6 +54,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				00872C6F1EC2288100542D22 /* WebKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -39,6 +66,7 @@
 			children = (
 				00872C561EC2245C00542D22 /* vbkbrowser */,
 				00872C551EC2245C00542D22 /* Products */,
+				00872C6D1EC2288100542D22 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -53,6 +81,21 @@
 		00872C561EC2245C00542D22 /* vbkbrowser */ = {
 			isa = PBXGroup;
 			children = (
+				00872C681EC225DE00542D22 /* mainWin.h */,
+				00872C691EC225DE00542D22 /* mainWin.m */,
+				00872C6A1EC225DE00542D22 /* mainWin.xib */,
+				00B7F1971EC9D38F00C14D6A /* webdelegate.h */,
+				00B7F1981EC9D38F00C14D6A /* webdelegate.m */,
+				00B7F19C1ECDE31700C14D6A /* const.h */,
+				00B7F19A1ECDE31700C14D6A /* BuyController.m */,
+				00B7F19B1ECDE31700C14D6A /* BuyController.h */,
+				00B7F19F1ECDE31700C14D6A /* BuyController.xib */,
+				00B7F1A71ECDE36E00C14D6A /* AboutController.h */,
+				00B7F1A11ECDE31700C14D6A /* AboutController.m */,
+				00B7F1A01ECDE31700C14D6A /* AboutController.xib */,
+				00B7F19E1ECDE31700C14D6A /* RegController.h */,
+				00B7F19D1ECDE31700C14D6A /* RegController.m */,
+				00B7F1A81ECDE36E00C14D6A /* RegController.xib */,
 				00872C571EC2245C00542D22 /* AppDelegate.h */,
 				00872C581EC2245C00542D22 /* AppDelegate.m */,
 				00872C5D1EC2245C00542D22 /* Assets.xcassets */,
@@ -69,6 +112,14 @@
 				00872C5B1EC2245C00542D22 /* main.m */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		00872C6D1EC2288100542D22 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				00872C6E1EC2288100542D22 /* WebKit.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -131,6 +182,10 @@
 			files = (
 				00872C5E1EC2245C00542D22 /* Assets.xcassets in Resources */,
 				00872C611EC2245C00542D22 /* MainMenu.xib in Resources */,
+				00B7F1A51ECDE31700C14D6A /* AboutController.xib in Resources */,
+				00B7F1A41ECDE31700C14D6A /* BuyController.xib in Resources */,
+				00B7F1A91ECDE36E00C14D6A /* RegController.xib in Resources */,
+				00872C6C1EC225DE00542D22 /* mainWin.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -141,8 +196,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				00872C6B1EC225DE00542D22 /* mainWin.m in Sources */,
+				00B7F1991EC9D38F00C14D6A /* webdelegate.m in Sources */,
+				00B7F1A31ECDE31700C14D6A /* RegController.m in Sources */,
+				00B7F1A21ECDE31700C14D6A /* BuyController.m in Sources */,
 				00872C5C1EC2245C00542D22 /* main.m in Sources */,
 				00872C591EC2245C00542D22 /* AppDelegate.m in Sources */,
+				00B7F1A61ECDE31700C14D6A /* AboutController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -200,7 +260,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
@@ -241,7 +301,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = macosx;
 			};
@@ -290,6 +350,7 @@
 				00872C671EC2245C00542D22 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
