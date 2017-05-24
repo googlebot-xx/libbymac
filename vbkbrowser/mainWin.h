@@ -35,22 +35,17 @@
     NSTimer *tasktimer;
 
     
-    //BOOL working;
-    
-    int taskindex;
-    int totalpage;
-    int pageindex;
-    BOOL jswaiting;
-    NSString * jsmessage;
-    
-    WebDelegate * webdelegate;
+
 }
 
 @property (nonatomic, assign) BOOL working;
 @property (nonatomic, retain) NSString* datadir;
+@property (nonatomic, retain) NSString* ebookdir;
 
 - (void)checkkey;
-- (void) log: (NSString*) msg;
+//- (void)log:(NSString*)msg;
+- (void) log:(NSString *)formatString, ...;
+
 
 @end
 

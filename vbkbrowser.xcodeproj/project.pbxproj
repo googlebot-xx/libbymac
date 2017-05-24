@@ -13,7 +13,6 @@
 		00872C611EC2245C00542D22 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 00872C5F1EC2245C00542D22 /* MainMenu.xib */; };
 		00872C6B1EC225DE00542D22 /* mainWin.m in Sources */ = {isa = PBXBuildFile; fileRef = 00872C691EC225DE00542D22 /* mainWin.m */; };
 		00872C6C1EC225DE00542D22 /* mainWin.xib in Resources */ = {isa = PBXBuildFile; fileRef = 00872C6A1EC225DE00542D22 /* mainWin.xib */; };
-		00872C6F1EC2288100542D22 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 00872C6E1EC2288100542D22 /* WebKit.framework */; };
 		00B7F1991EC9D38F00C14D6A /* webdelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 00B7F1981EC9D38F00C14D6A /* webdelegate.m */; };
 		00B7F1A21ECDE31700C14D6A /* BuyController.m in Sources */ = {isa = PBXBuildFile; fileRef = 00B7F19A1ECDE31700C14D6A /* BuyController.m */; };
 		00B7F1A31ECDE31700C14D6A /* RegController.m in Sources */ = {isa = PBXBuildFile; fileRef = 00B7F19D1ECDE31700C14D6A /* RegController.m */; };
@@ -21,7 +20,28 @@
 		00B7F1A51ECDE31700C14D6A /* AboutController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 00B7F1A01ECDE31700C14D6A /* AboutController.xib */; };
 		00B7F1A61ECDE31700C14D6A /* AboutController.m in Sources */ = {isa = PBXBuildFile; fileRef = 00B7F1A11ECDE31700C14D6A /* AboutController.m */; };
 		00B7F1A91ECDE36E00C14D6A /* RegController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 00B7F1A81ECDE36E00C14D6A /* RegController.xib */; };
+		00B7F1AF1ED369D000C14D6A /* content.opf in Resources */ = {isa = PBXBuildFile; fileRef = 00B7F1AB1ED369D000C14D6A /* content.opf */; };
+		00B7F1B01ED369D000C14D6A /* container.xml in Resources */ = {isa = PBXBuildFile; fileRef = 00B7F1AC1ED369D000C14D6A /* container.xml */; };
+		00B7F1B11ED369D000C14D6A /* toc.ncx in Resources */ = {isa = PBXBuildFile; fileRef = 00B7F1AD1ED369D000C14D6A /* toc.ncx */; };
+		00B7F1B21ED369D000C14D6A /* mimetype in Resources */ = {isa = PBXBuildFile; fileRef = 00B7F1AE1ED369D000C14D6A /* mimetype */; };
+		00B7F1EF1ED5E4A900C14D6A /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 00872C6E1EC2288100542D22 /* WebKit.framework */; };
+		00B7F1F11ED5E52200C14D6A /* ZipArchive.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 00B7F1BB1ED5DC0C00C14D6A /* ZipArchive.framework */; };
+		00B7F1F21ED5E52200C14D6A /* ZipArchive.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 00B7F1BB1ED5DC0C00C14D6A /* ZipArchive.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		00B7F1F31ED5E52200C14D6A /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				00B7F1F21ED5E52200C14D6A /* ZipArchive.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		00872C541EC2245C00542D22 /* vbkbrowser.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = vbkbrowser.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -47,6 +67,31 @@
 		00B7F1A11ECDE31700C14D6A /* AboutController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AboutController.m; sourceTree = "<group>"; };
 		00B7F1A71ECDE36E00C14D6A /* AboutController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AboutController.h; sourceTree = "<group>"; };
 		00B7F1A81ECDE36E00C14D6A /* RegController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = RegController.xib; sourceTree = "<group>"; };
+		00B7F1AB1ED369D000C14D6A /* content.opf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = content.opf; path = epub/content.opf; sourceTree = "<group>"; };
+		00B7F1AC1ED369D000C14D6A /* container.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = container.xml; path = epub/container.xml; sourceTree = "<group>"; };
+		00B7F1AD1ED369D000C14D6A /* toc.ncx */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = toc.ncx; path = epub/toc.ncx; sourceTree = "<group>"; };
+		00B7F1AE1ED369D000C14D6A /* mimetype */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = mimetype; path = epub/mimetype; sourceTree = "<group>"; };
+		00B7F1BB1ED5DC0C00C14D6A /* ZipArchive.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ZipArchive.framework; path = vbkbrowser/zip/ZipArchive.framework; sourceTree = "<group>"; };
+		00B7F1BE1ED5DC2700C14D6A /* crypt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = crypt.h; path = zip/crypt.h; sourceTree = "<group>"; };
+		00B7F1C01ED5DC2700C14D6A /* ioapi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ioapi.h; path = zip/ioapi.h; sourceTree = "<group>"; };
+		00B7F1C21ED5DC2700C14D6A /* mztools.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mztools.h; path = zip/mztools.h; sourceTree = "<group>"; };
+		00B7F1C31ED5DC2700C14D6A /* SSZipArchive.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SSZipArchive.h; path = zip/SSZipArchive.h; sourceTree = "<group>"; };
+		00B7F1C41ED5DC2700C14D6A /* SSZipCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SSZipCommon.h; path = zip/SSZipCommon.h; sourceTree = "<group>"; };
+		00B7F1C61ED5DC2700C14D6A /* unzip.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = unzip.h; path = zip/unzip.h; sourceTree = "<group>"; };
+		00B7F1C81ED5DC2700C14D6A /* zip.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = zip.h; path = zip/zip.h; sourceTree = "<group>"; };
+		00B7F1C91ED5DC2700C14D6A /* ZipArchive.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZipArchive.h; path = zip/ZipArchive.h; sourceTree = "<group>"; };
+		00B7F1CF1ED5DF7500C14D6A /* aes_via_ace.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = aes_via_ace.h; path = aes/aes_via_ace.h; sourceTree = "<group>"; };
+		00B7F1D01ED5DF7500C14D6A /* aes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = aes.h; path = aes/aes.h; sourceTree = "<group>"; };
+		00B7F1D31ED5DF7500C14D6A /* aesopt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = aesopt.h; path = aes/aesopt.h; sourceTree = "<group>"; };
+		00B7F1D51ED5DF7500C14D6A /* aestab.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = aestab.h; path = aes/aestab.h; sourceTree = "<group>"; };
+		00B7F1D61ED5DF7500C14D6A /* brg_endian.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = brg_endian.h; path = aes/brg_endian.h; sourceTree = "<group>"; };
+		00B7F1D71ED5DF7500C14D6A /* brg_types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = brg_types.h; path = aes/brg_types.h; sourceTree = "<group>"; };
+		00B7F1D91ED5DF7500C14D6A /* entropy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = entropy.h; path = aes/entropy.h; sourceTree = "<group>"; };
+		00B7F1DB1ED5DF7500C14D6A /* fileenc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fileenc.h; path = aes/fileenc.h; sourceTree = "<group>"; };
+		00B7F1DD1ED5DF7500C14D6A /* hmac.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = hmac.h; path = aes/hmac.h; sourceTree = "<group>"; };
+		00B7F1DF1ED5DF7500C14D6A /* prng.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = prng.h; path = aes/prng.h; sourceTree = "<group>"; };
+		00B7F1E11ED5DF7500C14D6A /* pwd2key.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pwd2key.h; path = aes/pwd2key.h; sourceTree = "<group>"; };
+		00B7F1E31ED5DF7500C14D6A /* sha1.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sha1.h; path = aes/sha1.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -54,7 +99,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				00872C6F1EC2288100542D22 /* WebKit.framework in Frameworks */,
+				00B7F1F11ED5E52200C14D6A /* ZipArchive.framework in Frameworks */,
+				00B7F1EF1ED5E4A900C14D6A /* WebKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -98,9 +144,12 @@
 				00B7F1A81ECDE36E00C14D6A /* RegController.xib */,
 				00872C571EC2245C00542D22 /* AppDelegate.h */,
 				00872C581EC2245C00542D22 /* AppDelegate.m */,
-				00872C5D1EC2245C00542D22 /* Assets.xcassets */,
-				00872C5F1EC2245C00542D22 /* MainMenu.xib */,
 				00872C621EC2245C00542D22 /* Info.plist */,
+				00872C5F1EC2245C00542D22 /* MainMenu.xib */,
+				00872C5D1EC2245C00542D22 /* Assets.xcassets */,
+				00B7F1BD1ED5DC1700C14D6A /* zip */,
+				00B7F1CE1ED5DF5E00C14D6A /* aes */,
+				00B7F1AA1ED369BA00C14D6A /* epub */,
 				00872C5A1EC2245C00542D22 /* Supporting Files */,
 			);
 			path = vbkbrowser;
@@ -117,9 +166,55 @@
 		00872C6D1EC2288100542D22 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				00B7F1BB1ED5DC0C00C14D6A /* ZipArchive.framework */,
 				00872C6E1EC2288100542D22 /* WebKit.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		00B7F1AA1ED369BA00C14D6A /* epub */ = {
+			isa = PBXGroup;
+			children = (
+				00B7F1AB1ED369D000C14D6A /* content.opf */,
+				00B7F1AC1ED369D000C14D6A /* container.xml */,
+				00B7F1AD1ED369D000C14D6A /* toc.ncx */,
+				00B7F1AE1ED369D000C14D6A /* mimetype */,
+			);
+			name = epub;
+			sourceTree = "<group>";
+		};
+		00B7F1BD1ED5DC1700C14D6A /* zip */ = {
+			isa = PBXGroup;
+			children = (
+				00B7F1BE1ED5DC2700C14D6A /* crypt.h */,
+				00B7F1C01ED5DC2700C14D6A /* ioapi.h */,
+				00B7F1C21ED5DC2700C14D6A /* mztools.h */,
+				00B7F1C31ED5DC2700C14D6A /* SSZipArchive.h */,
+				00B7F1C41ED5DC2700C14D6A /* SSZipCommon.h */,
+				00B7F1C61ED5DC2700C14D6A /* unzip.h */,
+				00B7F1C81ED5DC2700C14D6A /* zip.h */,
+				00B7F1C91ED5DC2700C14D6A /* ZipArchive.h */,
+			);
+			name = zip;
+			sourceTree = "<group>";
+		};
+		00B7F1CE1ED5DF5E00C14D6A /* aes */ = {
+			isa = PBXGroup;
+			children = (
+				00B7F1CF1ED5DF7500C14D6A /* aes_via_ace.h */,
+				00B7F1D01ED5DF7500C14D6A /* aes.h */,
+				00B7F1D31ED5DF7500C14D6A /* aesopt.h */,
+				00B7F1D51ED5DF7500C14D6A /* aestab.h */,
+				00B7F1D61ED5DF7500C14D6A /* brg_endian.h */,
+				00B7F1D71ED5DF7500C14D6A /* brg_types.h */,
+				00B7F1D91ED5DF7500C14D6A /* entropy.h */,
+				00B7F1DB1ED5DF7500C14D6A /* fileenc.h */,
+				00B7F1DD1ED5DF7500C14D6A /* hmac.h */,
+				00B7F1DF1ED5DF7500C14D6A /* prng.h */,
+				00B7F1E11ED5DF7500C14D6A /* pwd2key.h */,
+				00B7F1E31ED5DF7500C14D6A /* sha1.h */,
+			);
+			name = aes;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -132,6 +227,7 @@
 				00872C501EC2245C00542D22 /* Sources */,
 				00872C511EC2245C00542D22 /* Frameworks */,
 				00872C521EC2245C00542D22 /* Resources */,
+				00B7F1F31ED5E52200C14D6A /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -180,12 +276,16 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				00B7F1B11ED369D000C14D6A /* toc.ncx in Resources */,
 				00872C5E1EC2245C00542D22 /* Assets.xcassets in Resources */,
+				00B7F1B21ED369D000C14D6A /* mimetype in Resources */,
 				00872C611EC2245C00542D22 /* MainMenu.xib in Resources */,
 				00B7F1A51ECDE31700C14D6A /* AboutController.xib in Resources */,
 				00B7F1A41ECDE31700C14D6A /* BuyController.xib in Resources */,
 				00B7F1A91ECDE36E00C14D6A /* RegController.xib in Resources */,
 				00872C6C1EC225DE00542D22 /* mainWin.xib in Resources */,
+				00B7F1AF1ED369D000C14D6A /* content.opf in Resources */,
+				00B7F1B01ED369D000C14D6A /* container.xml in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -312,6 +412,11 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/vbkbrowser",
+					"$(PROJECT_DIR)/vbkbrowser/zip",
+				);
 				INFOPLIST_FILE = vbkbrowser/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.ebookconverter.vbkbrowser;
@@ -324,6 +429,11 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/vbkbrowser",
+					"$(PROJECT_DIR)/vbkbrowser/zip",
+				);
 				INFOPLIST_FILE = vbkbrowser/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.ebookconverter.vbkbrowser;

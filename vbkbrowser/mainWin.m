@@ -20,10 +20,25 @@ mainWin * _mainwin;
 BuyController *reg;
 AboutController * aboutcontroller;
 
-@implementation mainWin 
+
+
+@implementation mainWin {
+
+    IBOutlet NSBox * box;
+    
+    int taskindex;
+    int totalpage;
+    int pageindex;
+    BOOL jswaiting;
+    NSString * jsmessage;
+    
+    WebDelegate * webdelegate;
+}
 
 @synthesize working;
 @synthesize datadir;
+@synthesize ebookdir;
+
 
 - (id)init
 {
@@ -86,6 +101,8 @@ AboutController * aboutcontroller;
     [textview setVerticallyResizable:YES];
     [textview setHorizontallyResizable:NO];
     
+    [box setHidden:true];
+    
     //[convertbtn setWantsLayer:YES];
     //convertbtn.layer.backgroundColor = [NSColor grayColor].CGColor;
     //[[convertbtn cell] setBackgroundColor:[NSColor redColor]];
@@ -98,7 +115,8 @@ AboutController * aboutcontroller;
     NSString * aurl = @"https://www.vitalsource.com/login";
     [[webView mainFrame] loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:aurl]]];
     
-    //[self log:@"ready"];
+    
+    //[self log:@"ready %@",aurl];
     //[self log:@"go"];
 }
 
@@ -117,8 +135,9 @@ AboutController * aboutcontroller;
 
 - (IBAction)testfile:(id)sender
 {
-    NSString * url =@"https://jigsaw.vitalsource.com/books/9781506301587DEMO/epub/OEBPS/images/pg141.jpg";
-    [webdelegate saveepubfile:url data:nil];   
+    //NSString * url =@"https://jigsaw.vitalsource.com/books/9781506301587DEMO/epub/OEBPS/images/pg141.jpg";
+    //[webdelegate saveepubfile:url data:nil];
+    [self pageiframejs:0];
 }
 
 - (IBAction)testbtn:(id)sender
@@ -127,7 +146,8 @@ AboutController * aboutcontroller;
 //    NSLog(@"start");
 //    [self wait:3];
 //    NSLog(@"end");
-//    return;
+    [webdelegate BuildPub:nil];
+    return;
     
     NSString * url = [webView mainFrameURL];
     if ([url rangeOfString:@"login"].location != NSNotFound) {
@@ -143,6 +163,25 @@ AboutController * aboutcontroller;
     //[reg savekey:@"" skey:@"" suser:@""];
 #endif
 }
+
+- (IBAction)downloadbtn:(id)sender
+{
+    [self setWorking:true];
+}
+
+- (IBAction)boxclosebtn:(id)sender
+{
+    [box setHidden:true];
+}
+
+
+- (IBAction)runjstext:(id)sender
+{
+    NSString * js = [[textview textStorage] string];
+    id jsobj = [webView windowScriptObject];
+    [jsobj evaluateWebScript: js];
+}
+
 #pragma mark - runloop
 
 - (void) wait: (float) secs
@@ -193,6 +232,7 @@ AboutController * aboutcontroller;
     working = aworking;
     if (aworking) {
         [vars removeAllObjects];
+        [webdelegate clearurllist];
         totalpage=0;
         pageindex=0;
         tasktimer = [NSTimer scheduledTimerWithTimeInterval:0.3 target:self selector:@selector(taskhandle:) userInfo:nil repeats:YES];
@@ -220,6 +260,7 @@ AboutController * aboutcontroller;
         case 0:
             taskindex = [self totalbuttonjs];
             totalpage= [vars[@"Totalpages"] intValue];
+            [self log:@"Total pages = %d",totalpage];
             break;
         case 1:
             // check totalpages
@@ -233,7 +274,7 @@ AboutController * aboutcontroller;
             webdelegate.ticked =false;
             if (pageindex<totalpage) {
                 [self pagebuttonjs:pageindex]; ////goback page button click
-                [self log:[NSString stringWithFormat:@"load page %d",pageindex]];
+                [self log:@"load page %d",pageindex];
                 taskindex = 11;
             }
             break;
@@ -277,9 +318,21 @@ AboutController * aboutcontroller;
 
 #pragma mark - javasript
 
-- (void) log: (NSString*) msg
+- (void) log:(NSString *)formatString, ...
+{
+    
+    va_list args;
+    va_start(args, formatString);
+    NSString * str = [[NSString alloc] initWithFormat:formatString arguments:args];
+    va_end(args);
+    [textview.textStorage appendAttributedString:[[NSAttributedString alloc] initWithString:str]];
+    [textview.textStorage appendAttributedString:[[NSAttributedString alloc] initWithString:@"\n"]];
+}
+
+- (void) log1: (NSString*) msg
 {
     //[textview ]
+    //NSString * str = [NSString stringWithFormat:msg,args];
     [textview.textStorage appendAttributedString:[[NSAttributedString alloc] initWithString:msg]];
     [textview.textStorage appendAttributedString:[[NSAttributedString alloc] initWithString:@"\n"]];
 }
@@ -295,21 +348,23 @@ AboutController * aboutcontroller;
     //[webView stringByEvaluatingJavaScriptFromString:jsString];
     id jsobj = [webView windowScriptObject];
     //[jsobj setValue:self forKey:@"MyApp"];
-    NSString* js = @"console = { log: function(msg) { MyApp.consoleLog_(msg); } };\
-                    document.getElementById(\"session_email\").value = \"a02@pwqsoft.com\"; \
-                    document.getElementById(\"session_password\").value = \"600338qQ~\";  \
-                    document.getElementById(\"new_session\").submit(); \
-                    MyApp.consoleLog_(\"login ...\"); \
-                    ";
-                    //console.log(\"hellow\");";
+    NSString* js;
+    
+#ifdef DEBUG
+    js = @"console = { log: function(msg) { MyApp.consoleLog_(msg); } };\
+    document.getElementById(\"session_email\").value = \"a02@pwqsoft.com\"; \
+    document.getElementById(\"session_password\").value = \"600338qQ~\";  \
+    document.getElementById(\"new_session\").submit(); \
+    MyApp.consoleLog_(\"login ...\"); \
+    ";
+    //console.log(\"hellow\");";
     [jsobj evaluateWebScript: js];
-    //[webView  stringByEvaluatingJavaScriptFromString:@"alert('ok');"];
-    //NSString *href = [[webView windowScriptObject] evaluateWebScript:@"alert('ok');"];
-    //[self log:href];
+#endif
+   
 }
 
 - (void)consoleLog:(NSString *)aMessage {
-    NSLog(@"consoleLog: %@", aMessage);
+    //NSLog(@"consoleLog: %@", aMessage);
     jsmessage = aMessage;
     jswaiting = false;
 }
@@ -319,11 +374,12 @@ AboutController * aboutcontroller;
 //    NSLog(@"# pos %d",i);
     if ([aMessage rangeOfString:@"###"].location == 0) {
         NSString * astr = [aMessage stringByReplacingOccurrencesOfString:@"###" withString:@""];
-        [self log:astr];
+        //[self log:astr];
         NSArray * list = [astr componentsSeparatedByString:@"="];
         [vars setValue:[list objectAtIndex:1] forKey:[list objectAtIndex:0]];
         //NSLog(@"varlog %@",list);
-        [self log:aMessage];
+        //[self log:aMessage];
+        [self log:@"%@ is %@",[list objectAtIndex:0],[list objectAtIndex:1]];
     } else {
         [self log:aMessage];
     }
@@ -338,6 +394,10 @@ AboutController * aboutcontroller;
     return YES;
 }
 
+//https://medium.com/compileswift/how-to-communicate-with-iframes-inside-webview-2c9c86436edb
+//https://github.com/marcuswestin/WebViewJavascriptBridge
+// https://jerodsanto.net/2010/12/bridging-the-gap-between-javascripts-console-log-and-cocoas-nslog/
+
 - (int) totalbuttonjs
 {
     //NSString* jsString = [NSString stringWithFormat:@"alert('ok');"];
@@ -351,7 +411,7 @@ AboutController * aboutcontroller;
         MyApp.varLog_(\"###Totalpages=\"+items.length);  \
         ";
     [win evaluateWebScript: js];
-    [self log:@"before totoalpage"];
+    //[self log:@"before totoalpage"];
     
     return 10;
     
@@ -376,14 +436,37 @@ AboutController * aboutcontroller;
     js = @"var items =document.getElementsByClassName(\"level level-1 group\"); \
     if(items.length>%d) { \
         var buttons =  items[%d].getElementsByTagName(\"button\"); \
+        var node = buttons[0].getElementsByTagName(\"div\")[0];\
+        MyApp.varLog_(\"###title%d=\"+node.getAttribute(\"title\"));\
         buttons[0].click(); \
-    }    \
+        }    \
     ";
-    js = [NSString stringWithFormat:js,page,page];
+    js = [NSString stringWithFormat:js,page,page,page];
     [win evaluateWebScript: js];
     //NSLog(@"pagebutton %f",p2-p1);
     return 1;
 }
+
+
+- (int) pageiframejs:(int) page
+{
+    //NSString* jsString = [NSString stringWithFormat:@"alert('ok');"];
+    //[webView stringByEvaluatingJavaScriptFromString:jsString];
+    id win = [webView windowScriptObject];
+    NSString* js ;
+    js = @"var items = document.getElementsByTagName(\"iframe\"); \
+            var x = items[1]; \
+            var y = (x.contentWindow || x.contentDocument); \
+            MyApp.consoleLog_('y ');\
+            if (y.document)y = y.document; \
+            var html = y.getElementsByTagName(\"html\")[0];\
+            MyApp.consoleLog_('html doc '+y.innerHTML);\
+            ";
+    [win evaluateWebScript: js];
+    return 1;
+}
+
+
 
 //http://stackoverflow.com/questions/5353278/uiwebviewdelegate-not-monitoring-xmlhttprequest
 #pragma mark - WebPolicyDelegate
@@ -406,22 +489,40 @@ AboutController * aboutcontroller;
     [[webView mainFrame] loadRequest:request];
 }
 
+//save iframe html
 - (void)webView:(WebView *)sender didFinishLoadForFrame:(WebFrame *)frame {
+    //NSURL * url = [[[frame dataSource] request] URL];
+    NSString * url = [[[[frame dataSource] request] URL] absoluteString];
+    NSString * framename = [frame name];
+    if ([framename isEqualToString:@"epub-content"]) {
+        //NSLog(@"Frame %@ %@",[frame name],[url absoluteString]);
+        WebDataSource *source = [frame dataSource];
+        NSData *data = [source data];
+        [webdelegate saveepubfile:url data:data];
+        //NSString *str = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+        if ([box isHidden]) {
+            [box setHidden:false];
+        }
+        //NSLog(@"%@",url);
+    }
+
     if (frame == [sender mainFrame]){
-        NSURL * url = [[[frame dataSource] request] URL];
-        [address setStringValue:[url absoluteString]];
-        //NSLog(@"didFinishLoadForFrame %@",[url absoluteString]);
+        [address setStringValue:url];
         //[self log:@"didFinishLoadForFrame %@"];
      }
    
 }
 
-- (void)webView:(WebView *)sender didReceiveTitle:(NSString *)title forFrame:(WebFrame *)frame
+- (void)webView:(WebView *)sender didReceiveTitle:(NSString *)atitle forFrame:(WebFrame *)frame
 {
     // Report feedback only for the main frame.
-    if (frame == [sender mainFrame]){
+    NSString * framename = [frame name];
+    if ([framename isEqualToString:@"epub-content"]) {
         //[[sender window] setTitle:title];
         //[self log:title];
+        webdelegate.title = atitle;
+        //NSLog(@"%@",atitle);
+        //NSLog(@"%@",atitle);
     }
 }
 

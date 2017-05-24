@@ -1,0 +1,18 @@
+<?xml version="1.0"  encoding="UTF-8"?>
+<package xmlns="http://www.idpf.org/2007/opf" xmlns:dc="http://purl.org/dc/elements/1.1/" unique-identifier="bookid" version="2.0">
+	<metadata xmlns:dc="http://purl.org/dc/elements/1.1/"
+			   xmlns:opf="http://www.idpf.org/2007/opf">
+	   <dc:title>{title}</dc:title> 
+	   <dc:creator>Vitalsource Downloader Mac</dc:creator>
+	   <dc:language>en-US</dc:language> 
+	   <dc:rights/> 
+	   <dc:publisher>ebook-converter.com</dc:publisher> 
+	   <!-- UUID -->
+	   <dc:identifier id="bookid">urn:uuid:{bookid}</dc:identifier>
+	</metadata>		
+	<manifest>
+		<item id="ncx" href="toc.ncx" media-type="application/x-dtbncx+xml"/>{pageidlist}{filelist}
+	</manifest>
+	<spine toc="ncx">{itemreflist}
+	</spine>
+</package>
