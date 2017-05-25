@@ -14,5 +14,7 @@
     mainWin *mainwin;
 }
 
+- (IBAction)aboutbtn:(id)sender;
+
 @end
 

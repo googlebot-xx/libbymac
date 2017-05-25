@@ -8,6 +8,7 @@
 
 #import "AppDelegate.h"
 #import "mainWin.h"
+#import "AboutController.h"
 
 @interface AppDelegate ()
 
@@ -38,6 +39,11 @@
         mainwin = [[mainWin alloc] init];
         
     }
+}
+
+- (IBAction)aboutbtn:(id)sender
+{
+    [aboutcontroller ShowAbout];
 }
 
 @end

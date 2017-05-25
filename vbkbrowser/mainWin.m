@@ -24,8 +24,18 @@ AboutController * aboutcontroller;
 
 @implementation mainWin {
 
+    IBOutlet NSButton * testbtn;
+    IBOutlet id productcaption; // caption in main
+
     IBOutlet NSBox * box;
+    IBOutlet NSButton * downloadbtn;
+    IBOutlet NSTextView *textview;
+    IBOutlet NSTextField *address;
     
+    IBOutlet id buybtn;
+    IBOutlet id helpbtn;
+    IBOutlet id aboutbtn;
+
     int taskindex;
     int totalpage;
     int pageindex;
@@ -102,10 +112,16 @@ AboutController * aboutcontroller;
     [textview setHorizontallyResizable:NO];
     
     [box setHidden:true];
+
+#ifndef DEBUG
+    [testbtn setHidden:true];
+#endif
+    //[downloadbtn setWantsLayer:YES];
+    //downloadbtn.layer.backgroundColor = [NSColor greenColor].CGColor;
     
-    //[convertbtn setWantsLayer:YES];
-    //convertbtn.layer.backgroundColor = [NSColor grayColor].CGColor;
-    //[[convertbtn cell] setBackgroundColor:[NSColor redColor]];
+    //address ed
+    [address setTarget:self];
+    [address setAction:@selector(enterAddress:)];
 
     //[webView setResourceLoadDelegate:self];
     [self setcache];
@@ -146,16 +162,17 @@ AboutController * aboutcontroller;
 //    NSLog(@"start");
 //    [self wait:3];
 //    NSLog(@"end");
-    [webdelegate BuildPub:nil];
-    return;
+    //[webdelegate BuildPub:nil];
+    //return;
     
     NSString * url = [webView mainFrameURL];
     if ([url rangeOfString:@"login"].location != NSNotFound) {
-        [self runjs:nil];
+        [self loginjs:nil];
     } else {
+        [self totalbuttonjs];
         //[self rundownload];
         //[self performSelector: @selector(rundownload) withObject: nil afterDelay: 0.1];
-        [self setWorking:true];
+        //[self setWorking:true];
 
     }
 #ifdef DEBUG
@@ -167,6 +184,7 @@ AboutController * aboutcontroller;
 - (IBAction)downloadbtn:(id)sender
 {
     [self setWorking:true];
+   // [self totalbuttonjs];
 }
 
 - (IBAction)boxclosebtn:(id)sender
@@ -235,6 +253,7 @@ AboutController * aboutcontroller;
         [webdelegate clearurllist];
         totalpage=0;
         pageindex=0;
+        taskindex=0;
         tasktimer = [NSTimer scheduledTimerWithTimeInterval:0.3 target:self selector:@selector(taskhandle:) userInfo:nil repeats:YES];
         [self log:@"Start download, wait ...."];
     } else {
@@ -259,7 +278,7 @@ AboutController * aboutcontroller;
     switch (taskindex) {
         case 0:
             taskindex = [self totalbuttonjs];
-            totalpage= [vars[@"Totalpages"] intValue];
+            //totalpage= [vars[@"Totalpages"] intValue];
             [self log:@"Total pages = %d",totalpage];
             break;
         case 1:
@@ -273,8 +292,8 @@ AboutController * aboutcontroller;
             // Item 3
             webdelegate.ticked =false;
             if (pageindex<totalpage) {
+                [self log:@"load page %d",pageindex+1];
                 [self pagebuttonjs:pageindex]; ////goback page button click
-                [self log:@"load page %d",pageindex];
                 taskindex = 11;
             }
             break;
@@ -284,6 +303,15 @@ AboutController * aboutcontroller;
                 pageindex += 1;
                 taskindex = 10; //goback page button click
             }
+            if (pageindex==totalpage) {
+                taskindex = 20; //goback page button click
+            }
+            break;
+        case 20:
+            // Item 3
+            [self log:@"building epub file ...."];
+            bool b = [webdelegate BuildPub:nil];
+            [self setWorking:false];
             break;
         default:
             break;
@@ -291,11 +319,6 @@ AboutController * aboutcontroller;
 
     if (pageindex>1) {
         //working = false;
-    }
-    if (pageindex==totalpage) {
-        working = false;
-        [theTimer invalidate];
-        [self log:@"end"];
     }
 }
 
@@ -342,7 +365,7 @@ AboutController * aboutcontroller;
     [windowScriptObject setValue:self forKey:@"MyApp"];
 }
 
-- (void) runjs:(id)sender
+- (void) loginjs:(id)sender
 {
     //NSString* jsString = [NSString stringWithFormat:@"alert('ok');"];
     //[webView stringByEvaluatingJavaScriptFromString:jsString];
@@ -352,7 +375,7 @@ AboutController * aboutcontroller;
     
 #ifdef DEBUG
     js = @"console = { log: function(msg) { MyApp.consoleLog_(msg); } };\
-    document.getElementById(\"session_email\").value = \"a02@pwqsoft.com\"; \
+    document.getElementById(\"session_email\").value = \"a01@pwqsoft.com\"; \
     document.getElementById(\"session_password\").value = \"600338qQ~\";  \
     document.getElementById(\"new_session\").submit(); \
     MyApp.consoleLog_(\"login ...\"); \
@@ -372,14 +395,24 @@ AboutController * aboutcontroller;
 - (void)varLog:(NSString *)aMessage {
 //    int i = (int)[aMessage rangeOfString:@"###"].location;
 //    NSLog(@"# pos %d",i);
+    //[self log:aMessage];
     if ([aMessage rangeOfString:@"###"].location == 0) {
         NSString * astr = [aMessage stringByReplacingOccurrencesOfString:@"###" withString:@""];
         //[self log:astr];
         NSArray * list = [astr componentsSeparatedByString:@"="];
-        [vars setValue:[list objectAtIndex:1] forKey:[list objectAtIndex:0]];
+        //[vars setValue:[list objectAtIndex:1] forKey:[list objectAtIndex:0]];
+        if ([aMessage rangeOfString:@"title"].location!= NSNotFound)
+        {
+            [webdelegate savetitle:[list objectAtIndex:1]];
+            [self log:[list objectAtIndex:1]];
+        }
+        else if ([aMessage rangeOfString:@"Totalpages"].location!= NSNotFound)
+        {
+            totalpage= [[list objectAtIndex:1] intValue];
+        }
         //NSLog(@"varlog %@",list);
         //[self log:aMessage];
-        [self log:@"%@ is %@",[list objectAtIndex:0],[list objectAtIndex:1]];
+        //[self log:@"%@ is %@",[list objectAtIndex:0],[list objectAtIndex:1]];
     } else {
         [self log:aMessage];
     }
@@ -403,7 +436,9 @@ AboutController * aboutcontroller;
     //NSString* jsString = [NSString stringWithFormat:@"alert('ok');"];
     //[webView stringByEvaluatingJavaScriptFromString:jsString];
     id win = [webView windowScriptObject];
-    NSString* js = @"document.getElementsByClassName(\"toolbar-button toc-button /img/toc/toc.svg\")[0].click(); \
+    NSString* js = @"var items =document.getElementsByClassName(\"level level-1 group\"); \
+            if (items.length==0) {\
+                document.getElementsByClassName(\"toolbar-button toc-button /img/toc/toc.svg\")[0].click();} \
     ";
     [win evaluateWebScript: js];
     [self wait:0.8];
@@ -466,8 +501,6 @@ AboutController * aboutcontroller;
     return 1;
 }
 
-
-
 //http://stackoverflow.com/questions/5353278/uiwebviewdelegate-not-monitoring-xmlhttprequest
 #pragma mark - WebPolicyDelegate
 
@@ -495,13 +528,23 @@ AboutController * aboutcontroller;
     NSString * url = [[[[frame dataSource] request] URL] absoluteString];
     NSString * framename = [frame name];
     if ([framename isEqualToString:@"epub-content"]) {
-        //NSLog(@"Frame %@ %@",[frame name],[url absoluteString]);
+        //[self log:@"Frame %@",url];
         WebDataSource *source = [frame dataSource];
         NSData *data = [source data];
+        [webdelegate saveurl:url];
         [webdelegate saveepubfile:url data:data];
+        if (working)
+        {
+            [self log:@"save page %d",pageindex+1];
+        }
+        
         //NSString *str = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
         if ([box isHidden]) {
             [box setHidden:false];
+            [[textview.textStorage mutableString] setString:@""];
+
+            //[self log:@"ebook ready to download, click download button, \r%@",webdelegate.title];
+            [self log:@"ebook ready to download, click download button, \r"];
         }
         //NSLog(@"%@",url);
     }
@@ -517,11 +560,8 @@ AboutController * aboutcontroller;
 {
     // Report feedback only for the main frame.
     NSString * framename = [frame name];
-    if ([framename isEqualToString:@"epub-content"]) {
-        //[[sender window] setTitle:title];
-        //[self log:title];
-        webdelegate.title = atitle;
-        //NSLog(@"%@",atitle);
+    if (pageindex==0 && [framename isEqualToString:@"epub-content"]) {
+        //webdelegate.title = atitle;
         //NSLog(@"%@",atitle);
     }
 }
@@ -541,5 +581,51 @@ AboutController * aboutcontroller;
     }
     return true;
 }
+
+#pragma mark - Browser
+//https://stackoverflow.com/questions/995758/execute-an-action-when-the-enter-key-is-pressed-in-a-nstextfield
+- (void)enterAddress:(id)sender
+{
+    // do something interesting when the user hits <enter> in the text field
+    NSString * aurl = [address stringValue];
+    if ([aurl rangeOfString:@"http://"].location == NSNotFound)
+    {
+        aurl = [NSString stringWithFormat:@"http://%@",aurl];
+    }
+    [[webView mainFrame] loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:aurl]]];
+    
+}
+
+- (IBAction)gobtnclick:(id)sender
+{
+    [self enterAddress:nil];
+}
+
+- (IBAction)backbtnclick:(id)sender
+{
+    [webView goBack:nil];
+}
+
+- (IBAction)forwardbtnclick:(id)sender
+{
+    [webView goForward:nil];
+}
+
+#pragma mark - buy button
+- (IBAction)aboutbtn:(id)sender
+{
+    [aboutcontroller ShowAbout];
+}
+
+- (IBAction)gohome:(id)sender
+{
+    [[NSWorkspace sharedWorkspace] openURL: [NSURL URLWithString:c_home]];
+}
+
+- (IBAction)buynowurl:(id)sender
+{
+    [[NSWorkspace sharedWorkspace] openURL: [NSURL URLWithString:c_order]];
+}
+
 
 @end

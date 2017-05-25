@@ -22,7 +22,7 @@
     if (self) {
         //aboutcontroller = [[AboutController alloc] initWithWindowNibName:@"AboutController"];
         urllist = [[NSMutableArray alloc] init];
-        pagelist = [[NSMutableArray alloc] init];
+        titlelist = [[NSMutableArray alloc] init];
         timer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(timerFired:) userInfo:nil repeats:YES];
         title = @"test epub";
         //_mainwin = self;
@@ -48,6 +48,7 @@
 - (void) clearurllist
 {
     [urllist removeAllObjects];
+    [titlelist removeAllObjects];
 }
 
 - (id)webView:(WebView *)sender identifierForInitialRequest:(NSURLRequest *)request
@@ -117,6 +118,24 @@ fromDataSource:(WebDataSource *)dataSource
 //OEBPS https://jigsaw.vitalsource.com/books/9781506301587DEMO/epub/OEBPS/images/pg133.jpg
 //OEBPS https://jigsaw.vitalsource.com/books/9781506301587DEMO/epub/OEBPS/images/pg141.jpg
 
+
+- (void) saveurl: (NSString *)url
+{
+    if (_mainwin.working && [url rangeOfString:@"xhtm"].location != NSNotFound) {
+        [urllist addObject:url];
+        NSLog(@"save url %@",url);
+    }
+}
+
+- (void) savetitle: (NSString *)atitle
+{
+    if (_mainwin.working) {
+        [titlelist addObject:atitle];
+        NSLog(@"save title %@",atitle);
+    }
+}
+
+
 - (void) saveepubfile: (NSString *)url data:(NSData *)data
 {
     //NSArray * urllist = [self urlsplit:url];
@@ -127,12 +146,6 @@ fromDataSource:(WebDataSource *)dataSource
     
     NSURLComponents *urlComponents = [NSURLComponents componentsWithString:url];
     NSString * path = urlComponents.path;
-    
-    if (_mainwin.working && [path rangeOfString:@"xhtm"].location != NSNotFound) {
-        NSLog(@"%@",url);
-        [urllist addObject:url];
-    }
-
     path = [path stringByReplacingOccurrencesOfString:@"/books/" withString:@"/"]; //remove /books/ in path
     NSString * fname = [_mainwin.datadir stringByAppendingPathComponent:path];
     //path = [[fname lastPathComponent] stringByDeletingPathExtension];
@@ -173,10 +186,6 @@ fromDataSource:(WebDataSource *)dataSource
         s1 = [url substringWithRange:r1];
     }
     
-    if (_mainwin.working && [path rangeOfString:@"xhtm"].location != NSNotFound) {
-        NSLog(@"%@",url);
-        [urllist addObject:url];
-    }
     
     path = [path stringByReplacingOccurrencesOfString:@"/books/" withString:@"/"]; //remove /books/ in path
     path = [path stringByReplacingOccurrencesOfString:@"/OEBPS/" withString:@"/"]; //remove /books/ in path
@@ -360,6 +369,8 @@ fromDataSource:(WebDataSource *)dataSource
         //NSLog(@"%@",fname);
         NSString * scfi = [[fname lastPathComponent] stringByDeletingPathExtension];
         scfi = [scfi stringByDeletingPathExtension];
+        if ([titlelist count]>i)
+            scfi = [titlelist objectAtIndex:i];
         //NSLog(@"%@",scfi);
         nvpoint= [NSString stringWithFormat:@"%@\r\t\t<navPoint id=\"navpoint%d\" playOrder=\"%d\">",nvpoint,i+1,i+1];
         nvpoint= [NSString stringWithFormat:@"%@\r\t\t<navLabel>",nvpoint];
@@ -376,28 +387,32 @@ fromDataSource:(WebDataSource *)dataSource
 }
 
 
-- (void) BuildPub:(NSString *) afile
+- (bool) BuildPub:(NSString *) afile
 {
-    [urllist addObject:@"https://jigsaw.vitalsource.com/books/9781506301587DEMO/epub/OEBPS/cover.xlink.xhtml#cfi=/6/2"];
-    [urllist addObject:@"https://jigsaw.vitalsource.com/books/9781506301587DEMO/epub/OEBPS/ch0001.xlink.xhtml#cfi=/6/4%5B;vnd.vst.idref=ch0001%5D"];
-    [urllist addObject:@"https://jigsaw.vitalsource.com/books/9781506301587DEMO/epub/OEBPS/ch0005.xlink.xhtml#cfi=/6/6%5B;vnd.vst.idref=ch0005%5D"];
+//    [urllist addObject:@"https://jigsaw.vitalsource.com/books/9781506301587DEMO/epub/OEBPS/cover.xlink.xhtml#cfi=/6/2"];
+//    [urllist addObject:@"https://jigsaw.vitalsource.com/books/9781506301587DEMO/epub/OEBPS/ch0001.xlink.xhtml#cfi=/6/4%5B;vnd.vst.idref=ch0001%5D"];
+//    [urllist addObject:@"https://jigsaw.vitalsource.com/books/9781506301587DEMO/epub/OEBPS/ch0005.xlink.xhtml#cfi=/6/6%5B;vnd.vst.idref=ch0005%5D"];
+    
+    title = [titlelist objectAtIndex:0];
     NSString * idpath = [self getepubfolder:[urllist objectAtIndex:0]];
     NSString * dir = [_mainwin.datadir stringByAppendingPathComponent:idpath];
 
-    NSLog(@"%@",dir);
-    //[self CopyMETAINF:dir];
-    //[self ContentOPF:dir];
-    //[self TocNcx:dir];
-    [self zipePub:dir];
+    //NSLog(@"%@",dir);
+    [self CopyMETAINF:dir];
+    [self ContentOPF:dir];
+    [self TocNcx:dir];
+    return [self zipePub:dir];
 }
 
-- (void) zipePub:(NSString *) path
+- (bool) zipePub:(NSString *) path
 {
-    NSString * fname = [NSString stringWithFormat:@"%@/%@.epub",_mainwin.ebookdir,title];
-    NSLog(@"%@",fname);
+    NSString * fname = [self cleanfilename:title];
+    epubfile = [NSString stringWithFormat:@"%@/%@.epub",_mainwin.ebookdir,fname];
+    //NSLog(@"%@",fname);
     //SSZipArchive *archiver = [[SSZipArchive alloc] init];
-    BOOL success = [SSZipArchive createZipFileAtPath:fname
+    BOOL success = [SSZipArchive createZipFileAtPath:epubfile
                              withContentsOfDirectory:path];
+    return success;
 
 }
 
@@ -419,6 +434,16 @@ fromDataSource:(WebDataSource *)dataSource
     } else {
         return [str length]-range.location-[substr length]+1;
     }
+}
+
+- (NSString *) cleanfilename: (NSString *) str
+{
+    NSString * fname = [str stringByReplacingOccurrencesOfString:@":" withString:@""];
+    fname = [fname stringByReplacingOccurrencesOfString:@"[" withString:@""];
+    fname = [fname stringByReplacingOccurrencesOfString:@"]" withString:@""];
+    fname = [fname stringByReplacingOccurrencesOfString:@"?" withString:@""];
+    fname = [fname stringByReplacingOccurrencesOfString:@"," withString:@""];
+    return fname;
 }
 
 - (NSArray *) strsplit: (NSString *) str

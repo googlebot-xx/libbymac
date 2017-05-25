@@ -16,16 +16,9 @@
 
 @interface mainWin : NSWindowController <WebPolicyDelegate,WebFrameLoadDelegate>
 {
-    IBOutlet NSButton * convertbtn;
-    IBOutlet id productcaption; // caption in main
     
     IBOutlet WebView * webView;
-    IBOutlet NSTextView *textview;
-    IBOutlet NSTextField *address;
     
-    IBOutlet id buybtn;
-    IBOutlet id helpbtn;
-    IBOutlet id aboutbtn;
     
     NSString* datadir;
     NSString* cachedir;

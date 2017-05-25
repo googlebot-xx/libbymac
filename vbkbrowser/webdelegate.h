@@ -12,18 +12,22 @@
 @interface WebDelegate : NSObject <WebResourceLoadDelegate>
 {
     NSMutableArray * urllist;
-    NSMutableArray * pagelist;
+    NSMutableArray * titlelist;
     NSTimer *timer;
     int tick;
     
     NSString * title;
+    NSString * epubfile;
 }
 
 - (void) saveepubfile: (NSString *)url data:(NSData *)data;
 - (void) clearurllist;
-- (void) BuildPub:(NSString *) afile;
+- (void) saveurl: (NSString *)url;
+- (void) savetitle: (NSString *)atitle;
+- (bool) BuildPub:(NSString *) afile;
 
 @property (nonatomic, assign) int tick;
 @property (nonatomic, assign) BOOL ticked;
 @property (nonatomic, retain) NSString* title;
+@property (nonatomic, retain) NSString* epubfile;
 @end
