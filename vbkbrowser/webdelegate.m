@@ -5,16 +5,19 @@
 //  Created by aa on 2017-05-15.
 //  Copyright © 2017 ebookconverter. All rights reserved.
 //
-
+#import <Quartz/Quartz.h>
 #import "webdelegate.h"
 #import "mainWin.h"
 #import "ZipArchive.h"
 
-@implementation WebDelegate
+@implementation WebDelegate {
+    NSString * ebookid;
+}
 
 @synthesize tick;
 @synthesize ticked;
 @synthesize title;
+@synthesize ebooktype;
 
 - (id)init
 {
@@ -25,6 +28,7 @@
         titlelist = [[NSMutableArray alloc] init];
         timer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(timerFired:) userInfo:nil repeats:YES];
         title = @"test epub";
+        ebooktype = 0;
         //_mainwin = self;
     }
     
@@ -33,13 +37,16 @@
 
 - (void)timerFired:(NSTimer*)theTimer
 {
-    tick += 1;
+    if (ticked)
+        tick =0;
+    else
+        tick += 1;
+
     if (tick>6) {
         if (_mainwin.working) {
             //NSLog(@"tick %d",tick);
         }
         ticked = true;
-        tick = 0;
     }
 }
 
@@ -69,18 +76,22 @@ fromDataSource:(WebDataSource *)dataSource
     tick = 0;
     ticked = false;
     bool isbook = false;
-    //NSLog(@"didFinishDataSource %d %@ ",tick,url);
+//    NSLog(@"didFinishDataSource %d %@ ",tick,url);
 //    if ([self PosRight:url substr:@"pages"]==1) {
 //        [_mainwin log:url];
 //        //NSLog(@"didFinishDataSource %d %@ ",tick,url);
 //        isbook = true;
 //    }
 
-    if ([url rangeOfString:@"/epub/OEBPS/"].location != NSNotFound) {
+// https://jigsaw.vitalsource.com/books/9781446297650DEMO/images/553246736447566b5831394d716d784c79356d55547130716a5a672b4c70644e2b6b4b7630424e4a5261453d0a/encrypted/1600
+//    if ([url rangeOfString:@"/epub/OEBPS/"].location != NSNotFound) {
+    NSString * path = [self urltopath:url];
+    if ([path rangeOfString:@"/books/"].location == 0) {
         isbook = true;
     }
     
     if (isbook) {
+        //NSLog(@"didFinishDataSource %d %@ ",tick,url);
         NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys: identifier, @"url", dataSource, @"dataSource", nil];
         [self performSelector: @selector(reallyDidFinishLoading:) withObject: dict afterDelay: 0.1];
     }
@@ -112,6 +123,13 @@ fromDataSource:(WebDataSource *)dataSource
     //NSString *str = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
     [self saveepubfile:s1 data:data];
     tick = 0;
+    
+    //pdf ebook next page
+    if (_mainwin.working && [s1 rangeOfString:@"/encrypted/1600"].location!=NSNotFound ) {
+        [self saveurl:s1];
+        //NSLog(@"%@",s1);
+        ticked = true;
+    }
     //[_mainwin log:str];
 }
 
@@ -121,7 +139,8 @@ fromDataSource:(WebDataSource *)dataSource
 
 - (void) saveurl: (NSString *)url
 {
-    if (_mainwin.working && [url rangeOfString:@"xhtm"].location != NSNotFound) {
+    //if (_mainwin.working && [url rangeOfString:@"xhtm"].location != NSNotFound) {
+    if (_mainwin.working) {
         [urllist addObject:url];
         NSLog(@"save url %@",url);
     }
@@ -135,6 +154,8 @@ fromDataSource:(WebDataSource *)dataSource
     }
 }
 
+//OEBPS https://jigsaw.vitalsource.com/books/9781506301587DEMO/epub/OEBPS/images/pg141.jpg
+//pbk https://jigsaw.vitalsource.com/books/9780826904942/pages/300737558/content#cfi=/9
 
 - (void) saveepubfile: (NSString *)url data:(NSData *)data
 {
@@ -142,12 +163,24 @@ fromDataSource:(WebDataSource *)dataSource
     //NSMutableArray *pathlist= [self cleanpathlist:urllist];
     //NSFileManager *fileManager = [NSFileManager defaultManager];
     //NSLog(@"%@",pathlist);
-    //NSLog(@"OEBPS %@",url);
+    //NSLog(@"savefile %@",url);
     
     NSURLComponents *urlComponents = [NSURLComponents componentsWithString:url];
     NSString * path = urlComponents.path;
-    path = [path stringByReplacingOccurrencesOfString:@"/books/" withString:@"/"]; //remove /books/ in path
-    NSString * fname = [_mainwin.datadir stringByAppendingPathComponent:path];
+    NSString *bookid = [self getbookid:path];
+    
+    if (!bookid) return;  //no bookid no save
+    
+    bool isepub = [path rangeOfString:@"/epub/OEBPS/"].location!=NSNotFound;
+
+    NSString * fname;
+    if  (isepub) {
+        path = [path stringByReplacingOccurrencesOfString:@"/books/" withString:@"/"]; //remove /books/ in path
+        fname = [_mainwin.datadir stringByAppendingPathComponent:path];
+    } else {
+        fname = [_mainwin.datadir stringByAppendingPathComponent:bookid];
+        fname = [fname stringByAppendingPathComponent:path];
+    }
     //path = [[fname lastPathComponent] stringByDeletingPathExtension];
     path = [fname stringByDeletingLastPathComponent];
     [self createfolder:path];
@@ -200,29 +233,6 @@ fromDataSource:(WebDataSource *)dataSource
     return @"";
 }
 
-// /books/9781506301587DEMO/epub/OEBPS/cover.xlink.xhtml ==> /OEBPS/cover.xlink.xhtml
-//NSArray* comps = [path pathComponents];
-- (NSString*) getpagepath: (NSString *) url
-{
-    NSString * s1=@"" ;
-    NSString * s2=@"/epub/OEBPS/";
-    NSRange r1 = [url rangeOfString:s2];
-    if (r1.location != NSNotFound) {
-        r1.location = r1.location+[s2 length];
-        r1.length = [url length]-r1.location;
-        s1 = [url substringWithRange:r1];
-    }
-    return s1;
-}
-
-- (NSString*) urltopath: (NSString *) url
-{
-    url = [url stringByReplacingOccurrencesOfString:@"html#" withString:@"html?"];
-    NSURLComponents *urlComponents = [NSURLComponents componentsWithString:url];
-    NSString * fname = urlComponents.path;
-    
-    return fname;
-}
 
 - (NSString*) getmimetype: (NSString *) ext
 {
@@ -416,7 +426,89 @@ fromDataSource:(WebDataSource *)dataSource
 
 }
 
+#pragma mark - build pdf
+/// VitalSource Downloader/tmp/43857938579demo/
+- (NSString *) getpdftmpfolder: (NSString *) url
+{
+    NSString * path;
+    NSString * s1 = [self urltopath:url];
+    ebookid = [self getbookid:s1] ;
+    path = [_mainwin.datadir stringByAppendingPathComponent:ebookid];
+    //path = [path stringByAppendingPathComponent:@""];
+    
+    return path;
+}
+
+- (bool) Buildpdf:(NSString *) afile
+{
+//        [urllist addObject:@"https://jigsaw.vitalsource.com/books/9781446297650DEMO/images/553246736447566b58312f6a624d4f4747432b504e674f7473614c397473465736735567315635486a446f3d0a/encrypted/1600"];
+//        [urllist addObject:@"https://jigsaw.vitalsource.com/books/9781446297650DEMO/images/553246736447566b583138496e4237495553664c6c335736426b6e54387236615a6b7662463358596c4b773d0a/encrypted/1600"];
+//        [urllist addObject:@"https://jigsaw.vitalsource.com/books/9781446297650DEMO/images/553246736447566b58312b756244794e2f4550664641416137476b486d796e7a4f61734543754f5a4737673d0a/encrypted/1600"];
+    
+    //title = [titlelist objectAtIndex:0];
+    NSString * dir = [self getpdftmpfolder:[urllist objectAtIndex:0]];
+    //NSString * dir = [_mainwin.datadir stringByAppendingPathComponent:idpath];
+    
+    NSLog(@"%@",dir);
+    
+    PDFDocument *pdf = [[PDFDocument alloc] init];
+    //NSImage * img = scaledImage;
+    
+    for (NSString *url in urllist) {
+        
+        NSString * path = [self urltopath:url];
+        path = [dir stringByAppendingPathComponent:path];
+        //NSLog(@"%@", path);
+        
+        NSFileManager *fileManager = [NSFileManager defaultManager];
+        
+        if (![fileManager fileExistsAtPath:path])
+            continue;
+        
+        NSImage *img = [[NSImage alloc]initWithContentsOfFile:path];
+        
+        PDFPage * page;
+        
+        page = [[PDFPage alloc] init];
+        [page initWithImage: (NSImage *) img];
+        [pdf insertPage: page atIndex: [pdf pageCount]];
+        
+        //[page release];
+        //[img release];
+    }
+    NSString * fname = [NSString stringWithFormat:@"%@.pdf",ebookid];
+    fname = [_mainwin.ebookdir stringByAppendingPathComponent:fname];
+    
+   	[pdf writeToFile:  fname];
+    //[pdf release];
+    return true;
+}
+
 #pragma mark - tools
+
+// /books/9781506301587DEMO/epub/OEBPS/cover.xlink.xhtml ==> /OEBPS/cover.xlink.xhtml
+//NSArray* comps = [path pathComponents];
+- (NSString*) getpagepath: (NSString *) url
+{
+    NSString * s1=@"" ;
+    NSString * s2=@"/epub/OEBPS/";
+    NSRange r1 = [url rangeOfString:s2];
+    if (r1.location != NSNotFound) {
+        r1.location = r1.location+[s2 length];
+        r1.length = [url length]-r1.location;
+        s1 = [url substringWithRange:r1];
+    }
+    return s1;
+}
+
+- (NSString*) urltopath: (NSString *) url
+{
+    url = [url stringByReplacingOccurrencesOfString:@"html#" withString:@"html?"];
+    NSURLComponents *urlComponents = [NSURLComponents componentsWithString:url];
+    NSString * fname = urlComponents.path;
+    
+    return fname;
+}
 
 - (NSString *) urldecode: (NSURLRequest *) request
 {
@@ -485,6 +577,23 @@ fromDataSource:(WebDataSource *)dataSource
     //NSString * astr;
     //NSArray * list = [astr componentsSeparatedByString:@"="];
     return list;
+}
+
+//   /api/v0/books/9781506301587DEMO/pages
+- (NSString *) getbookid: (NSString *) path
+{
+    NSArray * list = [path componentsSeparatedByString:@"/"];
+    
+    for (int i=0; i<[list count]; i++) {
+        NSString * s1 = [list objectAtIndex:i];
+        if ([s1 isEqualToString:@"books"] && [list count]>i)
+            return [list objectAtIndex:i+1];
+        
+    }
+    //   /api/v0/books/9781506301587DEMO/pages
+    //NSString * astr;
+    //NSArray * list = [astr componentsSeparatedByString:@"="];
+    return nil;
 }
 
 - (BOOL) createfolder: (NSString*) folder
