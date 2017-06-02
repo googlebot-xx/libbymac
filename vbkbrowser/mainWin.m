@@ -52,6 +52,7 @@ AboutController * aboutcontroller;
 @synthesize working;
 @synthesize datadir;
 @synthesize ebookdir;
+@synthesize outputfile;
 
 
 - (id)init
@@ -181,7 +182,7 @@ AboutController * aboutcontroller;
         [self loginjs:nil];
     } else {
         //[self totalbuttonjs];
-        [self nextbuttonjs];
+        [self checknextbutton];
         
         //[self rundownload];
         //[self performSelector: @selector(rundownload) withObject: nil afterDelay: 0.1];
@@ -280,7 +281,7 @@ AboutController * aboutcontroller;
     } else {
         working = false;
         [tasktimer invalidate];
-        [self log:@"end"];
+        [self log:@"download end"];
         [downloadbtn setTitle:@"Download"];
     }
     //NSLog(@"working %d",aworking);
@@ -334,6 +335,7 @@ AboutController * aboutcontroller;
             [self log:@"building epub file ...."];
             bool b = [webdelegate BuildPub:nil];
             [self setWorking:false];
+            [self openoutputfile];
             break;
         default:
             break;
@@ -357,9 +359,9 @@ AboutController * aboutcontroller;
 {
     if ([vars objectForKey:key]) {
         // contains object
-        return 1;
+        return [[vars objectForKey:key] intValue];
     }
-    return 0;
+    return -1;
 }
 
 #pragma mark - javasript
@@ -444,7 +446,7 @@ AboutController * aboutcontroller;
         NSString * astr = [aMessage stringByReplacingOccurrencesOfString:@"###" withString:@""];
         //[self log:astr];
         NSArray * list = [astr componentsSeparatedByString:@"="];
-        //[vars setValue:[list objectAtIndex:1] forKey:[list objectAtIndex:0]];
+        [vars setValue:[list objectAtIndex:1] forKey:[list objectAtIndex:0]];
         if ([aMessage rangeOfString:@"title"].location!= NSNotFound)
         {
             [webdelegate savetitle:[list objectAtIndex:1]];
@@ -587,8 +589,11 @@ AboutController * aboutcontroller;
             if( webdelegate.ticked ){
                 pageindex += 1;
                 taskindex = 0; //goback page button click
-                if (webdelegate.tick>6) {
-                    taskindex = 20; //goback page button click
+                if (webdelegate.tick>c_timeout) {
+                    [self checknextbutton];
+                    if ([self checkdictkey:@"nextvisible"] != 1) {
+                        taskindex = 20;
+                    }
                 }
             }
             if (pageindex>9999) {
@@ -600,6 +605,7 @@ AboutController * aboutcontroller;
             [self log:@"building pdf file ...."];
             bool b = [webdelegate Buildpdf:nil];
             [self setWorking:false];
+            [self openoutputfile];
             break;
         default:
             break;
@@ -622,6 +628,39 @@ AboutController * aboutcontroller;
     return 10;
 }
 
+- (int) checknextbutton
+{
+    //NSString* jsString = [NSString stringWithFormat:@"alert('ok');"];
+    //[webView stringByEvaluatingJavaScriptFromString:jsString];
+    id win = [webView windowScriptObject];
+    [win setValue:self forKey:@"MyApp"];
+    NSString* js = @"var items =document.getElementsByClassName(\"navigation-button noButton horizontal-button next-button\"); \
+    if (items.length>0) {\
+        MyApp.varLog_(\"###nextvisible=1\");\
+    } else \
+    MyApp.varLog_(\"###nextvisible=0\"); \
+    ";
+    [win evaluateWebScript: js];
+    
+    return 10;
+}
+
+- (int) openoutputfile
+{
+    if (!outputfile) return 0;
+    [self log:outputfile];
+    
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    
+    if (![fileManager fileExistsAtPath:outputfile])
+        return 0;
+   
+    [[NSWorkspace sharedWorkspace] openURL:[NSURL fileURLWithPath:outputfile]];
+    [self log:@""];
+    [self log:@"done"];
+
+    return 0;
+}
 //http://stackoverflow.com/questions/5353278/uiwebviewdelegate-not-monitoring-xmlhttprequest
 #pragma mark - WebPolicyDelegate
 

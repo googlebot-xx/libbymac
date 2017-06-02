@@ -42,7 +42,7 @@
     else
         tick += 1;
 
-    if (tick>6) {
+    if (tick>c_timeout) {
         if (_mainwin.working) {
             //NSLog(@"tick %d",tick);
         }
@@ -402,7 +402,8 @@ fromDataSource:(WebDataSource *)dataSource
 //    [urllist addObject:@"https://jigsaw.vitalsource.com/books/9781506301587DEMO/epub/OEBPS/cover.xlink.xhtml#cfi=/6/2"];
 //    [urllist addObject:@"https://jigsaw.vitalsource.com/books/9781506301587DEMO/epub/OEBPS/ch0001.xlink.xhtml#cfi=/6/4%5B;vnd.vst.idref=ch0001%5D"];
 //    [urllist addObject:@"https://jigsaw.vitalsource.com/books/9781506301587DEMO/epub/OEBPS/ch0005.xlink.xhtml#cfi=/6/6%5B;vnd.vst.idref=ch0005%5D"];
-    
+    _mainwin.outputfile = nil;
+
     title = [titlelist objectAtIndex:0];
     NSString * idpath = [self getepubfolder:[urllist objectAtIndex:0]];
     NSString * dir = [_mainwin.datadir stringByAppendingPathComponent:idpath];
@@ -422,6 +423,7 @@ fromDataSource:(WebDataSource *)dataSource
     //SSZipArchive *archiver = [[SSZipArchive alloc] init];
     BOOL success = [SSZipArchive createZipFileAtPath:epubfile
                              withContentsOfDirectory:path];
+    _mainwin.outputfile = epubfile;
     return success;
 
 }
@@ -449,8 +451,9 @@ fromDataSource:(WebDataSource *)dataSource
     NSString * dir = [self getpdftmpfolder:[urllist objectAtIndex:0]];
     //NSString * dir = [_mainwin.datadir stringByAppendingPathComponent:idpath];
     
-    NSLog(@"%@",dir);
-    
+    //NSLog(@"%@",dir);
+    _mainwin.outputfile = nil;
+
     PDFDocument *pdf = [[PDFDocument alloc] init];
     //NSImage * img = scaledImage;
     
@@ -480,6 +483,7 @@ fromDataSource:(WebDataSource *)dataSource
     fname = [_mainwin.ebookdir stringByAppendingPathComponent:fname];
     
    	[pdf writeToFile:  fname];
+    _mainwin.outputfile = fname;
     //[pdf release];
     return true;
 }
