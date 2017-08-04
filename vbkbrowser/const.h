@@ -15,15 +15,16 @@
 #define c_lib @"Library"
 #define c_app @"VitalSource Downloader"
 #define c_product @"VitalSource Downloader"
-#define c_self @"VitalSources   Converter"
-#define c_order @"http://www.ebook-converter.com/download/order.php?id=48"
-#define c_home @"http://www.ebook-converter.com"
-#define c_web @"http://www.ebook-converter.com"
-#define c_active @"http://www.ebook-converter.com/activemac.php?id="
+#define c_self @"VitalSource Downloader"
+#define c_order @"http://www.ebook-converter.com/download/order.php?id=46"
+#define c_home @"https://www.ebook-converter.com/download/help.php?id=46"
+#define c_web @"https://www.ebook-converter.com"
+//#define c_active @"http://www.ebook-converter.com/download/activemac.php?id=%@&pid=%@"
+#define c_active @"https://www.ebook-converter.com/download/activevsprinter.php?id=%@&pid=%@"
 #define c_str @"vistaldownload"
-#define c_pid @"48"
+#define c_pid @"46"
 #define c_times 12
 
-
-#define c_seed @"vitaldownloadmac"
+//e17942a289d95a5f
+#define c_seed @"vitaldownmac"
 //com.vitalsource.bookshelf

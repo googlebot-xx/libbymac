@@ -7,6 +7,8 @@
 //
 #import <Quartz/Quartz.h>
 #import "webdelegate.h"
+#import "BuyController.h"
+#import "const.h"
 #import "mainWin.h"
 #import "ZipArchive.h"
 
@@ -142,7 +144,7 @@ fromDataSource:(WebDataSource *)dataSource
     //if (_mainwin.working && [url rangeOfString:@"xhtm"].location != NSNotFound) {
     if (_mainwin.working) {
         [urllist addObject:url];
-        NSLog(@"save url %@",url);
+        //NSLog(@"save url %@",url);
     }
 }
 
@@ -150,7 +152,7 @@ fromDataSource:(WebDataSource *)dataSource
 {
     if (_mainwin.working) {
         [titlelist addObject:atitle];
-        NSLog(@"save title %@",atitle);
+        //NSLog(@"save title %@",atitle);
     }
 }
 
@@ -371,11 +373,14 @@ fromDataSource:(WebDataSource *)dataSource
     NSData *data = [NSData dataWithContentsOfFile:filePath];
     NSString *opfstr = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
 
+    NSString *demofile = [[NSBundle mainBundle] pathForResource:@"instru" ofType:@"xhtml"];
+    NSData *demodata = [NSData dataWithContentsOfFile:demofile];
+
     NSString * nvpoint=@"";
     for (int i=0; i<[urllist count];i++){
         NSString * url = [urllist objectAtIndex:i];
-        NSString * fname = [self urltopath:url];
-        fname = [self getpagepath:fname] ;
+        NSString * fpath = [self urltopath:url];
+        NSString * fname = [self getpagepath:fpath] ;
         //NSLog(@"%@",fname);
         NSString * scfi = [[fname lastPathComponent] stringByDeletingPathExtension];
         scfi = [scfi stringByDeletingPathExtension];
@@ -388,6 +393,22 @@ fromDataSource:(WebDataSource *)dataSource
         nvpoint= [NSString stringWithFormat:@"%@\r\t\t</navLabel>",nvpoint];
         nvpoint= [NSString stringWithFormat:@"%@\r\t\t<content src=\"%@\"/>",nvpoint,fname];
         nvpoint= [NSString stringWithFormat:@"%@\r\t\t</navPoint>",nvpoint];
+        
+        if (![reg isreg])
+        {
+            int j = i % 2;
+            if (i>2 && j==0) { //copy demo page from 4
+            //if (true) { //copy demo page from 4
+                NSString * epubdemo = [fpath stringByReplacingOccurrencesOfString:@"/books/" withString:@"/"];
+                epubdemo = [_mainwin.datadir stringByAppendingPathComponent:epubdemo];
+
+                //NSString * epubfile = [fpath stringByAppendingPathComponent:@""];
+
+                //NSLog(@"%@",epubfile);
+                [demodata writeToFile:epubdemo atomically:YES];
+            
+            }
+        }
     }
     opfstr = [opfstr stringByReplacingOccurrencesOfString:@"{navPoint}" withString:nvpoint];
 
@@ -404,7 +425,9 @@ fromDataSource:(WebDataSource *)dataSource
 //    [urllist addObject:@"https://jigsaw.vitalsource.com/books/9781506301587DEMO/epub/OEBPS/ch0005.xlink.xhtml#cfi=/6/6%5B;vnd.vst.idref=ch0005%5D"];
     _mainwin.outputfile = nil;
 
-    title = [titlelist objectAtIndex:0];
+    if ([titlelist count]>0) {
+        title = [titlelist objectAtIndex:0];
+    }
     NSString * idpath = [self getepubfolder:[urllist objectAtIndex:0]];
     NSString * dir = [_mainwin.datadir stringByAppendingPathComponent:idpath];
 
@@ -413,12 +436,14 @@ fromDataSource:(WebDataSource *)dataSource
     [self ContentOPF:dir];
     [self TocNcx:dir];
     return [self zipePub:dir];
+    //return true;
 }
 
 - (bool) zipePub:(NSString *) path
 {
     NSString * fname = [self cleanfilename:title];
     epubfile = [NSString stringWithFormat:@"%@/%@.epub",_mainwin.ebookdir,fname];
+    
     //NSLog(@"%@",fname);
     //SSZipArchive *archiver = [[SSZipArchive alloc] init];
     BOOL success = [SSZipArchive createZipFileAtPath:epubfile
@@ -470,6 +495,9 @@ fromDataSource:(WebDataSource *)dataSource
         
         NSImage *img = [[NSImage alloc]initWithContentsOfFile:path];
         
+        if (![reg isreg])
+            [self drawtext:img];
+        
         PDFPage * page;
         
         page = [[PDFPage alloc] init];
@@ -487,6 +515,32 @@ fromDataSource:(WebDataSource *)dataSource
     //[pdf release];
     return true;
 }
+
+- (void)drawtext: (NSImage *) scaledImage
+{
+    [scaledImage lockFocus];
+    //	NSColor *color = [NSColor redColor];
+    // THESE DOESN'T SEEM TO WORK...
+    //	[color set];
+    //	[color setStroke];
+    //	[color setFill];
+    NSFont *slFont = [[NSFontManager
+                       sharedFontManager]
+                      fontWithFamily:@"Courier"
+                      traits:NSBoldFontMask
+                      weight:35 size:35.0];
+    NSDictionary *attr = [NSDictionary dictionaryWithObjectsAndKeys:
+                          slFont, NSFontAttributeName,
+                          [NSColor redColor], NSForegroundColorAttributeName,
+                          nil ];
+    
+    int y = [scaledImage size].height/2;
+    NSString *string = [NSString stringWithFormat:@"%@ demo version\n%@", c_product,c_home];
+    [string drawAtPoint:NSMakePoint(10,y) withAttributes:attr];
+    //[attr release];
+    [scaledImage unlockFocus];
+}
+
 
 #pragma mark - tools
 

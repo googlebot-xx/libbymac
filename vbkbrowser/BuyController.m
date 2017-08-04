@@ -131,19 +131,19 @@ RegController * regcontroller;
    
     //	[self closewintomain:nil];
 	NSString * s ;
-	s = @"You can try %d ebooks in demo version, %d left.\n\n"
+	s = @"You can try download Vitalsource ebook in demo version, it has limitation that not all pages show.\n\n"
     "if you would like to get the full version, please click 'Buy now' button.";
 
 #ifdef PAGE1
 	//s = @"You can decrypt %d ebooks in demo version, %d left.\n\n"
     //"if you would like to get the full version, please click 'Buy now' button.";
 #endif
-    int nday = c_times-times;
-    if (nday<0) {
-        nday = 0;
-    }
+//    int nday =  c_times-times;
+//    if (nday<0) {
+//        nday = 0;
+//    }
     
-	NSString *s1 = [NSString stringWithFormat:s,c_times,nday];
+	NSString *s1 = [NSString stringWithFormat:s];
 	
 	[timeslabel setStringValue:s1];
     

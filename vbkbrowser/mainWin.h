@@ -14,6 +14,7 @@
 
 @class BuyController;
 @class AboutController;
+@class RegController;
 
 @interface mainWin : NSWindowController <WebPolicyDelegate,WebFrameLoadDelegate>
 {
@@ -48,3 +49,4 @@
 extern mainWin * _mainwin;
 extern BuyController *reg;
 extern AboutController * aboutcontroller;
+//extern RegController * regcontroller;

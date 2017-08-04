@@ -5,12 +5,14 @@
 //  Created by aa on 2017-05-09.
 //  Copyright © 2017 ebookconverter. All rights reserved.
 //
+#include <stdlib.h>
 #import "WebKit/WebKit.h"
 #import "mainWin.h"
 #import "webdelegate.h"
 #import "const.h"
 #import "BuyController.h"
 #import "AboutController.h"
+#import "RegController.h"
 
 // 0.99
 //https://www.vitalsource.com/products/gluten-free-and-wheat-free-guide-with-recipes-speedy-publishing-v9781633835498
@@ -29,6 +31,8 @@ AboutController * aboutcontroller;
 
     IBOutlet NSButton * testbtn;
     IBOutlet id productcaption; // caption in main
+    IBOutlet id touchlabel; // caption in main
+    IBOutlet id resetbtn; // caption in main
 
     IBOutlet NSBox * box;
     IBOutlet NSButton * downloadbtn;
@@ -44,9 +48,11 @@ AboutController * aboutcontroller;
     int pageindex;
     BOOL jswaiting;
     NSString * jsmessage;
+    CGPoint mousepoint;
     
     WebDelegate * webdelegate;
     WebScriptObject * epubwinobj;
+    WebFrame * epubcontent;
 }
 
 @synthesize working;
@@ -59,6 +65,7 @@ AboutController * aboutcontroller;
 {
     self = [super initWithWindowNibName:@"mainWin" ];
     if (self) {
+        reg = [[BuyController alloc] initWithWindowNibName:@"BuyController"];
         aboutcontroller = [[AboutController alloc] initWithWindowNibName:@"AboutController"];
         webdelegate = [[WebDelegate alloc] init];
         _mainwin = self;
@@ -108,6 +115,7 @@ AboutController * aboutcontroller;
     datadir = [ebookdir stringByAppendingPathComponent:@"tmp"];
     [self createfolder:datadir];
     
+    [reg checkkey];
     //[NSString stringWithFormat:@"Ver %@ (%@)\n\n%@",s2,s4,s5];
     //[textview setHasVerticalScroller:YES];
     //[textview setHasHorizontalScroller:YES];
@@ -115,12 +123,27 @@ AboutController * aboutcontroller;
     //[webView setFrameLoadDelegate:self];
     [textview setVerticallyResizable:YES];
     [textview setHorizontallyResizable:NO];
-    
+    [testbtn setHidden:true];
+    [resetbtn setHidden:true];
     [box setHidden:true];
+    [touchlabel setHidden:true];
 
-#ifndef DEBUG
+    if ([reg isreg]) {
+        [buybtn setHidden:true];
+    }
+    
+#ifdef DEBUG
+    [testbtn setHidden:false];
+    [resetbtn setHidden:false];
+#else
     [testbtn setHidden:true];
 #endif
+    
+#ifdef DEBUG
+//    [testbtn setHidden:false];
+#endif
+    
+
     //[downloadbtn setWantsLayer:YES];
     //downloadbtn.layer.backgroundColor = [NSColor greenColor].CGColor;
     
@@ -168,6 +191,11 @@ AboutController * aboutcontroller;
 //    NSLog(@"start");
 //    [self wait:3];
 //    NSLog(@"end");
+//    NSRect r = [[self window] frame]  ;
+//    CGPoint warpPoint = CGPointMake(r.origin.x+r.size.width-100,[[NSScreen mainScreen] frame].size.height- (r.origin.y+r.size.height/2));
+//    CGWarpMouseCursorPosition(warpPoint);
+//    NSLog(@"%4.2f %4.2f %4.2f",r.origin.x,r.origin.y,r.size.height);
+//    return;
     //[webdelegate BuildPub:nil];
     //return;
     //[webdelegate Buildpdf:nil];
@@ -217,6 +245,13 @@ AboutController * aboutcontroller;
     }
 }
 
+- (IBAction)resetbtn:(id)sender
+{
+#ifdef DEBUG
+    [regcontroller savekey:@"" skey:@"" suser:@"aa"];
+//    [reg savetimes:0];
+#endif
+}
 #pragma mark - runloop
 
 - (void) wait: (float) secs
@@ -265,12 +300,19 @@ AboutController * aboutcontroller;
 - (void) setWorking:(BOOL)aworking
 {
     working = aworking;
+    [touchlabel setHidden:!aworking];
     if (aworking) {
         [vars removeAllObjects];
         [webdelegate clearurllist];
         totalpage=0;
         pageindex=0;
         taskindex=0;
+        //[NSThread sleepForTimeInterval:0.5f];
+        //move mouse
+        NSRect r = [[self window] frame]  ;
+        mousepoint = CGPointMake(r.origin.x+r.size.width-50,[[NSScreen mainScreen] frame].size.height- (r.origin.y+r.size.height/2));
+        CGWarpMouseCursorPosition(mousepoint);
+        
         if (webdelegate.ebooktype==0) { //epub
             tasktimer = [NSTimer scheduledTimerWithTimeInterval:0.3 target:self selector:@selector(epubtaskhandle:) userInfo:nil repeats:YES];
         } else if (webdelegate.ebooktype==1) { //pdf
@@ -341,7 +383,8 @@ AboutController * aboutcontroller;
             break;
     }
 
-    if (pageindex>1) {
+    if (pageindex>4) {
+        //taskindex = 20; //goback page button click
         //working = false;
     }
 }
@@ -485,13 +528,13 @@ AboutController * aboutcontroller;
     id win = [webView windowScriptObject];
     [win setValue:self forKey:@"MyApp"];
    
-    NSString* js = @"var items =document.getElementsByClassName(\"level level-1 group\"); \
+    NSString* js = @"var items =document.getElementsByClassName(\"toc-level level-1 group\"); \
             if (items.length==0) {\
                 document.getElementsByClassName(\"toolbar-button toc-button /img/toc/toc.svg\")[0].click();} \
     ";
     [win evaluateWebScript: js];
     [self wait:0.8];
-    js = @"var items =document.getElementsByClassName(\"level level-1 group\"); \
+    js = @"var items =document.getElementsByClassName(\"toc-level level-1 group\"); \
         MyApp.varLog_(\"###Totalpages=\"+items.length);  \
         ";
     [win evaluateWebScript: js];
@@ -499,7 +542,7 @@ AboutController * aboutcontroller;
     
     return 10;
     
-    js = @"var items =document.getElementsByClassName(\"level level-1 group\"); \
+    js = @"var items =document.getElementsByClassName(\"toc-level level-1 group\"); \
         MyApp.pagehtmlLog_(\"###Totaldiv=\"+items.length);  \
         if(items.length>4) { \
             var buttons =  items[4].getElementsByTagName(\"button\"); \
@@ -523,7 +566,7 @@ AboutController * aboutcontroller;
     //[webView stringByEvaluatingJavaScriptFromString:jsString];
     id win = [webView windowScriptObject];
     NSString* js ;
-    js = @"var items =document.getElementsByClassName(\"level level-1 group\"); \
+    js = @"var items =document.getElementsByClassName(\"toc-level level-1 group\"); \
     if(items.length>%d) { \
         var buttons =  items[%d].getElementsByTagName(\"button\"); \
         var node = buttons[0].getElementsByTagName(\"div\")[0];\
@@ -563,8 +606,18 @@ AboutController * aboutcontroller;
     switch (taskindex) {
         case 0:
             webdelegate.ticked =false;
-            taskindex = [self nextbuttonjs];
-            [self log:@"load page %d",pageindex+1];
+            int n = pageindex % 10;
+            if (n==8) {
+                CGPoint p1 = CGPointMake(mousepoint.x+arc4random_uniform(10), mousepoint.y+arc4random_uniform(10));
+                //CGWarpMouseCursorPosition(p1);
+                [self movemouse:p1];
+            }
+            if (pageindex == 0) {
+                [epubcontent reload];
+            } else {
+                taskindex = [self nextbuttonjs];
+                [self log:@"load page %d",pageindex+1];
+            }
             taskindex = 11;
             //totalpage= [vars[@"Totalpages"] intValue];
             break;
@@ -649,15 +702,27 @@ AboutController * aboutcontroller;
 {
     if (!outputfile) return 0;
     [self log:outputfile];
+
+    [self log:@""];
+    [self log:@"done"];
     
+    NSAlert *alert = [NSAlert alertWithMessageText:@"Do you want to open new download file ?"
+                                     defaultButton:@"Yes"
+                                   alternateButton:@"No"
+                                       otherButton:nil
+                         informativeTextWithFormat:@""];
+    
+    NSInteger button = [alert runModal];
+    if (button == NSAlertAlternateReturn) {
+        return 0;
+    }
+
     NSFileManager *fileManager = [NSFileManager defaultManager];
     
     if (![fileManager fileExistsAtPath:outputfile])
         return 0;
    
     [[NSWorkspace sharedWorkspace] openURL:[NSURL fileURLWithPath:outputfile]];
-    [self log:@""];
-    [self log:@"done"];
 
     return 0;
 }
@@ -690,6 +755,7 @@ AboutController * aboutcontroller;
     if ([framename isEqualToString:@"epub-content"]) {
         //[self log:@"Frame %@",url];
         NSLog(@"Frame %@",url);
+        epubcontent = frame;
         WebDataSource *source = [frame dataSource];
         NSData *data = [source data];
         
@@ -697,7 +763,7 @@ AboutController * aboutcontroller;
         [webdelegate saveepubfile:url data:data];
         if (working)
         {
-            if ([url rangeOfString:@"xhtm"].location != NSNotFound)
+            if ([url rangeOfString:@"html"].location != NSNotFound)
                 [webdelegate saveurl:url];
             [self log:@"save page %d",pageindex+1];
         }
@@ -749,6 +815,19 @@ AboutController * aboutcontroller;
         
     }
     return true;
+}
+
+- (void)movemouse:(CGPoint)point
+{
+    CGPoint p = CGPointMake(point.x,point.y);
+    
+    CGEventRef event = CGEventCreate(NULL);
+    
+    CGEventSetType(event, kCGEventMouseMoved);
+    CGEventSetLocation(event, p);
+    CGEventPost(kCGSessionEventTap, event);
+    
+    CFRelease(event);
 }
 
 #pragma mark - Browser

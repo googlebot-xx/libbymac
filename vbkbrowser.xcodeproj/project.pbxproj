@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		00016C6B1EEB151D00090675 /* instru.xhtml in Resources */ = {isa = PBXBuildFile; fileRef = 00016C6A1EEB151D00090675 /* instru.xhtml */; };
 		00872C591EC2245C00542D22 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 00872C581EC2245C00542D22 /* AppDelegate.m */; };
 		00872C5C1EC2245C00542D22 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 00872C5B1EC2245C00542D22 /* main.m */; };
 		00872C5E1EC2245C00542D22 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 00872C5D1EC2245C00542D22 /* Assets.xcassets */; };
@@ -55,6 +56,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		00016C6A1EEB151D00090675 /* instru.xhtml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = instru.xhtml; path = epub/instru.xhtml; sourceTree = "<group>"; };
 		00872C541EC2245C00542D22 /* VitalSource Downloader.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "VitalSource Downloader.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		00872C571EC2245C00542D22 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		00872C581EC2245C00542D22 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -216,6 +218,7 @@
 		00B7F1AA1ED369BA00C14D6A /* epub */ = {
 			isa = PBXGroup;
 			children = (
+				00016C6A1EEB151D00090675 /* instru.xhtml */,
 				00B7F1AB1ED369D000C14D6A /* content.opf */,
 				00B7F1AC1ED369D000C14D6A /* container.xml */,
 				00B7F1AD1ED369D000C14D6A /* toc.ncx */,
@@ -290,7 +293,7 @@
 				TargetAttributes = {
 					00872C531EC2245C00542D22 = {
 						CreatedOnToolsVersion = 8.2.1;
-						ProvisioningStyle = Automatic;
+						ProvisioningStyle = Manual;
 					};
 				};
 			};
@@ -325,6 +328,7 @@
 				009F57351ED71C7800B596C9 /* vbkbrowser48.png in Resources */,
 				00B7F1A51ECDE31700C14D6A /* AboutController.xib in Resources */,
 				009F572A1ED70EE500B596C9 /* sign-left.png in Resources */,
+				00016C6B1EEB151D00090675 /* instru.xhtml in Resources */,
 				009F57301ED7112400B596C9 /* about.png in Resources */,
 				009F57391ED71DB700B596C9 /* background.jpg in Resources */,
 				009F572B1ED70EE500B596C9 /* sign-right.png in Resources */,
@@ -393,7 +397,7 @@
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_IDENTITY = "";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -440,7 +444,7 @@
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_IDENTITY = "Developer ID Application: WENQIAN Pan (L7JSV82XX3)";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
@@ -463,7 +467,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "";
 				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = "";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/vbkbrowser",
@@ -480,7 +486,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "Developer ID Application: WENQIAN Pan (L7JSV82XX3)";
 				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = "";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/vbkbrowser",
