@@ -46,6 +46,7 @@ AboutController * aboutcontroller;
     int taskindex;
     int totalpage;
     int pageindex;
+    BOOL framewaiting;
     BOOL jswaiting;
     NSString * jsmessage;
     CGPoint mousepoint;
@@ -157,7 +158,7 @@ AboutController * aboutcontroller;
     [webView setPolicyDelegate:self];
     [webView setFrameLoadDelegate:self];
     webView.customUserAgent=@"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:53.0) Gecko/20100101";
-    NSString * aurl = @"https://www.vitalsource.com/login";
+    NSString * aurl = @"https://www.vitalsource.com/bookshelf/home";
     [[webView mainFrame] loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:aurl]]];
     
     
@@ -206,7 +207,7 @@ AboutController * aboutcontroller;
     //return;
     
     NSString * url = [webView mainFrameURL];
-    if ([url rangeOfString:@"login"].location != NSNotFound) {
+    if ([url rangeOfString:@"signin"].location != NSNotFound) {
         [self loginjs:nil];
     } else {
         //[self totalbuttonjs];
@@ -344,6 +345,56 @@ AboutController * aboutcontroller;
         case 0:
             taskindex = [self totalbuttonjs];
             //totalpage= [vars[@"Totalpages"] intValue];
+            totalpage = [webdelegate.pagelist count];
+            [self log:@"ePub total pages = %d",totalpage];
+            taskindex = 10;
+            break;
+        case 10:
+            // Item 3
+            webdelegate.ticked =false;
+            if (pageindex<totalpage) {
+                [self log:@"load page %d",pageindex+1];
+                //[self pagebuttonjs:pageindex]; ////goback page button click
+                [self nextpage:pageindex];
+                framewaiting = true;
+                taskindex = 11;
+            }
+            break;
+        case 11:
+            // Item 3
+            if( !framewaiting ){
+                pageindex += 1;
+                taskindex = 10; //goback page button click
+            }
+            if (pageindex==totalpage) {
+                taskindex = 20; //goback page button click
+            }
+            break;
+        case 20:
+            // Item 3
+            [self log:@"building epub file ...."];
+            bool b = [webdelegate BuildPub:nil];
+            [self setWorking:false];
+            [self openoutputfile];
+            break;
+        default:
+            break;
+    }
+
+    if (pageindex>4) {
+        //taskindex = 20; //goback page button click
+        //working = false;
+    }
+}
+
+- (void) epubtaskhandle_js:(NSTimer*)theTimer
+{
+    if (!working) return;
+    
+    switch (taskindex) {
+        case 0:
+            taskindex = [self totalbuttonjs];
+            //totalpage= [vars[@"Totalpages"] intValue];
             [self log:@"Total pages = %d",totalpage];
             break;
         case 1:
@@ -382,7 +433,7 @@ AboutController * aboutcontroller;
         default:
             break;
     }
-
+    
     if (pageindex>4) {
         //taskindex = 20; //goback page button click
         //working = false;
@@ -464,9 +515,9 @@ AboutController * aboutcontroller;
 //    ";
     
     js = @"console = { log: function(msg) { MyApp.consoleLog_(msg); } };\
-    document.getElementById(\"session_email\").value = \"a02@pwqsoft.com\"; \
-    document.getElementById(\"session_password\").value = \"600338qQ~\";  \
-    document.getElementById(\"new_session\").submit(); \
+    document.getElementById(\"email-field\").value = \"a02@pwqsoft.com\"; \
+    document.getElementById(\"password-field\").value = \"600338qQ~\";  \
+    document.getElementById(\"signin-form\").submit(); \
     MyApp.consoleLog_(\"login ...\"); \
     ";
     //console.log(\"hellow\");";
@@ -554,12 +605,24 @@ AboutController * aboutcontroller;
     [win evaluateWebScript: js];
 }
 
+
+
+- (int) nextpage:(int) page
+{
+    NSDictionary * urldict = [webdelegate.pagelist objectAtIndex:page];
+    NSString * s1= [urldict objectForKey:@"absoluteURL"];
+    s1 = [NSString stringWithFormat:@"https://jigsaw.vitalsource.com%@",s1];
+    if (webdelegate.ebooktype==1) {
+        s1 = [NSString stringWithFormat:@"%@?width=2000",s1];
+    }
+    [[webView mainFrame] loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:s1]]];
+    //NSLog(@"url=%@",[urldict objectForKey:@"absoluteURL"]);
+    return 1;
+}
+
 //<button class="navigation-button noButton horizontal-button next-button" style="display: block; outline: medium none;">
 //<button class="navigation-button noButton horizontal-button previous-button" style="display: block;">
 //
-
-
-
 - (int) pagebuttonjs:(int) page
 {
     //NSString* jsString = [NSString stringWithFormat:@"alert('ok');"];
@@ -600,6 +663,52 @@ AboutController * aboutcontroller;
 }
 #pragma mark - PDF ebook handle
 - (void) pdftaskhandle:(NSTimer*)theTimer
+{
+    if (!working) return;
+    
+    switch (taskindex) {
+        case 0:
+            taskindex = [self totalbuttonjs];
+            //totalpage= [vars[@"Totalpages"] intValue];
+            totalpage = [webdelegate.pagelist count];
+            [self log:@"PDF total pages = %d",totalpage];
+            taskindex = 10;
+            break;
+        case 10:
+            // Item 3
+            webdelegate.ticked =false;
+            if (pageindex<totalpage) {
+                [self log:@"load page %d",pageindex+1];
+                //[self pagebuttonjs:pageindex]; ////goback page button click
+                [self nextpage:pageindex];
+                framewaiting = true;
+                taskindex = 11;
+            }
+            break;
+        case 11:
+            // Item 3
+            if( !framewaiting ){
+                pageindex += 1;
+                taskindex = 10; //goback page button click
+            }
+            if (pageindex==totalpage) {
+                taskindex = 20; //goback page button click
+            }
+            break;
+        case 20:
+            // Item 3
+            [self log:@"building pdf file ...."];
+            bool b = [webdelegate Buildpdf:nil];
+            [self setWorking:false];
+            [self openoutputfile];
+            break;
+        default:
+            break;
+    }
+    
+}
+
+- (void) pdftaskhandle_js:(NSTimer*)theTimer
 {
     if (!working) return;
     
@@ -672,7 +781,7 @@ AboutController * aboutcontroller;
     //NSString* jsString = [NSString stringWithFormat:@"alert('ok');"];
     //[webView stringByEvaluatingJavaScriptFromString:jsString];
     id win = [webView windowScriptObject];
-    NSString* js = @"var items =document.getElementsByClassName(\"navigation-button noButton horizontal-button next-button\"); \
+    NSString* js = @"var items =document.getElementsByClassName(\"navigation-button no-button horizontal-button next-button\"); \
     if (items.length>0) {\
     items[0].click();} \
     ";
@@ -687,7 +796,7 @@ AboutController * aboutcontroller;
     //[webView stringByEvaluatingJavaScriptFromString:jsString];
     id win = [webView windowScriptObject];
     [win setValue:self forKey:@"MyApp"];
-    NSString* js = @"var items =document.getElementsByClassName(\"navigation-button noButton horizontal-button next-button\"); \
+    NSString* js = @"var items =document.getElementsByClassName(\"navigation-button no-button horizontal-button next-button\"); \
     if (items.length>0) {\
         MyApp.varLog_(\"###nextvisible=1\");\
     } else \
@@ -752,6 +861,7 @@ AboutController * aboutcontroller;
     //NSURL * url = [[[frame dataSource] request] URL];
     NSString * url = [[[[frame dataSource] request] URL] absoluteString];
     NSString * framename = [frame name];
+    
     if ([framename isEqualToString:@"epub-content"]) {
         //[self log:@"Frame %@",url];
         NSLog(@"Frame %@",url);
@@ -759,8 +869,10 @@ AboutController * aboutcontroller;
         WebDataSource *source = [frame dataSource];
         NSData *data = [source data];
         
-        
-        [webdelegate saveepubfile:url data:data];
+        if ([url rangeOfString:@"/api/"].location==NSNotFound) {
+            [webdelegate saveepubfile:url data:data];
+        }
+
         if (working)
         {
             if ([url rangeOfString:@"html"].location != NSNotFound)
@@ -770,7 +882,7 @@ AboutController * aboutcontroller;
         
         //NSString *str = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
         if ([box isHidden]) {
-            if  ([url rangeOfString:@"/epub/OEBPS/"].location!= NSNotFound) {
+            if  ([url rangeOfString:@"/epub/"].location!= NSNotFound) {
                 webdelegate.ebooktype = 0; //epub
             } else {
                webdelegate.ebooktype = 1; //pdf
@@ -782,11 +894,21 @@ AboutController * aboutcontroller;
             [self log:@"ebook ready to download, click download button, \r"];
         }
         //NSLog(@"%@",url);
+        return;
     }
 
     if (frame == [sender mainFrame]){
-        [address setStringValue:url];
-        //[self log:@"didFinishLoadForFrame %@"];
+        //[address setStringValue:url];
+        //[self log:@"didFinishLoadForFrame %@",url];
+        //NSLog(@"didFinishLoadForFrame %@",url);
+        WebDataSource *source = [frame dataSource];
+        NSData *data = [source data];
+        
+        if ([url rangeOfString:@"/api/"].location==NSNotFound) {
+            [webdelegate saveepubfile:url data:data];
+            framewaiting = false;
+        }
+        
      }
    
 }

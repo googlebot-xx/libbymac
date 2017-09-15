@@ -16,9 +16,11 @@
     NSTimer *timer;
     int tick;
     
+    NSString *idurl;
     int ebooktype;
     NSString * title;
     NSString * epubfile;
+    NSArray * pagelist;
 }
 
 - (void) saveepubfile: (NSString *)url data:(NSData *)data;
@@ -26,6 +28,7 @@
 - (void) saveurl: (NSString *)url;
 - (NSString*) urltopath: (NSString *) url;
 - (void) savetitle: (NSString *)atitle;
+- (NSString *) nextpage: (int)page;
 - (bool) BuildPub:(NSString *) afile;
 - (bool) Buildpdf:(NSString *) afile;
 
@@ -34,4 +37,5 @@
 @property (nonatomic, assign) BOOL ticked;
 @property (nonatomic, retain) NSString* title;
 @property (nonatomic, retain) NSString* epubfile;
+@property (nonatomic, retain) NSArray* pagelist;
 @end

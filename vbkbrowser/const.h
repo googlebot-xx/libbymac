@@ -27,4 +27,11 @@
 
 //e17942a289d95a5f
 #define c_seed @"vitaldownmac"
+#define contains(str1, str2) ([str1 rangeOfString: str2 ].location != NSNotFound)
+
+//NSString a = @"PUC MINAS - BRAZIL";
+//NSString b = @"BRAZIL";
+//if( contains(a,b) ){
+//   //TO DO HERE
+//}
 //com.vitalsource.bookshelf

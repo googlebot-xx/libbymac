@@ -29,7 +29,7 @@
     NSString* outputfile;
     NSMutableDictionary *vars;
     NSTimer *tasktimer;
-
+    
     
 
 }

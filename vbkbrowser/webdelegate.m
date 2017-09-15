@@ -12,6 +12,11 @@
 #import "mainWin.h"
 #import "ZipArchive.h"
 
+
+@interface WebDelegate () <WebResourceLoadDelegate>
+
+@end
+
 @implementation WebDelegate {
     NSString * ebookid;
 }
@@ -20,6 +25,7 @@
 @synthesize ticked;
 @synthesize title;
 @synthesize ebooktype;
+@synthesize pagelist;
 
 - (id)init
 {
@@ -73,28 +79,31 @@ fromDataSource:(WebDataSource *)dataSource
 
 - (void) webView: (WebView *)sender resource:(id)identifier didFinishLoadingFromDataSource:(WebDataSource *)dataSource
 {
-    NSString *url = [identifier absoluteString];
+    idurl = [identifier absoluteString];
     //int d = [self PosRight:url substr:@"pages"];
     tick = 0;
     ticked = false;
     bool isbook = false;
-//    NSLog(@"didFinishDataSource %d %@ ",tick,url);
-//    if ([self PosRight:url substr:@"pages"]==1) {
-//        [_mainwin log:url];
-//        //NSLog(@"didFinishDataSource %d %@ ",tick,url);
-//        isbook = true;
-//    }
+  
 
 // https://jigsaw.vitalsource.com/books/9781446297650DEMO/images/553246736447566b5831394d716d784c79356d55547130716a5a672b4c70644e2b6b4b7630424e4a5261453d0a/encrypted/1600
 //    if ([url rangeOfString:@"/epub/OEBPS/"].location != NSNotFound) {
-    NSString * path = [self urltopath:url];
-    if ([path rangeOfString:@"/books/"].location == 0) {
+    NSString * path = [self urltopath:idurl];
+    //if ([path rangeOfString:@"/books/"].location == 0) {
+    if ([path rangeOfString:@"/books/"].location !=NSNotFound) {
         isbook = true;
     }
     
     if (isbook) {
         //NSLog(@"didFinishDataSource %d %@ ",tick,url);
-        NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys: identifier, @"url", dataSource, @"dataSource", nil];
+        //version 1
+        //NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys: identifier, @"url", dataSource, @"dataSource", nil];
+        
+        
+        //version 2
+        WebResource *wd = [dataSource subresourceForURL:identifier] ;//] [NSURL URLWithString:identifier]];
+        NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys: identifier, @"url", wd, @"dataSource", nil];
+        
         [self performSelector: @selector(reallyDidFinishLoading:) withObject: dict afterDelay: 0.1];
     }
 }
@@ -103,8 +112,19 @@ fromDataSource:(WebDataSource *)dataSource
 {
     NSURL *url = [dict objectForKey: @"url"];
     NSString * s1 = [url absoluteString];
-    WebDataSource *dataSource = [dict objectForKey: @"dataSource"];
-    
+
+    //https://jigsaw.vitalsource.com/api/v0/books/9781506301594DEMO/pages
+    NSString *pagestr=[s1 substringFromIndex:s1.length-6];
+    if ([pagestr rangeOfString:@"/pages"].location!=NSNotFound) {
+        //NSLog(@"pages found %@",s1);
+        [self savepages:dict];
+        return;
+    }
+
+    if ([s1 rangeOfString:@"/api/"].location!=NSNotFound) {
+        return;
+    }
+
     //NSString * path = [self urlsplit:s1];
     //[_mainwin log:path];
 //    WebDataSource *ds = [dict objectForKey: @"dataSource"];
@@ -117,19 +137,26 @@ fromDataSource:(WebDataSource *)dataSource
 //        url = [NSURL URLWithString:s1];
 //    }
 
-    WebResource *wd = [dataSource subresourceForURL:url] ;//] [NSURL URLWithString:identifier]];
-    NSData *data = [wd data];
-    if (data == nil) {
-        data = [dataSource data];
-    }
+    //return;
+    //version 1
+//    WebDataSource *dataSource = [dict objectForKey: @"dataSource"];
+//    WebResource *wd = [dataSource subresourceForURL:url] ;//] [NSURL URLWithString:identifier]];
+//    NSData *data = [wd data];
+//    if (data == nil) {
+//        data = [dataSource data];
+//    }
     //NSString *str = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+
+    //version 2
+    WebResource *wd = [dict objectForKey: @"dataSource"];
+    NSData *data = [wd data];
     [self saveepubfile:s1 data:data];
     tick = 0;
     
     //pdf ebook next page
-    if (_mainwin.working && [s1 rangeOfString:@"/encrypted/1600"].location!=NSNotFound ) {
+    if (_mainwin.working && [s1 rangeOfString:@"/encrypted/"].location!=NSNotFound ) {
         [self saveurl:s1];
-        //NSLog(@"%@",s1);
+        //NSLog(@"save url %@",s1);
         ticked = true;
     }
     //[_mainwin log:str];
@@ -148,6 +175,62 @@ fromDataSource:(WebDataSource *)dataSource
     }
 }
 
+//By implementing and registering a subclass of NSURLProtocol you can capture all the request from your UIWebView.
+//https://stackoverflow.com/questions/5353278/uiwebviewdelegate-not-monitoring-xmlhttprequest
+//https://stackoverflow.com/questions/3155359/in-webkit-how-do-i-get-the-content-of-a-resource
+
+//https://www.raywenderlich.com/59982/nsurlprotocol-tutorial
+
+- (void) savepages:(NSDictionary *)dict
+{
+    //NSURL *url = [dict objectForKey: @"url"];
+    //url = [NSURL URLWithString:idurl];
+    
+    //version 1
+//    WebDataSource *dataSource = [dict objectForKey: @"dataSource"];
+//    WebResource *wd = [dataSource subresourceForURL:url] ;//] [NSURL URLWithString:identifier]];
+//    NSData *data = [wd data];
+
+    //version 2
+    WebResource *wd = [dict objectForKey: @"dataSource"];
+    NSData *data = [wd data];
+    
+    NSError *error = nil;
+    //[pagelist dealloc];
+    
+
+#ifdef DEBUG
+    //NSString *str = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+    //NSLog(@"%@",str);
+#endif
+    
+    pagelist = NULL;
+    pagelist = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
+    //pagelist.retain;
+    
+//    [urllist removeAllObjects];
+//    for (int i=0; i<[pagelist count]; i++) {
+//        NSDictionary *urldict = [pagelist objectAtIndex:i];
+//        NSString * s1 = [urldict objectForKey:@"absoluteURL"];
+//        s1 = [NSString stringWithFormat:@"https://jigsaw.vitalsource.com%@",s1];
+//        [urllist addObject:s1];
+//    }
+    
+}
+
+- (void) buildurllist
+{
+    //build urllist
+    [urllist removeAllObjects];
+    for (int i=0; i<[pagelist count]; i++) {
+        NSDictionary *urldict = [pagelist objectAtIndex:i];
+        NSString * s1 = [urldict objectForKey:@"absoluteURL"];
+        s1 = [NSString stringWithFormat:@"https://jigsaw.vitalsource.com%@",s1];
+        [urllist addObject:s1];
+    }
+}
+
+
 - (void) savetitle: (NSString *)atitle
 {
     if (_mainwin.working) {
@@ -155,6 +238,15 @@ fromDataSource:(WebDataSource *)dataSource
         //NSLog(@"save title %@",atitle);
     }
 }
+
+- (NSString *) nextpage: (int)page
+{
+    if (page<[urllist count]) {
+        return [urllist objectAtIndex:page];
+    }
+    return NULL;
+}
+
 
 //OEBPS https://jigsaw.vitalsource.com/books/9781506301587DEMO/epub/OEBPS/images/pg141.jpg
 //pbk https://jigsaw.vitalsource.com/books/9780826904942/pages/300737558/content#cfi=/9
@@ -173,8 +265,9 @@ fromDataSource:(WebDataSource *)dataSource
     
     if (!bookid) return;  //no bookid no save
     
-    bool isepub = [path rangeOfString:@"/epub/OEBPS/"].location!=NSNotFound;
+    bool isepub = [path rangeOfString:@"/epub/"].location!=NSNotFound;
 
+   
     NSString * fname;
     if  (isepub) {
         path = [path stringByReplacingOccurrencesOfString:@"/books/" withString:@"/"]; //remove /books/ in path
@@ -425,9 +518,16 @@ fromDataSource:(WebDataSource *)dataSource
 //    [urllist addObject:@"https://jigsaw.vitalsource.com/books/9781506301587DEMO/epub/OEBPS/ch0005.xlink.xhtml#cfi=/6/6%5B;vnd.vst.idref=ch0005%5D"];
     _mainwin.outputfile = nil;
 
-    if ([titlelist count]>0) {
-        title = [titlelist objectAtIndex:0];
+    if ([pagelist count]>0) {
+        NSDictionary *urldict = [pagelist objectAtIndex:0];
+        title = [urldict objectForKey:@"chapterTitle"];
+        if ([title length]>100) {
+            title = [title substringToIndex:100];
+        }
     }
+
+    [self buildurllist];
+  
     NSString * idpath = [self getepubfolder:[urllist objectAtIndex:0]];
     NSString * dir = [_mainwin.datadir stringByAppendingPathComponent:idpath];
 
@@ -589,10 +689,13 @@ fromDataSource:(WebDataSource *)dataSource
 - (NSString *) cleanfilename: (NSString *) str
 {
     NSString * fname = [str stringByReplacingOccurrencesOfString:@":" withString:@""];
-    fname = [fname stringByReplacingOccurrencesOfString:@"[" withString:@""];
-    fname = [fname stringByReplacingOccurrencesOfString:@"]" withString:@""];
-    fname = [fname stringByReplacingOccurrencesOfString:@"?" withString:@""];
-    fname = [fname stringByReplacingOccurrencesOfString:@"," withString:@""];
+//    fname = [fname stringByReplacingOccurrencesOfString:@"[" withString:@""];
+//    fname = [fname stringByReplacingOccurrencesOfString:@"]" withString:@""];
+//    fname = [fname stringByReplacingOccurrencesOfString:@"?" withString:@""];
+//    fname = [fname stringByReplacingOccurrencesOfString:@"," withString:@""];
+    NSCharacterSet* illegalFileNameCharacters = [NSCharacterSet characterSetWithCharactersInString:@"/\\?%*|:,[]\"<>"];
+    fname  = [[str componentsSeparatedByCharactersInSet:illegalFileNameCharacters] componentsJoinedByString:@""];
+
     return fname;
 }
 
