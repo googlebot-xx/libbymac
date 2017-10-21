@@ -188,6 +188,8 @@ AboutController * aboutcontroller;
 
 - (IBAction)testbtn:(id)sender
 {
+    [webdelegate BuildPub:nil];
+    return;
 //    [self setWorking:true];
 //    NSLog(@"start");
 //    [self wait:3];
@@ -249,6 +251,7 @@ AboutController * aboutcontroller;
 - (IBAction)resetbtn:(id)sender
 {
 #ifdef DEBUG
+    [self loginjs:sender];
     [regcontroller savekey:@"" skey:@"" suser:@"aa"];
 //    [reg savetimes:0];
 #endif
@@ -513,10 +516,16 @@ AboutController * aboutcontroller;
 //    document.getElementById(\"new_session\").submit(); \
 //    MyApp.consoleLog_(\"login ...\"); \
 //    ";
-    
     js = @"console = { log: function(msg) { MyApp.consoleLog_(msg); } };\
     document.getElementById(\"email-field\").value = \"a02@pwqsoft.com\"; \
     document.getElementById(\"password-field\").value = \"600338qQ~\";  \
+    document.getElementById(\"signin-form\").submit(); \
+    MyApp.consoleLog_(\"login ...\"); \
+    ";
+    
+    js = @"console = { log: function(msg) { MyApp.consoleLog_(msg); } };\
+    document.getElementById(\"email-field\").value = \"rashadjefferson@gmail.com\"; \
+    document.getElementById(\"password-field\").value = \"Nkbagroup$\";  \
     document.getElementById(\"signin-form\").submit(); \
     MyApp.consoleLog_(\"login ...\"); \
     ";

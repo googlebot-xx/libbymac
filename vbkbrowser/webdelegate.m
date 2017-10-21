@@ -290,16 +290,50 @@ fromDataSource:(WebDataSource *)dataSource
 //https://jigsaw.vitalsource.com/books/9781506301587DEMO/epub/OEBPS/ch0001.xlink.xhtml#cfi=/6/4%5B;vnd.vst.idref=ch0001%5D
 //https://jigsaw.vitalsource.com/books/9781506301587DEMO/epub/OEBPS/ch0005.xlink.xhtml#cfi=/6/6%5B;vnd.vst.idref=ch0005%5D
 
-- (NSString *) getepubfolder: (NSString *) url
+- (NSString *) getepubfolder: (NSString *)url path:(NSString *)path
 {
-    NSURLComponents *urlComponents = [NSURLComponents componentsWithString:url];
-    NSString * path = urlComponents.path;
+    NSString * dir =[url stringByReplacingOccurrencesOfString:@"/books/" withString:@"/"];
+    NSRange r2 = [dir rangeOfString:path];
+    NSRange r1;
+    r1.length = r2.location;
+    r1.location = 1;
+    dir = [dir substringWithRange:r1];
+    return dir;
+}
 
+- (NSString *) getepubfolder2: (NSString *) url
+{
+    NSArray * list = [url componentsSeparatedByString:@"/"];
+    int n = [list count];
+    NSString * path = @"";
+    for (int i=0; i<n; i++) {
+        NSString * s1 = [list objectAtIndex:i];
+        if ([s1 isEqualToString:@"books"]) {
+            path  = [path stringByAppendingPathComponent:[list objectAtIndex:i+1]];
+            if (n>i+1) {
+                NSString * epub = [list objectAtIndex:i+2];
+            }
+            break;
+        }
+        
+    }
+    return path;
+    
+    
+    
+    NSURLComponents *urlComponents = [NSURLComponents componentsWithString:url];
+    path = urlComponents.path;
+    path = [path stringByDeletingLastPathComponent];
+    title = [self getbookid:path];
+
+    path = [path stringByReplacingOccurrencesOfString:@"/books/" withString:@"/"]; //remove /books/ in path
+    return path;
+    
     NSString * s2=@"/books/";
     NSRange r1 = [url rangeOfString:s2];
     NSRange r2 = [url rangeOfString:@"/OEBPS/"];
     
-    if ((r1.location!=NSNotFound)||(r2.location != NSNotFound)) {
+    if ((r1.location!=NSNotFound) && (r2.location != NSNotFound)) {
         r1.location = r1.location+[s2 length];
         r1.length = r2.location-r1.location;
         path = [url substringWithRange:r1];
@@ -392,12 +426,16 @@ fromDataSource:(WebDataSource *)dataSource
     
     NSString * pageidlist=@"";
     NSString * itemreflist=@"";
-    for (int i=0; i<[urllist count];i++){
-        NSString * url = [urllist objectAtIndex:i];
+    for (int i=0; i<[pagelist count];i++){
+        NSDictionary *urldict = [pagelist objectAtIndex:i];
+        NSString * fname =  [urldict objectForKey:@"path"];
+        fname = [self removelash:fname];
         
-        NSString * fname = [self urltopath:url];
+        //NSString * url = [urllist objectAtIndex:i];
+        
+        //fname = [self urltopath:url];
         //fname = [fname lastPathComponent];
-        fname = [self getpagepath:fname] ;
+        //fname = [self getpagepath:fname] ;
         //NSLog(@"%@",fname);
         NSString * scfi = [[fname lastPathComponent] stringByDeletingPathExtension];
         scfi = [scfi stringByDeletingPathExtension];
@@ -407,7 +445,9 @@ fromDataSource:(WebDataSource *)dataSource
     }
     //NSLog(@"%@",pageidlist);
     //NSLog(@"%@",itemreflist);
-    path = [path stringByAppendingPathComponent:@"OEBPS"];
+    
+    //path = [path stringByAppendingPathComponent:@"OEBPS"];
+    
     //NSLog(@"%@",path);
     //NSURL *myDirectoryURL = [NSURL fileURLWithPath:path];
     NSDirectoryEnumerator *directoryEnumerator = [[NSFileManager defaultManager] enumeratorAtPath:path ];//    NSDirectoryEnumerator *directoryEnumerator = [[NSFileManager defaultManager] enumeratorAtPath:path includingPropertiesForKeys:[NSArray array] options:0 errorHandler:^BOOL(NSURL *url, NSError *error) {
@@ -470,15 +510,20 @@ fromDataSource:(WebDataSource *)dataSource
     NSData *demodata = [NSData dataWithContentsOfFile:demofile];
 
     NSString * nvpoint=@"";
-    for (int i=0; i<[urllist count];i++){
-        NSString * url = [urllist objectAtIndex:i];
-        NSString * fpath = [self urltopath:url];
-        NSString * fname = [self getpagepath:fpath] ;
+    for (int i=0; i<[pagelist count];i++){
+        NSDictionary *urldict = [pagelist objectAtIndex:i];
+        NSString * fname = [urldict objectForKey:@"path"];
+        fname = [self removelash:fname];
+
+        //NSString * url = [urllist objectAtIndex:i];
+        //NSString * fpath = [self urltopath:url];
+        //NSString * fname = [self getpagepath:fpath] ;
         //NSLog(@"%@",fname);
-        NSString * scfi = [[fname lastPathComponent] stringByDeletingPathExtension];
-        scfi = [scfi stringByDeletingPathExtension];
-        if ([titlelist count]>i)
-            scfi = [titlelist objectAtIndex:i];
+        //NSString * scfi = [[fname lastPathComponent] stringByDeletingPathExtension];
+        //scfi = [scfi stringByDeletingPathExtension];
+        NSString * scfi = [urldict objectForKey:@"chapterTitle"];
+        //if ([titlelist count]>i)
+        //    scfi = [titlelist objectAtIndex:i];
         //NSLog(@"%@",scfi);
         nvpoint= [NSString stringWithFormat:@"%@\r\t\t<navPoint id=\"navpoint%d\" playOrder=\"%d\">",nvpoint,i+1,i+1];
         nvpoint= [NSString stringWithFormat:@"%@\r\t\t<navLabel>",nvpoint];
@@ -492,8 +537,8 @@ fromDataSource:(WebDataSource *)dataSource
             int j = i % 2;
             if (i>2 && j==0) { //copy demo page from 4
             //if (true) { //copy demo page from 4
-                NSString * epubdemo = [fpath stringByReplacingOccurrencesOfString:@"/books/" withString:@"/"];
-                epubdemo = [_mainwin.datadir stringByAppendingPathComponent:epubdemo];
+                NSString * epubdemo = fname ;//[fpath stringByReplacingOccurrencesOfString:@"/books/" withString:@"/"];
+                epubdemo = [path stringByAppendingPathComponent:epubdemo];
 
                 //NSString * epubfile = [fpath stringByAppendingPathComponent:@""];
 
@@ -506,7 +551,8 @@ fromDataSource:(WebDataSource *)dataSource
     opfstr = [opfstr stringByReplacingOccurrencesOfString:@"{navPoint}" withString:nvpoint];
 
     data = [opfstr dataUsingEncoding:NSUTF8StringEncoding];
-    NSString * s1 = [NSString stringWithFormat:@"%@/OEBPS/toc.ncx",path];
+    //NSString * s1 = [NSString stringWithFormat:@"%@/OEBPS/toc.ncx",path];
+    NSString * s1 = [NSString stringWithFormat:@"%@/toc.ncx",path];
     [data writeToFile:s1 atomically:YES];
 }
 
@@ -517,18 +563,20 @@ fromDataSource:(WebDataSource *)dataSource
 //    [urllist addObject:@"https://jigsaw.vitalsource.com/books/9781506301587DEMO/epub/OEBPS/ch0001.xlink.xhtml#cfi=/6/4%5B;vnd.vst.idref=ch0001%5D"];
 //    [urllist addObject:@"https://jigsaw.vitalsource.com/books/9781506301587DEMO/epub/OEBPS/ch0005.xlink.xhtml#cfi=/6/6%5B;vnd.vst.idref=ch0005%5D"];
     _mainwin.outputfile = nil;
-
-    if ([pagelist count]>0) {
-        NSDictionary *urldict = [pagelist objectAtIndex:0];
-        title = [urldict objectForKey:@"chapterTitle"];
-        if ([title length]>100) {
-            title = [title substringToIndex:100];
-        }
+    
+    if ([pagelist count]==0)
+        return false;
+    
+    NSDictionary *urldict = [pagelist objectAtIndex:0];
+    title = [self getbookid:[urldict objectForKey:@"absoluteURL"]];
+    if ([title length]>100) {
+        title = [title substringToIndex:100];
     }
+    //NSString *bookid = [self getbookid:path];
 
     [self buildurllist];
   
-    NSString * idpath = [self getepubfolder:[urllist objectAtIndex:0]];
+    NSString * idpath = [self getepubfolder:[urldict objectForKey:@"absoluteURL"] path:[urldict objectForKey:@"path"]];
     NSString * dir = [_mainwin.datadir stringByAppendingPathComponent:idpath];
 
     //NSLog(@"%@",dir);
@@ -697,6 +745,17 @@ fromDataSource:(WebDataSource *)dataSource
     fname  = [[str componentsSeparatedByCharactersInSet:illegalFileNameCharacters] componentsJoinedByString:@""];
 
     return fname;
+}
+
+- (NSString *) removelash: (NSString *) str
+{
+    NSString * ss = str;
+    unichar first = [str characterAtIndex:0];
+    if (first == '/') {
+        ss = [str substringFromIndex:1];
+        // The first character is a letter from A-Z or a-z
+    }
+    return ss;
 }
 
 - (NSArray *) strsplit: (NSString *) str
