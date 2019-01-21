@@ -153,14 +153,21 @@ AboutController * aboutcontroller;
     [address setAction:@selector(enterAddress:)];
 
     //[webView setResourceLoadDelegate:self];
+    //[self clearcache];
     [self setcache];
     [webView setResourceLoadDelegate:webdelegate];
     [webView setPolicyDelegate:self];
     [webView setFrameLoadDelegate:self];
-    webView.customUserAgent=@"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:53.0) Gecko/20100101";
-    NSString * aurl = @"https://www.vitalsource.com/bookshelf/home";
-    [[webView mainFrame] loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:aurl]]];
+    webView.customUserAgent=@"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:53.0) Gecko/20100101";
     
+
+    //NSString * aurl = @"https://www.vitalsource.com/bookshelf/home";
+    //NSString * aurl = @"https://www.bing.com";
+    
+    NSString * aurl = @"https://www.vitalsource.com/";
+    [[webView mainFrame] loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:aurl]]];
+
+    //[self performSelector: @selector(homepagebtnclick:) withObject: nil afterDelay: 2];
     
     //[self log:@"ready %@",aurl];
     //[self log:@"go"];
@@ -168,6 +175,7 @@ AboutController * aboutcontroller;
 
 - (void)setcache
 {
+    //return;
     int cacheSizeMemory = 4*1024*1024; // 4MB
     int cacheSizeDisk = 32*1024*1024; // 32MB
     NSURLCache *sharedCache = [[NSURLCache alloc] initWithMemoryCapacity:cacheSizeMemory diskCapacity:cacheSizeDisk diskPath:cachedir];
@@ -176,6 +184,7 @@ AboutController * aboutcontroller;
 
 - (void)clearcache
 {
+    //return;
     [[NSURLCache sharedURLCache] removeAllCachedResponses];
 }
 
@@ -188,8 +197,8 @@ AboutController * aboutcontroller;
 
 - (IBAction)testbtn:(id)sender
 {
-    [webdelegate BuildPub:nil];
-    return;
+    //[webdelegate BuildPub:nil];
+    //return;
 //    [self setWorking:true];
 //    NSLog(@"start");
 //    [self wait:3];
@@ -366,12 +375,19 @@ AboutController * aboutcontroller;
         case 11:
             // Item 3
             if( !framewaiting ){
-                pageindex += 1;
-                taskindex = 10; //goback page button click
+                taskindex = 12; //goback page button click
+                int r = arc4random_uniform(100);
+                double n = r*3.0/100.0;
+                //n = arc4random_uniform(100)*2/100;
+                //NSLog(@"delay %f",n);
+                [self performSelector:@selector(waitselector) withObject:nil afterDelay:n];
             }
             if (pageindex==totalpage) {
                 taskindex = 20; //goback page button click
             }
+            break;
+        case 12:
+            // do nothing ...
             break;
         case 20:
             // Item 3
@@ -379,6 +395,7 @@ AboutController * aboutcontroller;
             bool b = [webdelegate BuildPub:nil];
             [self setWorking:false];
             [self openoutputfile];
+            [[NSWorkspace sharedWorkspace] openFile:ebookdir withApplication:@"Finder"];
             break;
         default:
             break;
@@ -388,6 +405,16 @@ AboutController * aboutcontroller;
         //taskindex = 20; //goback page button click
         //working = false;
     }
+}
+
+-(void) waitselector {
+    taskindex = 10;
+    pageindex +=1;
+    //NSLog(@"waitselector ...");
+    if (pageindex==totalpage) {
+        taskindex = 20; //goback page button click
+    }
+    
 }
 
 - (void) epubtaskhandle_js:(NSTimer*)theTimer
@@ -432,6 +459,8 @@ AboutController * aboutcontroller;
             bool b = [webdelegate BuildPub:nil];
             [self setWorking:false];
             [self openoutputfile];
+            [[NSWorkspace sharedWorkspace] openFile:ebookdir withApplication:@"Finder"];
+            
             break;
         default:
             break;
@@ -510,25 +539,33 @@ AboutController * aboutcontroller;
     NSString* js;
     
 #ifdef DEBUG
+        js = @"console = { log: function(msg) { MyApp.consoleLog_(msg); } };\
+        document.getElementById(\"email-field\").value = \"info@pwqsoft.com\"; \
+        document.getElementById(\"password-field\").value = \"600338qQ~\";  \
+        document.getElementById(\"signin-form\").submit(); \
+        MyApp.consoleLog_(\"login ...\"); \
+        ";
+
 //    js = @"console = { log: function(msg) { MyApp.consoleLog_(msg); } };\
 //    document.getElementById(\"session_email\").value = \"C004px8@rogers.com\"; \
 //    document.getElementById(\"session_password\").value = \"Newman@101\";  \
 //    document.getElementById(\"new_session\").submit(); \
 //    MyApp.consoleLog_(\"login ...\"); \
 //    ";
-    js = @"console = { log: function(msg) { MyApp.consoleLog_(msg); } };\
-    document.getElementById(\"email-field\").value = \"a02@pwqsoft.com\"; \
-    document.getElementById(\"password-field\").value = \"600338qQ~\";  \
-    document.getElementById(\"signin-form\").submit(); \
-    MyApp.consoleLog_(\"login ...\"); \
-    ";
+
+//    js = @"console = { log: function(msg) { MyApp.consoleLog_(msg); } };\
+//    document.getElementById(\"email-field\").value = \"a02@pwqsoft.com\"; \
+//    document.getElementById(\"password-field\").value = \"600338qQ~\";  \
+//    document.getElementById(\"signin-form\").submit(); \
+//    MyApp.consoleLog_(\"login ...\"); \
+//    ";
     
-    js = @"console = { log: function(msg) { MyApp.consoleLog_(msg); } };\
-    document.getElementById(\"email-field\").value = \"rashadjefferson@gmail.com\"; \
-    document.getElementById(\"password-field\").value = \"Nkbagroup$\";  \
-    document.getElementById(\"signin-form\").submit(); \
-    MyApp.consoleLog_(\"login ...\"); \
-    ";
+//    js = @"console = { log: function(msg) { MyApp.consoleLog_(msg); } };\
+//    document.getElementById(\"email-field\").value = \"rashadjefferson@gmail.com\"; \
+//    document.getElementById(\"password-field\").value = \"Nkbagroup$\";  \
+//    document.getElementById(\"signin-form\").submit(); \
+//    MyApp.consoleLog_(\"login ...\"); \
+//    ";
     //console.log(\"hellow\");";
     [jsobj evaluateWebScript: js];
 #endif
@@ -694,7 +731,26 @@ AboutController * aboutcontroller;
                 taskindex = 11;
             }
             break;
+            
         case 11:
+            // Item 3
+            if( !framewaiting ){
+                taskindex = 12; //goback page button click
+                int r = arc4random_uniform(100);
+                double n = r*3.0/100.0;
+                //n = arc4random_uniform(100)*2/100;
+                //NSLog(@"delay %f",n);
+                [self performSelector:@selector(waitselector) withObject:nil afterDelay:n];
+            }
+            if (pageindex==totalpage) {
+                taskindex = 20; //goback page button click
+            }
+            break;
+        case 12:
+            // do nothing ...
+            break;
+            
+        case 111:
             // Item 3
             if( !framewaiting ){
                 pageindex += 1;
@@ -710,6 +766,8 @@ AboutController * aboutcontroller;
             bool b = [webdelegate Buildpdf:nil];
             [self setWorking:false];
             [self openoutputfile];
+            [[NSWorkspace sharedWorkspace] openFile:ebookdir withApplication:@"Finder"];
+            
             break;
         default:
             break;
@@ -777,6 +835,8 @@ AboutController * aboutcontroller;
             bool b = [webdelegate Buildpdf:nil];
             [self setWorking:false];
             [self openoutputfile];
+            [[NSWorkspace sharedWorkspace] openFile:ebookdir withApplication:@"Finder"];
+            
             break;
         default:
             break;
@@ -818,6 +878,7 @@ AboutController * aboutcontroller;
 
 - (int) openoutputfile
 {
+   
     if (!outputfile) return 0;
     [self log:outputfile];
 
@@ -891,11 +952,11 @@ AboutController * aboutcontroller;
         
         //NSString *str = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
         if ([box isHidden]) {
-            if  ([url rangeOfString:@"/epub/"].location!= NSNotFound) {
-                webdelegate.ebooktype = 0; //epub
-            } else {
-               webdelegate.ebooktype = 1; //pdf
-            }
+//            if  ([url rangeOfString:@"/epub/"].location!= NSNotFound) {
+//                webdelegate.ebooktype = 0; //epub
+//            } else {
+//               webdelegate.ebooktype = 1; //pdf
+//            }
             [box setHidden:false];
             [[textview.textStorage mutableString] setString:@""];
 
@@ -907,7 +968,7 @@ AboutController * aboutcontroller;
     }
 
     if (frame == [sender mainFrame]){
-        //[address setStringValue:url];
+        [address setStringValue:url];
         //[self log:@"didFinishLoadForFrame %@",url];
         //NSLog(@"didFinishLoadForFrame %@",url);
         WebDataSource *source = [frame dataSource];
@@ -930,6 +991,19 @@ AboutController * aboutcontroller;
         //webdelegate.title = atitle;
         //NSLog(@"%@",atitle);
     }
+}
+
+- (void)foundjason
+{
+    NSLog(@"page found");
+    if ([box isHidden]) {
+        [box setHidden:false];
+        [[textview.textStorage mutableString] setString:@""];
+        
+        //[self log:@"ebook ready to download, click download button, \r%@",webdelegate.title];
+        [self log:@"ebook ready to download, click download button, \r"];
+    }
+
 }
 
 #pragma mark - Tools
@@ -988,6 +1062,15 @@ AboutController * aboutcontroller;
 - (IBAction)forwardbtnclick:(id)sender
 {
     [webView goForward:nil];
+}
+
+- (IBAction)homepagebtnclick:(id)sender
+{
+    NSString * aurl = @"https://www.vitalsource.com/bookshelf/home";
+    [[webView mainFrame] loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:aurl]]];
+    if (![box isHidden]) {
+        [box setHidden:true];
+    }
 }
 
 #pragma mark - buy button

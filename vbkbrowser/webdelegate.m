@@ -118,6 +118,8 @@ fromDataSource:(WebDataSource *)dataSource
     if ([pagestr rangeOfString:@"/pages"].location!=NSNotFound) {
         //NSLog(@"pages found %@",s1);
         [self savepages:dict];
+        //[self performSelector: @selector(_mainwin:foundjason:) withObject:nil afterDelay: 0.1];
+        [_mainwin foundjason];
         return;
     }
 
@@ -206,8 +208,18 @@ fromDataSource:(WebDataSource *)dataSource
     
     pagelist = NULL;
     pagelist = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
-    //pagelist.retain;
     
+    //pagelist.retain;
+    //check ebooktype
+    NSDictionary *urldict = [pagelist objectAtIndex:0];
+    NSString * s1 = [urldict objectForKey:@"absoluteURL"];
+    if  ([s1 rangeOfString:@"/epub/"].location!= NSNotFound) {
+        ebooktype = 0; //epub
+        //NSLog(@"epub %@",s1);
+    } else {
+       ebooktype = 1; //pdf
+        //NSLog(@"pdf %@",s1);
+    }
 //    [urllist removeAllObjects];
 //    for (int i=0; i<[pagelist count]; i++) {
 //        NSDictionary *urldict = [pagelist objectAtIndex:i];
@@ -242,6 +254,7 @@ fromDataSource:(WebDataSource *)dataSource
 - (NSString *) nextpage: (int)page
 {
     if (page<[urllist count]) {
+        UpdateSystemActivity(OverallAct);
         return [urllist objectAtIndex:page];
     }
     return NULL;
@@ -279,6 +292,13 @@ fromDataSource:(WebDataSource *)dataSource
     //path = [[fname lastPathComponent] stringByDeletingPathExtension];
     path = [fname stringByDeletingLastPathComponent];
     [self createfolder:path];
+
+    //clear html page
+//    NSString * ext = [fname pathExtension];
+//    if ([ext rangeOfString:@".xhtml.html"].location != NSNotFound) {
+//        //mimetype = @"application/xhtml+xml";
+//    }
+    
     if (data != nil) {
         [data writeToFile:fname atomically:YES];
     }
@@ -439,6 +459,9 @@ fromDataSource:(WebDataSource *)dataSource
         //NSLog(@"%@",fname);
         NSString * scfi = [[fname lastPathComponent] stringByDeletingPathExtension];
         scfi = [scfi stringByDeletingPathExtension];
+        if (scfi.length == 0) {
+            scfi = [NSString stringWithFormat:@"page%d",i];
+        }
         //NSLog(@"%@",scfi);
         pageidlist= [NSString stringWithFormat:@"%@\r\t\t<item href=\"%@\" id=\"%@\" media-type=\"application/xhtml+xml\"/>",pageidlist,fname,scfi];
         itemreflist= [NSString stringWithFormat:@"%@\r\t\t<itemref idref=\"%@\"/>",itemreflist,scfi];
@@ -522,6 +545,7 @@ fromDataSource:(WebDataSource *)dataSource
         //NSString * scfi = [[fname lastPathComponent] stringByDeletingPathExtension];
         //scfi = [scfi stringByDeletingPathExtension];
         NSString * scfi = [urldict objectForKey:@"chapterTitle"];
+        scfi = [self cleanstring:scfi];
         //if ([titlelist count]>i)
         //    scfi = [titlelist objectAtIndex:i];
         //NSLog(@"%@",scfi);
@@ -531,6 +555,9 @@ fromDataSource:(WebDataSource *)dataSource
         nvpoint= [NSString stringWithFormat:@"%@\r\t\t</navLabel>",nvpoint];
         nvpoint= [NSString stringWithFormat:@"%@\r\t\t<content src=\"%@\"/>",nvpoint,fname];
         nvpoint= [NSString stringWithFormat:@"%@\r\t\t</navPoint>",nvpoint];
+        
+        NSString * htmlfile = [path stringByAppendingPathComponent:fname];
+        [self CleanHtml:htmlfile];
         
         if (![reg isreg])
         {
@@ -556,6 +583,17 @@ fromDataSource:(WebDataSource *)dataSource
     [data writeToFile:s1 atomically:YES];
 }
 
+- (bool) CleanHtml:(NSString *) filePath
+{
+    NSData *data = [NSData dataWithContentsOfFile:filePath];
+    NSString *opfstr = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+    opfstr = [opfstr stringByReplacingOccurrencesOfString:@"visibility:hidden !important" withString:@""];
+
+    data = [opfstr dataUsingEncoding:NSUTF8StringEncoding];
+    [data writeToFile:filePath atomically:YES];
+    NSLog(@"clean file %@",filePath);
+    return true;
+}
 
 - (bool) BuildPub:(NSString *) afile
 {
@@ -746,6 +784,14 @@ fromDataSource:(WebDataSource *)dataSource
 
     return fname;
 }
+
+- (NSString *) cleanstring: (NSString *) str
+{
+    NSString * fname = [str stringByTrimmingCharactersInSet:[NSCharacterSet illegalCharacterSet]];
+    
+    return fname;
+}
+
 
 - (NSString *) removelash: (NSString *) str
 {

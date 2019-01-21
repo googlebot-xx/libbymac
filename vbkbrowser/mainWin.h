@@ -40,6 +40,7 @@
 @property (nonatomic, retain) NSString* outputfile;
 
 - (void)checkkey;
+- (void)foundjason;
 //- (void)log:(NSString*)msg;
 - (void) log:(NSString *)formatString, ...;
 

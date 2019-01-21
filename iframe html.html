@@ -1,0 +1,101 @@
+<iframe name="easyXDM_default4019_provider" id="easyXDM_default4019_provider" src="https://jigsaw.vitalsource.com/books/9781506301532DEMO/pages/recent?jigsaw_brand=vitalsource&amp;xdm_e=https%3A%2F%2Fbookshelf.vitalsource.com&amp;xdm_c=default4019&amp;xdm_p=1" scrolling="no" title="Entering Book Content" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" width="100%" height="100%" frameborder="0"></iframe>
+
+<iframe name="easyXDM_default4019_provider" id="easyXDM_default4019_provider" src="https://jigsaw.vitalsource.com/books/9781506301532DEMO/pages/recent?jigsaw_brand=vitalsource&amp;xdm_e=https%3A%2F%2Fbookshelf.vitalsource.com&amp;xdm_c=default4019&amp;xdm_p=1" scrolling="no" title="Entering Book Content" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" width="100%" height="100%" frameborder="0"></iframe>
+
+html body div#bookshelf div#reader-handler div#jigsaw-placeholder-outer div#jigsaw-placeholder-inner div#jigsaw-placeholder iframe#easyXDM_default7564_provider
+html body div#epub-container iframe#epub-content
+
+<iframe name="easyXDM_default432_provider" id="easyXDM_default432_provider" src="https://jigsaw.vitalsource.com/books/9781506301587DEMO/pages/recent?jigsaw_brand=vitalsource&amp;xdm_e=https%3A%2F%2Fbookshelf.vitalsource.com&amp;xdm_c=default432&amp;xdm_p=1" scrolling="no" title="Entering Book Content" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" width="100%" height="100%" frameborder="0"></iframe>
+
+
+<iframe id="epub-content" allowtransparency="true" src="/books/9781506301587DEMO/epub/OEBPS/ch0005.xlink.xhtml?create=true#cfi=/6/6" title="Book Content" scrolling="auto" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" style="display: block; transform-origin: 0px 0px 0px;" width="100%" height="100%" frameborder="0"></iframe>
+
+<div id="epub-container" style="overflow: hidden;">
+	<iframe id="epub-content" allowtransparency="true" src="/books/VSMTEST-SALES-DEMO-EPUB/epub/OEBPS/sample.xhtml?create=true#cfi=/6/2" title="Book Content" scrolling="auto" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" style="display: block; transform-origin: 0px 0px 0px;" width="100%" height="100%" frameborder="0"></iframe>
+</div>
+
+var x = document.getElementById("epub-content");
+var y = (x.contentWindow || x.contentDocument);
+if (y.document)y = y.document;
+y.body.style.backgroundColor = "red";
+
+var items = document.getElementsByTagName("iframe"); 
+MyApp.consoleLog_("iframe="+items.length);
+var x = items[0];
+var y = (x.contentWindow || x.contentDocument);
+if (y.document) {
+   html=y.document.getElementsByTagName("html")[0];
+	MyApp.consoleLog_("y.doc");
+}
+
+if (items.length<3) {throw ''; }  
+
+var items = document.getElementsByTagName("iframe"); 
+MyApp.consoleLog_("iframe="+items.length);
+var x = items[0];
+var y = (x.contentWindow || x.contentDocument);
+if (y.document) {
+   html=y.document.getElementsByTagName("html")[0];
+	MyApp.consoleLog_("y.doc");
+}
+MyApp.consoleLog_(“y.end”);
+
+var items = document.getElementsByTagName("iframe"); 
+MyApp.consoleLog_("iframe="+items.length);
+var x = items[0];
+var y = x.contentDocument;
+============================
+	var y = doc.getElementsByTagName("iframe");
+=====================================
+var items = document.getElementsByTagName("iframe"); 
+MyApp.consoleLog_("iframe="+items.length);
+var x = items[1];
+src = x.getAttribute("src");
+
+MyApp.consoleLog_(src);
+/* var doc = x.contentDocument ? x.contentDocument: */
+var doc = x.contentWindow.document;
+try {
+	if(doc)
+	var y = doc.getElementsByTagName("iframe");
+}
+catch(err) {
+    MyApp.consoleLog_(err.message);
+}
+MyApp.consoleLog_("end");
+===================================
+var s = "document.getElementsByTagName('iframe');";
+==================================
+var items = document.getElementsByTagName("iframe"); 
+try {
+	var x = items[1].contentDocument;
+	var y = x.getElementsByTagName("iframe");
+}
+catch(err) {
+    MyApp.consoleLog_(err.message);
+}
+MyApp.consoleLog_("end");
+==============================
+var items= document.getElementsByTagName("html"); 
+try {
+	var x = items[0].innerHTML;
+	MyApp.consoleLog_(x);
+}
+catch(err) {
+    MyApp.consoleLog_(err.message);
+}
+MyApp.consoleLog_("end");
+===============================
+var items= document.getElementsByTagName("html"); 
+var x = items[0].innerHTML;
+MyApp.consoleLog_(x);
+========================
+var items= document.getElementsByTagName("body"); 
+var x = items[0].innerHTML;
+MyApp.consoleLog_(x);
+========================
+old:
+WebScriptObject *win = [[[[webPluginContainerKey webFrame] webView] windowScriptObject] valueForKey:@"deliveryFrame"];
+new:
+WebScriptObject *win = [[[[webPluginContainerKey webFrame] webView] windowScriptObject] valueForKey:[[webPluginContainerKey webFrame] name]];
+

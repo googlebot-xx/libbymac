@@ -37,7 +37,7 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <webView misplaced="YES" id="Xl8-hg-SMd">
-                        <rect key="frame" x="0.0" y="20" width="1034" height="569"/>
+                        <rect key="frame" x="0.0" y="4" width="1034" height="583"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <webPreferences key="preferences" defaultFontSize="12" defaultFixedFontSize="12">
                             <nil key="identifier"/>
@@ -170,6 +170,17 @@
                                         <action selector="testbtn:" target="-2" id="hVY-rm-08j"/>
                                     </connections>
                                 </button>
+                                <button toolTip="Go Back" misplaced="YES" id="ZaU-8s-wLN">
+                                    <rect key="frame" x="362" y="10" width="22" height="22"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                    <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="go-home" imagePosition="only" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="yGo-at-0Rj">
+                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                        <font key="font" metaFont="system"/>
+                                    </buttonCell>
+                                    <connections>
+                                        <action selector="homepagebtnclick:" target="-2" id="Cfx-ey-Z51"/>
+                                    </connections>
+                                </button>
                             </subviews>
                         </view>
                         <color key="fillColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -211,7 +222,7 @@
                                 <button verticalHuggingPriority="750" misplaced="YES" id="FYH-rc-1ff">
                                     <rect key="frame" x="384" y="344" width="29" height="26"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                    <buttonCell key="cell" type="disclosure" bezelStyle="roundedDisclosure" image="E96A43D2-491D-4F53-AE72-AD23EE50B5AF" imagePosition="only" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="5Zq-CO-L5S">
+                                    <buttonCell key="cell" type="disclosure" bezelStyle="roundedDisclosure" image="1C4A2430-AEA0-4BB8-8566-93F64CE338C8" imagePosition="only" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="5Zq-CO-L5S">
                                         <behavior key="behavior" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
                                         <font key="font" metaFont="system"/>
                                     </buttonCell>
@@ -253,7 +264,7 @@
         </window>
     </objects>
     <resources>
-        <image name="E96A43D2-491D-4F53-AE72-AD23EE50B5AF" width="1" height="1">
+        <image name="1C4A2430-AEA0-4BB8-8566-93F64CE338C8" width="1" height="1">
             <mutableData key="keyedArchiveRepresentation">
 YnBsaXN0MDDUAQIDBAUGPT5YJHZlcnNpb25YJG9iamVjdHNZJGFyY2hpdmVyVCR0b3ASAAGGoK4HCBMU
 GR4fIyQrLjE3OlUkbnVsbNUJCgsMDQ4PEBESVk5TU2l6ZVYkY2xhc3NcTlNJbWFnZUZsYWdzVk5TUmVw
@@ -306,6 +317,7 @@ CiEKKQosCjEKOQo8Ck4KUQpWAAAAAAAAAgEAAAAAAAAAQQAAAAAAAAAAAAAAAAAAClg
         </image>
         <image name="about" width="48" height="48"/>
         <image name="buy" width="48" height="48"/>
+        <image name="go-home" width="104.72727203369141" height="104.72727203369141"/>
         <image name="help" width="48" height="48"/>
         <image name="share-sign" width="32" height="32"/>
         <image name="sign-left" width="32" height="32"/>
