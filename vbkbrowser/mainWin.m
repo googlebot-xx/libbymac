@@ -158,7 +158,7 @@ AboutController * aboutcontroller;
     [webView setResourceLoadDelegate:webdelegate];
     [webView setPolicyDelegate:self];
     [webView setFrameLoadDelegate:self];
-    webView.customUserAgent=@"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:53.0) Gecko/20100101";
+    webView.customUserAgent=@"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.75.14 (KHTML, like Gecko) Version/7.0.3 Safari/7046A194A";
     
 
     //NSString * aurl = @"https://www.vitalsource.com/bookshelf/home";
