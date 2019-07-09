@@ -222,7 +222,7 @@
                                 <button verticalHuggingPriority="750" misplaced="YES" id="FYH-rc-1ff">
                                     <rect key="frame" x="384" y="344" width="29" height="26"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                    <buttonCell key="cell" type="disclosure" bezelStyle="roundedDisclosure" image="1C4A2430-AEA0-4BB8-8566-93F64CE338C8" imagePosition="only" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="5Zq-CO-L5S">
+                                    <buttonCell key="cell" type="disclosure" bezelStyle="roundedDisclosure" image="745A591C-8DCF-4F64-A9D3-EBFBB6DDB87E" imagePosition="only" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="5Zq-CO-L5S">
                                         <behavior key="behavior" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
                                         <font key="font" metaFont="system"/>
                                     </buttonCell>
@@ -259,12 +259,13 @@
             </view>
             <connections>
                 <outlet property="delegate" destination="-2" id="0bl-1N-AYu"/>
+                <outlet property="initialFirstResponder" destination="Xl8-hg-SMd" id="T9Y-zf-Zih"/>
             </connections>
             <point key="canvasLocation" x="1296" y="-212"/>
         </window>
     </objects>
     <resources>
-        <image name="1C4A2430-AEA0-4BB8-8566-93F64CE338C8" width="1" height="1">
+        <image name="745A591C-8DCF-4F64-A9D3-EBFBB6DDB87E" width="1" height="1">
             <mutableData key="keyedArchiveRepresentation">
 YnBsaXN0MDDUAQIDBAUGPT5YJHZlcnNpb25YJG9iamVjdHNZJGFyY2hpdmVyVCR0b3ASAAGGoK4HCBMU
 GR4fIyQrLjE3OlUkbnVsbNUJCgsMDQ4PEBESVk5TU2l6ZVYkY2xhc3NcTlNJbWFnZUZsYWdzVk5TUmVw

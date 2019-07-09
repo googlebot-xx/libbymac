@@ -1,0 +1,58 @@
+<button class="navigation-button no-button horizontal-button next-button" style="display: block;"><span class="isvg loaded" aria-hidden="true"><svg width="20" height="11" viewBox="0 0 20 11" xmlns="http://www.w3.org/2000/svg"><title>chevron_left_large</title><path d="M10 8.579L5.923 4.502 1.714.293A.999.999 0 0 0 .3.293L.293.299a1 1 0 0 0 0 1.415L8.579 10l.645.644.016-.016c.183.222.45.372.76.372a.997.997 0 0 0 .707-.293l.003.003.711-.71 3.434-3.434 4.852-4.852a1 1 0 0 0 0-1.415L19.7.293a.999.999 0 0 0-1.414 0L10 8.579z" fill="#757575" fill-rule="evenodd"></path></svg></span><span class="offScreen">Next</span></button>
+
+next page
+Navigation [<!--framePath //<!--frame2-->/<!--frame2-->-->] https://jigsaw.vitalsource.com/books/9781635672275/pages/450773326/content?width=1600
+2019-05-17 16:02:32.584174 VitalSource Downloader[40798:1461784] Navigation [] https://bookshelf.vitalsource.com/#/books/9781635672275/cfi/8
+2019-05-17 16:02:33.726848 VitalSource Downloader[40798:1461784] Frame [<!--framePath //<!--frame2-->/<!--frame2-->-->] https://jigsaw.vitalsource.com/books/9781635672275/pages/450773326/content?width=1600
+
+<iframe id="epub-content" allowtransparency="true" title="Book Content" src="/books/9781635672275/pages/450773317/content?create=true" scrolling="auto" style="transform-origin: 0px 0px 0px;" width="100%" height="100%" frameborder="0"></iframe>
+
+epub frame
+
+2019-05-16 08:15:42.953212 VitalSource Downloader[37092:1313478] Frame [epub-content] https://jigsaw.vitalsource.com/books/VCS-0074009900852/epub/EPUB/screens/000055366094202008.xhtml
+2019-05-16 08:15:59.425345 VitalSource Downloader[37092:1313478] Frame [epub-content] https://jigsaw.vitalsource.com/books/VCS-0074009900852/epub/EPUB/screens/000105625142173835.xhtml
+2019-05-16 08:16:17.526651 VitalSource Downloader[37092:1313478] Frame [epub-content] https://jigsaw.vitalsource.com/books/VCS-0074009900852/epub/EPUB/screens/welcome-01.xhtml#cfi=/6/4%5B;vnd.vst.idref=vst-ae169b91-f520-449d-b99c-655767e4d0a1%5D!
+2019-05-16 08:16:25.821301 VitalSource Downloader[37092:1313478] Frame [epub-content] https://jigsaw.vitalsource.com/books/VCS-0074009900852/epub/EPUB/screens/000059562188144505.xhtml
+2019-05-16 08:16:32.999248 VitalSource Downloader[37092:1313478] Frame [epub-content] https://jigsaw.vitalsource.com/books/VCS-0074009900852/epub/EPUB/screens/how-to-access-your-ebooks.xhtml
+2019-05-16 08:16:40.831786 VitalSource Downloader[37092:1313478] Frame [epub-content] https://jigsaw.vitalsource.com/books/VCS-0074009900852/epub/EPUB/screens/find-an-ebook-in-an-lms-course.xhtml
+
+
+pdf frame
+
+2019-05-16 08:17:34.652153 VitalSource Downloader[37092:1313478] Frame [<!--framePath //<!--frame2-->/<!--frame2-->-->] https://jigsaw.vitalsource.com/books/9781635672275/pages/450773319/content?width=1600
+2019-05-16 08:17:43.123999 VitalSource Downloader[37092:1313478] Frame [<!--framePath //<!--frame2-->/<!--frame2-->-->] https://jigsaw.vitalsource.com/books/9781635672275/pages/450773320/content?width=1600
+2019-05-16 08:17:49.730285 VitalSource Downloader[37092:1313478] Frame [next-page] https://jigsaw.vitalsource.com/books/9781635672275/pages/450773321/content?width=1600
+2019-05-16 08:18:16.292651 VitalSource Downloader[37092:1313478] Frame [<!--framePath //<!--frame2-->/<!--frame2-->-->] https://jigsaw.vitalsource.com/books/9781635672275/pages/450773322/content?width=1600
+2019-05-16 08:18:29.870105 VitalSource Downloader[37092:1313478] Frame [<!--framePath //<!--frame2-->/<!--frame2-->-->] https://jigsaw.vitalsource.com/books/9781635672275/pages/450773323/content?width=1600
+2019-05-16 08:18:36.211496 VitalSource Downloader[37092:1313478] Frame [next-page] https://jigsaw.vitalsource.com/books/9781635672275/pages/450773324/content?width=1600
+2019-05-16 08:18:42.794231 VitalSource Downloader[37092:1313478] Frame [<!--framePath //<!--frame2-->/<!--frame2-->-->] https://jigsaw.vitalsource.com/books/9781635672275/pages/450773325/content?width=1600
+2019-05-16 08:18:57.892589 VitalSource Downloader[37092:1313478] Frame [<!--framePath //<!--frame2-->/<!--frame2-->-->] https://jigsaw.vitalsource.com/books/9781635672275/pages/450773326/content?width=1600
+2019-05-16 08:19:04.034879 VitalSource Downloader[37092:1313478] Frame [next-page] https://jigsaw.vitalsource.com/books/9781635672275/pages/450773327/content?width=1600
+2019-05-16 08:19:16.316618 VitalSource Downloader[37092:1313478] Frame [<!--framePath //<!--frame2-->/<!--frame2-->-->] https://jigsaw.vitalsource.com/books/9781635672275/pages/450773328/content?width=1600
+
+
+Frame [epub-content] https://jigsaw.vitalsource.com/books/VCS-0074009900852/epub/EPUB/screens/000059637188192318.xhtml
+2019-05-16 14:01:13.540321 VitalSource Downloader[37855:1345032] Frame [<!--framePath //<!--frame2-->/<!--frame0-->/<!--frame0-->-->] about:blank
+
+
+https://bookshelf.vitalsource.com/#/books/VCS-0074009900852/cfi/6/8!/4/6/4/2/2/2/2/2@0:0
+https://bookshelf.vitalsource.com/#/books/VCS-0074009900852/cfi/6/20!/4/6/4/2/2/2/2@0:0
+https://bookshelf.vitalsource.com/#/books/VCS-0074009900852/cfi/6/12!/4/6/4/2/2/2/2/2@0:0
+https://bookshelf.vitalsource.com/#/books/VCS-0074009900852/cfi/6/10!/4/6/4/2/2/2/2@0:0
+https://bookshelf.vitalsource.com/#/books/VCS-0074009900852/cfi/6/20!/4/6/4/2/2/2/2@0:0
+https://bookshelf.vitalsource.com/#/books/VCS-0074009900852/cfi/6/22!/4/6/4/2/2/2/2@0:0
+https://bookshelf.vitalsource.com/#/books/VCS-0074009900852/cfi/6/24!/4/6/4/2/2/2/2@0:0
+
+[{"path":"/EPUB/screens/cover.xhtml","absoluteURL":"/books/VCS-0074009900852/epub/EPUB/screens/cover.xhtml","cfi":"/6/2[;vnd.vst.idref=vst-4b4cfacf-80a2-440c-acaf-70ed8fb158f1]","cfiWithoutAssertions":"/6/2","linear":true,"page":"1","chapterTitle":"Cover"},{"path":"/EPUB/screens/welcome-01.xhtml","absoluteURL":"/books/VCS-0074009900852/epub/EPUB/screens/welcome-01.xhtml","cfi":"/6/4[;vnd.vst.idref=vst-ae169b91-f520-449d-b99c-655767e4d0a1]","cfiWithoutAssertions":"/6/4","linear":true,"page":"2","chapterTitle":"Welcome!"},{"path":"/EPUB/screens/000059562188144505.xhtml","absoluteURL":"/books/VCS-0074009900852/epub/EPUB/screens/000059562188144505.xhtml","cfi":"/6/6[;vnd.vst.idref=vst-1bc048d4-7e99-404a-bce8-5dda6038a042]","cfiWithoutAssertions":"/6/6","linear":true,"page":"3","chapterTitle":"Getting Started"},{"path":"/EPUB/screens/how-to-access-your-ebooks.xhtml","absoluteURL":"/books/VCS-0074009900852/epub/EPUB/screens/how-to-access-your-ebooks.xhtml","cfi":"/6/8[;vnd.vst.idref=vst-70a6f9d3-0932-45ba-a583-6060eab3e536]","cfiWithoutAssertions":"/6/8","linear":true,"page":"4","chapterTitle":"Part 1: How Do I Access My Digital Content?"},{"path":"/EPUB/screens/find-an-ebook-in-an-lms-course.xhtml","absoluteURL":"/books/VCS-0074009900852/epub/EPUB/screens/find-an-ebook-in-an-lms-course.xhtml","cfi":"/6/10[;vnd.vst.idref=vst-353dae26-fc2c-4666-9f42-8780bbd7b96c]","cfiWithoutAssertions":"/6/10","linear":true,"page":"5","chapterTitle":"Find an eBook in Your Learning Management System"},
+
+https://bookshelf.vitalsource.com/#/books/9781635672275/cfi/0
+https://bookshelf.vitalsource.com/#/books/9781635672275/cfi/5
+https://bookshelf.vitalsource.com/#/books/9781635672275/cfi/8
+
+https://bookshelf.vitalsource.com/#/books/9781635672275/cfi/3!/4/2@100:0.00
+
+    [[webView mainFrame] loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:s1]]];
+//    }
+    [[webView mainFrame] loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:aurl]]];	
+	
+	[{"path":"/pages/450773317/content","absoluteURL":"/books/9781635672275/pages/450773317/content","cfi":"/0","cfiWithoutAssertions":"/0","linear":null,"page":"Front Cover","chapterTitle":"SAMPLE: Computer Forensics Associate - Chapter 1 Preview","index":0},{"path":"/pages/450773318/content","absoluteURL":"/books/9781635672275/pages/450773318/content","cfi":"/1","cfiWithoutAssertions":"/1","linear":null,"page":"I","chapterTitle":"SAMPLE: Computer Forensics Associate - Chapter 1 Preview","index":1},{"path":"/pages/450773319/content","absoluteURL":"/books/9781635672275/pages/450773319/content","cfi":"/2","cfiWithoutAssertions":"/2","linear":null,"page":"II","chapterTitle":"SAMPLE: Computer Forensics Associate - Chapter 1 Preview","index":2},{"path":"/pages/450773320/content","absoluteURL":"/books/9781635672275/pages/450773320/content","cfi":"/3","cfiWithoutAssertions":"/3","linear":null,"page":"III","chapterTitle":"SAMPLE: Computer Forensics Associate - Chapter 1 Preview","index":3},{"path":"/pages/450773321/content","absoluteURL":"/books/9781635672275/pages/450773321/content","cfi":"/4","cfiWithoutAssertions":"/4","linear":null,"page":"IV","chapterTitle":"SAMPLE: Computer Forensics Associate - Chapter 1 Preview","index":4},

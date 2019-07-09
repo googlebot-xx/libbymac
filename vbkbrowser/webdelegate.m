@@ -18,12 +18,13 @@
 @end
 
 @implementation WebDelegate {
-    NSString * ebookid;
+//    NSString * ebookid;
 }
 
 @synthesize tick;
 @synthesize ticked;
 @synthesize title;
+@synthesize ebookid;
 @synthesize ebooktype;
 @synthesize pagelist;
 
@@ -34,7 +35,7 @@
         //aboutcontroller = [[AboutController alloc] initWithWindowNibName:@"AboutController"];
         urllist = [[NSMutableArray alloc] init];
         titlelist = [[NSMutableArray alloc] init];
-        timer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(timerFired:) userInfo:nil repeats:YES];
+        //timer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(timerFired:) userInfo:nil repeats:YES];
         title = @"test epub";
         ebooktype = 0;
         //_mainwin = self;
@@ -70,7 +71,7 @@
 fromDataSource:(WebDataSource *)dataSource
 {
     //NSString *url = [self urldecode:request];
-    //NSLog(@"%@",url);
+    //NSLog(@"Resource %@",url);
     
     //[urllist addObject:[request URL]];
     //[_mainwin log:url];
@@ -93,9 +94,9 @@ fromDataSource:(WebDataSource *)dataSource
     if ([path rangeOfString:@"/books/"].location !=NSNotFound) {
         isbook = true;
     }
-    
+
     if (isbook) {
-        //NSLog(@"didFinishDataSource %d %@ ",tick,url);
+        //NSLog(@"didFinish %d %@ ",tick,idurl);
         //version 1
         //NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys: identifier, @"url", dataSource, @"dataSource", nil];
         
@@ -150,6 +151,8 @@ fromDataSource:(WebDataSource *)dataSource
     //NSString *str = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
 
     //version 2
+    //NSLog(@"saveres %@",s1);
+    
     WebResource *wd = [dict objectForKey: @"dataSource"];
     NSData *data = [wd data];
     [self saveepubfile:s1 data:data];
@@ -157,7 +160,7 @@ fromDataSource:(WebDataSource *)dataSource
     
     //pdf ebook next page
     if (_mainwin.working && [s1 rangeOfString:@"/encrypted/"].location!=NSNotFound ) {
-        [self saveurl:s1];
+        //[self saveurl:s1];
         //NSLog(@"save url %@",s1);
         ticked = true;
     }
@@ -205,7 +208,8 @@ fromDataSource:(WebDataSource *)dataSource
     //NSString *str = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
     //NSLog(@"%@",str);
 #endif
-    
+   
+    title = nil;
     pagelist = NULL;
     pagelist = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
     
@@ -213,6 +217,7 @@ fromDataSource:(WebDataSource *)dataSource
     //check ebooktype
     NSDictionary *urldict = [pagelist objectAtIndex:0];
     NSString * s1 = [urldict objectForKey:@"absoluteURL"];
+    ebookid = [self getbookid:s1];
     if  ([s1 rangeOfString:@"/epub/"].location!= NSNotFound) {
         ebooktype = 0; //epub
         //NSLog(@"epub %@",s1);
@@ -236,8 +241,13 @@ fromDataSource:(WebDataSource *)dataSource
     [urllist removeAllObjects];
     for (int i=0; i<[pagelist count]; i++) {
         NSDictionary *urldict = [pagelist objectAtIndex:i];
+        //NSString * s1 = [urldict objectForKey:@"cfi"];
         NSString * s1 = [urldict objectForKey:@"absoluteURL"];
-        s1 = [NSString stringWithFormat:@"https://jigsaw.vitalsource.com%@",s1];
+        if (ebooktype==1)
+           s1 = [NSString stringWithFormat:@"https://jigsaw.vitalsource.com%@?width=2000",s1];
+        else
+            s1 = [NSString stringWithFormat:@"https://jigsaw.vitalsource.com%@",s1];
+        //s1 = [NSString stringWithFormat:@"https://jigsaw.vitalsource.com/books/%@/cfi%@",ebookid, s1];
         [urllist addObject:s1];
     }
 }
@@ -279,7 +289,11 @@ fromDataSource:(WebDataSource *)dataSource
     if (!bookid) return;  //no bookid no save
     
     bool isepub = [path rangeOfString:@"/epub/"].location!=NSNotFound;
-
+    //int p = [path rangeOfString:bookid options:NSBackwardsSearch ].location;
+    //NSLog(@"path %@ %d",path, [path length]);
+    //if ([path rangeOfString:bookid options:NSBackwardsSearch ].location==7)
+    if ([path length] == (7+[bookid length]))
+        return;
    
     NSString * fname;
     if  (isepub) {
@@ -559,7 +573,7 @@ fromDataSource:(WebDataSource *)dataSource
         NSString * htmlfile = [path stringByAppendingPathComponent:fname];
         [self CleanHtml:htmlfile];
         
-        if (![reg isreg])
+        if (false && ![reg isreg])
         {
             int j = i % 2;
             if (i>2 && j==0) { //copy demo page from 4
@@ -591,7 +605,7 @@ fromDataSource:(WebDataSource *)dataSource
 
     data = [opfstr dataUsingEncoding:NSUTF8StringEncoding];
     [data writeToFile:filePath atomically:YES];
-    NSLog(@"clean file %@",filePath);
+    //NSLog(@"clean file %@",filePath);
     return true;
 }
 
@@ -652,26 +666,92 @@ fromDataSource:(WebDataSource *)dataSource
     return path;
 }
 
+- (bool) pdfimglist
+{
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    NSDictionary *urldict = [pagelist objectAtIndex:0];
+    
+    NSString * idpath = [self getepubfolder:[urldict objectForKey:@"absoluteURL"] path:[urldict objectForKey:@"path"]];
+    //NSString * path = [_mainwin.datadir stringByAppendingPathComponent:idpath];
+    NSString * path = [_mainwin.datadir stringByAppendingPathComponent:ebookid];
+
+    [urllist removeAllObjects];
+    for (int i=0; i<[pagelist count];i++){
+        NSDictionary *urldict = [pagelist objectAtIndex:i];
+        NSString * fname = [urldict objectForKey:@"absoluteURL"];
+        fname = [self removelash:fname];
+        NSString * htmlfile = [path stringByAppendingPathComponent:fname];
+        //NSLog(htmlfile);
+        if (![fileManager fileExistsAtPath:htmlfile]) {
+            [_mainwin log:@"Missing page %d",i];
+            continue;
+        }
+//        NSLog(htmlfile);
+        NSData *data = [NSData dataWithContentsOfFile:htmlfile];
+        NSString *htmlstr = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+        NSString * s1= nil;
+        NSString * s2=@"src=\"";
+        NSString * s3=@"\"";
+        NSRange r1 = [htmlstr rangeOfString:s2 options:NSCaseInsensitiveSearch];
+        NSRange r2 = [htmlstr rangeOfString:s3 options:NSCaseInsensitiveSearch range:NSMakeRange(r1.location+6,[htmlstr length]-r1.location-10)];
+        NSString * img = nil;
+        if ((r1.location!=NSNotFound) && (r2.location != NSNotFound)) {
+            r1.location = r1.location+[s2 length];
+            r1.length = r2.location-r1.location;
+            img = [htmlstr substringWithRange:r1];
+            //NSLog(img);
+            img = [img stringByDeletingLastPathComponent];
+            //s1 = [NSString stringWithFormat:@"%@//%@",_mainwin.datadir,ebookid];
+            s1 = [_mainwin.datadir stringByAppendingPathComponent:ebookid];
+            img = [s1 stringByAppendingPathComponent:img];
+            s1 = [img stringByAppendingPathComponent:@"2000"];
+            s2 = [img stringByAppendingPathComponent:@"1600"];
+            s3 = [img stringByAppendingPathComponent:@"800"];
+            //NSLog(s1);
+            if ([fileManager fileExistsAtPath:s1]) { //2000
+                [urllist addObject:s1];
+            }
+            else if ([fileManager fileExistsAtPath:s2]) { //1600
+                [urllist addObject:s2];
+            }
+            else if ([fileManager fileExistsAtPath:s3]) {  //800
+                [urllist addObject:s3];
+            } else {
+                [_mainwin log:@"Missing PDF img %d",i];
+            }
+        } else {
+            [_mainwin log:@"Missing img tag %d",i];
+        }
+        
+        
+        
+    }
+    return true;
+}
+
+
 - (bool) Buildpdf:(NSString *) afile
 {
 //        [urllist addObject:@"https://jigsaw.vitalsource.com/books/9781446297650DEMO/images/553246736447566b58312f6a624d4f4747432b504e674f7473614c397473465736735567315635486a446f3d0a/encrypted/1600"];
 //        [urllist addObject:@"https://jigsaw.vitalsource.com/books/9781446297650DEMO/images/553246736447566b583138496e4237495553664c6c335736426b6e54387236615a6b7662463358596c4b773d0a/encrypted/1600"];
 //        [urllist addObject:@"https://jigsaw.vitalsource.com/books/9781446297650DEMO/images/553246736447566b58312b756244794e2f4550664641416137476b486d796e7a4f61734543754f5a4737673d0a/encrypted/1600"];
-    
+    NSString * dir;
     //title = [titlelist objectAtIndex:0];
-    NSString * dir = [self getpdftmpfolder:[urllist objectAtIndex:0]];
+    //NSString * dir = [self getpdftmpfolder:[urllist objectAtIndex:0]];
     //NSString * dir = [_mainwin.datadir stringByAppendingPathComponent:idpath];
-    
+    //NSLog(dir);
+    [self pdfimglist];
+    //return true;
     //NSLog(@"%@",dir);
     _mainwin.outputfile = nil;
 
     PDFDocument *pdf = [[PDFDocument alloc] init];
     //NSImage * img = scaledImage;
-    
+    [_mainwin log:@"Load pdf pages %d ...", [urllist count]];
     for (NSString *url in urllist) {
         
-        NSString * path = [self urltopath:url];
-        path = [dir stringByAppendingPathComponent:path];
+        NSString * path = url ;//[self urltopath:url];
+        //path = [dir stringByAppendingPathComponent:path];
         //NSLog(@"%@", path);
         
         NSFileManager *fileManager = [NSFileManager defaultManager];
@@ -697,6 +777,7 @@ fromDataSource:(WebDataSource *)dataSource
     fname = [_mainwin.ebookdir stringByAppendingPathComponent:fname];
     
    	[pdf writeToFile:  fname];
+    [_mainwin log:@"PDF file saved %s", fname];
     _mainwin.outputfile = fname;
     //[pdf release];
     return true;

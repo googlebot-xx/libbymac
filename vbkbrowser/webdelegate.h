@@ -19,6 +19,7 @@
     NSString *idurl;
     int ebooktype;
     NSString * title;
+    NSString * ebookid;
     NSString * epubfile;
     NSArray * pagelist;
 }
@@ -36,6 +37,7 @@
 @property (nonatomic, assign) int ebooktype;
 @property (nonatomic, assign) BOOL ticked;
 @property (nonatomic, retain) NSString* title;
+@property (nonatomic, retain) NSString* ebookid;
 @property (nonatomic, retain) NSString* epubfile;
 @property (nonatomic, retain) NSArray* pagelist;
 @end

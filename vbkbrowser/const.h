@@ -23,9 +23,9 @@
 #define c_active @"https://www.ebook-converter.com/download/activevsprinter.php?id=%@&pid=%@"
 #define c_str @"vistaldownload"
 #define c_pid @"46"
-#define c_times 12
+#define c_times 40
 
-//e17942a289d95a5f
+//40ccbda02539220a
 #define c_seed @"vitaldownmac"
 #define contains(str1, str2) ([str1 rangeOfString: str2 ].location != NSNotFound)
 
