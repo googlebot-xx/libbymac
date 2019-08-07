@@ -9,8 +9,10 @@
 #import "webdelegate.h"
 #import "BuyController.h"
 #import "const.h"
+#import "MyURLProtocol.h"
 #import "mainWin.h"
 #import "ZipArchive.h"
+
 
 
 @interface WebDelegate () <WebResourceLoadDelegate>
@@ -78,10 +80,48 @@ fromDataSource:(WebDataSource *)dataSource
     return [request URL];
 }
 
+//- (void)webView:(WebView *)sender resource:(id)identifier didReceiveResponse:(NSURLResponse *)response fromDataSource:(WebDataSource *)dataSource
+//{
+//    NSString *url = [identifier absoluteString];
+//    NSLog(@"didReceiveResponse %@",url);
+//    
+//}
+- (NSURLRequest*) webView:(WebView*)sender resource:(id)identifier willSendRequest:(NSURLRequest*)request
+         redirectResponse:(NSURLResponse*)redirectResponse fromDataSource:(WebDataSource*)dataSource
+{
+     NSString *url = [self urldecode:request];
+     NSString * j_inject=@"base64font?id";
+    // NSString * j_inject=@".js";
+    // Am I interested in this request?
+    if ([url rangeOfString:j_inject].location !=NSNotFound) {
+        NSMutableURLRequest* newRequest = [request mutableCopy];
+        [NSURLProtocol setProperty:@YES forKey:@"MyApp" inRequest:newRequest];
+        //NSLog(@"Response %@",url);
+        return newRequest;
+    }
+    else {
+        // Not interested, let it go through normally
+        return request;
+    }
+}
+
 - (void) webView: (WebView *)sender resource:(id)identifier didFinishLoadingFromDataSource:(WebDataSource *)dataSource
 {
     idurl = [identifier absoluteString];
+    //NSLog(@"didFinishLoadingFromDataSource %@",idurl);
     //int d = [self PosRight:url substr:@"pages"];
+    NSString * path = [self urltopath:idurl];
+    
+    
+    if (false && [path rangeOfString:@".js"].location !=NSNotFound) {
+        WebResource *wrd = [dataSource subresourceForURL:identifier] ;//] [NSURL URLWithString:identifier]];
+        NSString * str =[[NSString alloc] initWithData:wrd.data encoding:NSUTF8StringEncoding];
+        //NSLog(@"%@",str);
+        //NSString * str=@"console.log('dd')";
+        //wrd.data = [str dataUsingEncoding:NSUTF8StringEncoding];
+        return;
+    }
+    
     tick = 0;
     ticked = false;
     bool isbook = false;
@@ -89,7 +129,7 @@ fromDataSource:(WebDataSource *)dataSource
 
 // https://jigsaw.vitalsource.com/books/9781446297650DEMO/images/553246736447566b5831394d716d784c79356d55547130716a5a672b4c70644e2b6b4b7630424e4a5261453d0a/encrypted/1600
 //    if ([url rangeOfString:@"/epub/OEBPS/"].location != NSNotFound) {
-    NSString * path = [self urltopath:idurl];
+
     //if ([path rangeOfString:@"/books/"].location == 0) {
     if ([path rangeOfString:@"/books/"].location !=NSNotFound) {
         isbook = true;

@@ -26,6 +26,7 @@
 		009F57351ED71C7800B596C9 /* vbkbrowser48.png in Resources */ = {isa = PBXBuildFile; fileRef = 009F57331ED71C7800B596C9 /* vbkbrowser48.png */; };
 		009F57371ED71D7500B596C9 /* key.png in Resources */ = {isa = PBXBuildFile; fileRef = 009F57361ED71D7500B596C9 /* key.png */; };
 		009F57391ED71DB700B596C9 /* background.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 009F57381ED71DB700B596C9 /* background.jpg */; };
+		00ACBB0F22F9DA9100754A94 /* MyURLProtocol.m in Sources */ = {isa = PBXBuildFile; fileRef = 00ACBB0E22F9DA9100754A94 /* MyURLProtocol.m */; };
 		00B7F1991EC9D38F00C14D6A /* webdelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 00B7F1981EC9D38F00C14D6A /* webdelegate.m */; };
 		00B7F1A21ECDE31700C14D6A /* BuyController.m in Sources */ = {isa = PBXBuildFile; fileRef = 00B7F19A1ECDE31700C14D6A /* BuyController.m */; };
 		00B7F1A31ECDE31700C14D6A /* RegController.m in Sources */ = {isa = PBXBuildFile; fileRef = 00B7F19D1ECDE31700C14D6A /* RegController.m */; };
@@ -81,6 +82,8 @@
 		009F57331ED71C7800B596C9 /* vbkbrowser48.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = vbkbrowser48.png; path = img/vbkbrowser48.png; sourceTree = "<group>"; };
 		009F57361ED71D7500B596C9 /* key.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = key.png; path = img/key.png; sourceTree = "<group>"; };
 		009F57381ED71DB700B596C9 /* background.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = background.jpg; path = img/background.jpg; sourceTree = "<group>"; };
+		00ACBB0D22F9DA9100754A94 /* MyURLProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MyURLProtocol.h; sourceTree = "<group>"; };
+		00ACBB0E22F9DA9100754A94 /* MyURLProtocol.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MyURLProtocol.m; sourceTree = "<group>"; };
 		00B7F1971EC9D38F00C14D6A /* webdelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = webdelegate.h; sourceTree = "<group>"; };
 		00B7F1981EC9D38F00C14D6A /* webdelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = webdelegate.m; sourceTree = "<group>"; };
 		00B7F19A1ECDE31700C14D6A /* BuyController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BuyController.m; sourceTree = "<group>"; };
@@ -158,6 +161,8 @@
 				00872C6A1EC225DE00542D22 /* mainWin.xib */,
 				00B7F1971EC9D38F00C14D6A /* webdelegate.h */,
 				00B7F1981EC9D38F00C14D6A /* webdelegate.m */,
+				00ACBB0D22F9DA9100754A94 /* MyURLProtocol.h */,
+				00ACBB0E22F9DA9100754A94 /* MyURLProtocol.m */,
 				00B7F19C1ECDE31700C14D6A /* const.h */,
 				00B7F19A1ECDE31700C14D6A /* BuyController.m */,
 				00B7F19B1ECDE31700C14D6A /* BuyController.h */,
@@ -362,6 +367,7 @@
 				00B7F1A31ECDE31700C14D6A /* RegController.m in Sources */,
 				00B7F1A21ECDE31700C14D6A /* BuyController.m in Sources */,
 				00872C5C1EC2245C00542D22 /* main.m in Sources */,
+				00ACBB0F22F9DA9100754A94 /* MyURLProtocol.m in Sources */,
 				00872C591EC2245C00542D22 /* AppDelegate.m in Sources */,
 				00B7F1A61ECDE31700C14D6A /* AboutController.m in Sources */,
 			);

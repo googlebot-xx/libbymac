@@ -16,7 +16,7 @@
 @class AboutController;
 @class RegController;
 
-@interface mainWin : NSWindowController <WebPolicyDelegate,WebFrameLoadDelegate>
+@interface mainWin : NSWindowController <WebPolicyDelegate,WebFrameLoadDelegate,WebUIDelegate>
 {
     
     IBOutlet WebView * webView;

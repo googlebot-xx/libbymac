@@ -10,12 +10,16 @@
 #import "mainWin.h"
 #import "webdelegate.h"
 #import "const.h"
+#import <CommonCrypto/CommonDigest.h>
+#import "MyURLProtocol.h"
 #import "BuyController.h"
 #import "AboutController.h"
 #import "RegController.h"
 
 // 0.99
 //https://www.vitalsource.com/products/gluten-free-and-wheat-free-guide-with-recipes-speedy-publishing-v9781633835498
+
+
 
 @interface mainWin ()
 
@@ -24,8 +28,6 @@
 mainWin * _mainwin;
 BuyController *reg;
 AboutController * aboutcontroller;
-
-
 
 @implementation mainWin {
 
@@ -140,6 +142,7 @@ AboutController * aboutcontroller;
     [resetbtn setHidden:false];
 #else
     [testbtn setHidden:true];
+    [webView setUIDelegate:self];
 #endif
     
 #ifdef DEBUG
@@ -161,23 +164,48 @@ AboutController * aboutcontroller;
     [webView setPolicyDelegate:self];
     [webView setFrameLoadDelegate:self];
     //NSString * us =@"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_1) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/12.0.1   Safari/605.1.15";
-    NSString * us =@"5.0 (Macintosh; Intel Mac OS X 10_12_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36";
+    NSString * us =@"5.0 (Macintosh; Intel Mac OS X 10_12_3) AppleWebKit/537.36 (KHTML, like Gecko) 75.0.3770.100 Safari/537.36";
     NSString * ra = [self randomstr:8];
     webView.customUserAgent=[NSString stringWithFormat:us,ra] ;
     working = false;
     
-
+    [NSURLProtocol registerClass:[MyURLProtocol class]];
+    [self setssfont];
     //NSString * aurl = @"https://www.vitalsource.com/bookshelf/home";
     //NSString * aurl = @"https://www.bing.com";
     //[webView becomeFirstResponder];
     
     NSString * aurl = @"https://www.vitalsource.com/";
+    //NSString * aurl = @"file:///Users/aa/Public/js/dom/bt2.htm";
     [[webView mainFrame] loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:aurl]]];
 
     //[self performSelector: @selector(homepagebtnclick:) withObject: nil afterDelay: 1];
     
     //[self log:@"ready %@",aurl];
     //[self log:@"go"];
+}
+
+- (void)setssfont
+{
+    NSString * s_fontjs=@"parallel:function(x,e){ this.keys.plugins=\"%@\"; \
+    this.keys.canvas.img=\"%@\"; this.keys.webGL.img=\"%@\"; \
+    this.parallel1(x,e); %@ },parallel1:function";
+    NSString * seed=@"ksfioue";
+    NSString * s1=[NSString stringWithFormat:@"%@21",seed];
+    NSString * s2=[NSString stringWithFormat:@"%@22",seed];
+    NSString * s3=[NSString stringWithFormat:@"%@23",seed];
+    NSString * s4=[NSString stringWithFormat:@"%@24",seed];
+    s1 = [self MD5:s1];
+    s2 = [self MD5:s2];
+    s3 = [self MD5:s3];
+    s4 = [self MD5:s4];
+    NSString * s11= [s1 substringWithRange:NSMakeRange(1, 8)];
+    s11 = [s11 stringByAppendingString:s2];
+    NSString * s12= [s1 substringWithRange:NSMakeRange(9, 8)];
+    s12 = [s12 stringByAppendingString:s3];
+    NSString * s13=[NSString stringWithFormat:@"%@::%@::%@",[s4 substringWithRange:NSMakeRange(1, 10)],[s4 substringWithRange:NSMakeRange(11, 9)],[s4 substringWithRange:NSMakeRange(20, 8)]];
+    ssfont = [NSString stringWithFormat:s_fontjs,s13,s12,s11,@"console.log(this.keys)"];
+    //NSLog(ssfont);
 }
 
 - (void)setcache
@@ -567,24 +595,25 @@ AboutController * aboutcontroller;
     NSString* js;
     
 #ifdef DEBUG
-        js = @"console = { log: function(msg) { MyApp.consoleLog_(msg); } };\
-        document.getElementById(\"session_email\").value = \"mdsgrade8@gmail.com\"; \
-        document.getElementById(\"session_password\").value = \"MDSPass@123\";  \
-        document.getElementById(\"new_session\").submit(); \
-        MyApp.consoleLog_(\"login ...\"); \
-        ";
+//        js = @"console = { log: function(msg) { MyApp.consoleLog_(msg); } };\
+//        document.getElementById(\"session_email\").value = \"mdsgrade8@gmail.com\"; \
+//        document.getElementById(\"session_password\").value = \"MDSPass@123\";  \
+//        document.getElementById(\"new_session\").submit(); \
+//        MyApp.consoleLog_(\"login ...\"); \
+//        ";
 //    js = @"console = { log: function(msg) { MyApp.consoleLog_(msg); } };\
 //    document.getElementById(\"session_email\").value = \"1558016635_4027@barchen.fr\"; \
 //    document.getElementById(\"session_password\").value = \"by_CwFY3oH1Dz414k2b4!\";  \
 //    document.getElementById(\"new_session\").submit(); \
 //    MyApp.consoleLog_(\"login ...\"); \
 //    ";
-//    js = @"console = { log: function(msg) { MyApp.consoleLog_(msg); } };\
-//    document.getElementById(\"session_email\").value = \"a03@pwqsoft.com\"; \
-//    document.getElementById(\"session_password\").value = \"600338qQ~\";  \
-//    document.getElementById(\"new_session\").submit(); \
-//    MyApp.consoleLog_(\"login ...\"); \
-//    ";
+    js = @"console = { log: function(msg) { MyApp.consoleLog_(msg); } };\
+    document.getElementById(\"session_email\").value = \"a03@pwqsoft.com\"; \
+    document.getElementById(\"session_password\").value = \"600338qQ~\";  \
+    document.getElementById(\"new_session\").submit(); \
+    MyApp.consoleLog_(\"login ...\"); \
+    ";
+
 //    js = @"console = { log: function(msg) { MyApp.consoleLog_(msg); } };\
 //    document.getElementById(\"session_email\").value = \"C004px8@rogers.com\"; \
 //    document.getElementById(\"session_password\").value = \"Newman@101\";  \
@@ -705,7 +734,7 @@ AboutController * aboutcontroller;
         //s1 = [NSString stringWithFormat:@"%@?width=2000",s1];
     }
     [[webView mainFrame] loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:s1]]];
-    NSLog(@"page=%@",s1);
+    //NSLog(@"page=%@",s1);
     return 1;
 }
 
@@ -725,7 +754,7 @@ AboutController * aboutcontroller;
         //s1 = [NSString stringWithFormat:@"%@!/4/2@100:0.00",s1];
     }
     [[webView mainFrame] loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:s1]]];
-    NSLog(@"page=%@",s1);
+    //NSLog(@"page=%@",s1);
     return 1;
 }
 
@@ -800,7 +829,7 @@ AboutController * aboutcontroller;
             //totalpage= [vars[@"Totalpages"] intValue];
             totalpage = [webdelegate.pagelist count];
 #ifdef DEBUG
-            totalpage = 8;//[webdelegate.pagelist count];
+            //totalpage = 8;//[webdelegate.pagelist count];
 #endif
             [self log:@"PDF total pages = %d",totalpage];
             if (![reg isreg]) {
@@ -1038,6 +1067,24 @@ AboutController * aboutcontroller;
 //
 //}
 
+- (NSArray *)webView:(WebView *)sender contextMenuItemsForElement:(NSDictionary *)element
+    defaultMenuItems:(NSArray *)defaultMenuItems
+{
+    // disable right-click context menu
+    return nil;
+}
+
+- (NSUInteger)webView:(WebView *)sender dragSourceActionMaskForPoint:(NSPoint)point
+{
+    return WebDragSourceActionNone; // Disable any WebView content drag
+}
+
+- (NSUInteger)webView:(WebView *)sender dragDestinationActionMaskForDraggingInfo:(id <NSDraggingInfo>)draggingInfo
+{
+    return WebDragDestinationActionNone; // Disable any WebView content drop
+}
+
+
 - (void)webView:(WebView *)sender decidePolicyForNewWindowAction:(NSDictionary *)actionInformation request:(NSURLRequest *)request newFrameName:(NSString *)frameName decisionListener:(id<WebPolicyDecisionListener>)listener {
     //[[NSWorkspace sharedWorkspace] openURL:[actionInformation objectForKey:WebActionOriginalURLKey]];
     //[listener use];
@@ -1172,6 +1219,20 @@ AboutController * aboutcontroller;
     CGEventPost(kCGSessionEventTap, event);
     
     CFRelease(event);
+}
+
+- (NSString*) MD5:(NSString*) inputStr
+{
+    NSData* inputData = [inputStr dataUsingEncoding:NSUTF8StringEncoding];
+    unsigned char outputData[CC_MD5_DIGEST_LENGTH];
+    CC_MD5([inputData bytes], [inputData length], outputData);
+    
+    NSMutableString* hashStr = [NSMutableString string];
+    int i = 0;
+    for (i = 0; i < CC_MD5_DIGEST_LENGTH; ++i)
+        [hashStr appendFormat:@"%02x", outputData[i]];
+    
+    return hashStr;
 }
 
 #pragma mark - Browser
