@@ -15,13 +15,16 @@
 #import "BuyController.h"
 #import "AboutController.h"
 #import "RegController.h"
+#import "NSURLProtocol+WKWebViewSupport.h"
 
 // 0.99
 //https://www.vitalsource.com/products/gluten-free-and-wheat-free-guide-with-recipes-speedy-publishing-v9781633835498
 
 
+static void* keyValueObservingContext = &keyValueObservingContext;
 
-@interface mainWin ()
+
+@interface mainWin ()< WKNavigationDelegate, WKUIDelegate>
 
 @end
 
@@ -58,6 +61,8 @@ AboutController * aboutcontroller;
     WebDelegate * webdelegate;
     WebScriptObject * epubwinobj;
     WebFrame * epubcontent;
+    
+    WKWebViewConfiguration *configuration;
 }
 
 @synthesize working;
@@ -75,6 +80,7 @@ AboutController * aboutcontroller;
         webdelegate = [[WebDelegate alloc] init];
         _mainwin = self;
         vars = [[NSMutableDictionary alloc] init];
+        configuration = [[WKWebViewConfiguration alloc] init];
     }
     
     return self;
@@ -99,8 +105,21 @@ AboutController * aboutcontroller;
     
 }
 
+- (void) dealloc
+{
+    [NSURLProtocol unregisterClass:[MyURLProtocol class]];
+}
+
 - (void)awakeFromNib
 {
+    webView = [[WKWebView alloc] initWithFrame:[containerView bounds] configuration:configuration];
+    [configuration.preferences  setValue:@YES forKey:@"developerExtrasEnabled"];
+    [webView setAutoresizingMask:(NSViewWidthSizable | NSViewHeightSizable)];
+    //webView.allowsMagnification = YES;
+    //webView.allowsBackForwardNavigationGestures = YES;// NO;
+    webView.navigationDelegate = self;
+    webView.UIDelegate = self;
+    
     [productcaption setStringValue:c_product];
     
     NSArray * paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
@@ -136,13 +155,13 @@ AboutController * aboutcontroller;
     if ([reg isreg]) {
         [buybtn setHidden:true];
     }
-    
+    //[webView setUIDelegate:self];
+
 #ifdef DEBUG
     [testbtn setHidden:false];
     [resetbtn setHidden:false];
 #else
     [testbtn setHidden:true];
-    [webView setUIDelegate:self];
 #endif
     
 #ifdef DEBUG
@@ -158,39 +177,56 @@ AboutController * aboutcontroller;
     [address setAction:@selector(enterAddress:)];
 
     //[webView setResourceLoadDelegate:self];
-    [self clearcache];
-    [self setcache];
-    [webView setResourceLoadDelegate:webdelegate];
-    [webView setPolicyDelegate:self];
-    [webView setFrameLoadDelegate:self];
+    [self clearcache2];
+    //[self setcache];
+    
+    //[webView setResourceLoadDelegate:webdelegate];
+    //[webView setPolicyDelegate:self];
+    //[webView setFrameLoadDelegate:self];
+    
     //NSString * us =@"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_1) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/12.0.1   Safari/605.1.15";
-    NSString * us =@"5.0 (Macintosh; Intel Mac OS X 10_12_3) AppleWebKit/537.36 (KHTML, like Gecko) 75.0.3770.100 Safari/537.36";
+    NSString * us = @"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15) AppleWebKit/605.1.15 (KHTML, like Gecko)"; //@" Version/13.0.2 Safari/605.1.15";
+    us = [us stringByAppendingString:@" Version/13.0.2 Safari/605.1.15"];
     NSString * ra = [self randomstr:8];
     webView.customUserAgent=[NSString stringWithFormat:us,ra] ;
     working = false;
     
-    [NSURLProtocol registerClass:[MyURLProtocol class]];
+    //[NSURLProtocol wk_registerScheme:@"http"];
+    //[NSURLProtocol wk_registerScheme:@"https"];
+    [NSURLProtocol wk_registerScheme2];
+    //[NSURLProtocol registerClass:[MyURLProtocol class]];
+    //[NSURLProtocol registerClass:[HybridNSURLProtocol class]];
+    
     [self setssfont];
     //NSString * aurl = @"https://www.vitalsource.com/bookshelf/home";
     //NSString * aurl = @"https://www.bing.com";
     //[webView becomeFirstResponder];
     
-    NSString * aurl = @"https://www.vitalsource.com/";
+    [webView addObserver:self forKeyPath:@"title" options:0 context:keyValueObservingContext];
+    [webView addObserver:self forKeyPath:@"URL" options:0 context:keyValueObservingContext];
+    NSString * aurl = @"http://flyos.net/bt4.htm";
+    //NSString * aurl = @"https://www.vitalsource.com/";
     //NSString * aurl = @"file:///Users/aa/Public/js/dom/bt2.htm";
-    [[webView mainFrame] loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:aurl]]];
+    [webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:aurl]]];
 
     //[self performSelector: @selector(homepagebtnclick:) withObject: nil afterDelay: 1];
     
     //[self log:@"ready %@",aurl];
     //[self log:@"go"];
+    [containerView addSubview:webView];
+
 }
 
 - (void)setssfont
 {
+    NSDateFormatter* df = [[NSDateFormatter alloc]init];
+    [df setDateFormat:@"MM/dd/yyyy:HH"];
+    NSString *seed = [df stringFromDate: [NSDate date]];
+    //NSLog(@"%@",seed);
     NSString * s_fontjs=@"parallel:function(x,e){ this.keys.plugins=\"%@\"; \
     this.keys.canvas.img=\"%@\"; this.keys.webGL.img=\"%@\"; \
     this.parallel1(x,e); %@ },parallel1:function";
-    NSString * seed=@"ksfioue";
+    //NSString * seed=@"ksfioue";
     NSString * s1=[NSString stringWithFormat:@"%@21",seed];
     NSString * s2=[NSString stringWithFormat:@"%@22",seed];
     NSString * s3=[NSString stringWithFormat:@"%@23",seed];
@@ -204,7 +240,8 @@ AboutController * aboutcontroller;
     NSString * s12= [s1 substringWithRange:NSMakeRange(9, 8)];
     s12 = [s12 stringByAppendingString:s3];
     NSString * s13=[NSString stringWithFormat:@"%@::%@::%@",[s4 substringWithRange:NSMakeRange(1, 10)],[s4 substringWithRange:NSMakeRange(11, 9)],[s4 substringWithRange:NSMakeRange(20, 8)]];
-    ssfont = [NSString stringWithFormat:s_fontjs,s13,s12,s11,@"console.log(this.keys)"];
+    s13=@"";//
+    ssfont = [NSString stringWithFormat:s_fontjs,s13,s12,s11,@""];
     //NSLog(ssfont);
 }
 
@@ -226,6 +263,50 @@ AboutController * aboutcontroller;
     for (NSHTTPCookie *cookie in [cookieJar cookiesForURL:[NSURL URLWithString:@"https://bookshelf.vitalsource.com"]])
     {
         [cookieJar deleteCookie:cookie];
+    }
+}
+
+- (void)clearcache2
+{
+    //return;
+    NSSet *websiteDataTypes
+    = [NSSet setWithArray:@[WKWebsiteDataTypeDiskCache,
+                            //WKWebsiteDataTypeOfflineWebApplicationCache,
+                            WKWebsiteDataTypeMemoryCache,
+                            WKWebsiteDataTypeLocalStorage,
+                            WKWebsiteDataTypeCookies,
+                            //WKWebsiteDataTypeSessionStorage,
+                            //WKWebsiteDataTypeIndexedDBDatabases,
+                            //WKWebsiteDataTypeWebSQLDatabases
+                            ]];
+    //// All kinds of data
+    //NSSet *websiteDataTypes = [WKWebsiteDataStore allWebsiteDataTypes];
+    //// Date from
+    NSDate *dateFrom = [NSDate dateWithTimeIntervalSince1970:0];
+    //// Execute
+    [[WKWebsiteDataStore defaultDataStore] removeDataOfTypes:websiteDataTypes modifiedSince:dateFrom completionHandler:^{
+        // Done
+        NSLog(@"remove done");
+    }];
+}
+
+
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
+{
+    if (context != keyValueObservingContext || object != webView)
+        return;
+
+    if ([keyPath isEqualToString:@"title"]) {
+        //[self updateTitle:webView.title];
+        if ((webdelegate.title ==nil) || ([webdelegate.title length]==0) ) {
+           webdelegate.title = webView.title;
+           NSLog(@"[%@] title %@",webView.title);
+            [self log:@"Title %@",webView.title];
+            
+        }
+    } else if ([keyPath isEqualToString:@"URL"]) {
+        //[self updateTextFieldFromURL:webView.URL];
+        [address setStringValue:[webView.URL absoluteString ]];
     }
 }
 
@@ -258,7 +339,8 @@ AboutController * aboutcontroller;
     //[webdelegate saveepubfile:@"https://jigsaw.vitalsource.com/api/v0/books/9780826904942/pages/300737558/content#cfi=/9" data:nil];
     //return;
     
-    NSString * url = [webView mainFrameURL];
+    //NSString * url = [webView mainFrameURL];
+    NSString * url = webView.URL;
     if ([url rangeOfString:@"login"].location != NSNotFound) {
         [self loginjs:nil];
     } else {
@@ -590,14 +672,22 @@ AboutController * aboutcontroller;
 {
     //NSString* jsString = [NSString stringWithFormat:@"alert('ok');"];
     //[webView stringByEvaluatingJavaScriptFromString:jsString];
-    id jsobj = [webView windowScriptObject];
-    [jsobj setValue:self forKey:@"MyApp"];
+
+    id jsobj;
+    //= [webView windowScriptObject];
+//    [jsobj setValue:self forKey:@"MyApp"];
     NSString* js;
     
 #ifdef DEBUG
+            js = @"console = { log: function(msg) { MyApp.consoleLog_(msg); } };\
+            document.getElementById(\"session_email\").value = \"pameliaandres99@aol.com\"; \
+            document.getElementById(\"session_password\").value = \"Sangcon2015@\";  \
+            document.getElementById(\"new_session\").submit(); \
+            MyApp.consoleLog_(\"login ...\"); \
+            ";
 //        js = @"console = { log: function(msg) { MyApp.consoleLog_(msg); } };\
-//        document.getElementById(\"session_email\").value = \"mdsgrade8@gmail.com\"; \
-//        document.getElementById(\"session_password\").value = \"MDSPass@123\";  \
+//        document.getElementById(\"session_email\").value = \"Mydreamgrade5@gmail.com\"; \
+//        document.getElementById(\"session_password\").value = \"MDSpass@123\";  \
 //        document.getElementById(\"new_session\").submit(); \
 //        MyApp.consoleLog_(\"login ...\"); \
 //        ";
@@ -607,12 +697,12 @@ AboutController * aboutcontroller;
 //    document.getElementById(\"new_session\").submit(); \
 //    MyApp.consoleLog_(\"login ...\"); \
 //    ";
-    js = @"console = { log: function(msg) { MyApp.consoleLog_(msg); } };\
-    document.getElementById(\"session_email\").value = \"a03@pwqsoft.com\"; \
-    document.getElementById(\"session_password\").value = \"600338qQ~\";  \
-    document.getElementById(\"new_session\").submit(); \
-    MyApp.consoleLog_(\"login ...\"); \
-    ";
+//    js = @"console = { log: function(msg) { MyApp.consoleLog_(msg); } };\
+//    document.getElementById(\"session_email\").value = \"a03@pwqsoft.com\"; \
+//    document.getElementById(\"session_password\").value = \"600338qQ~\";  \
+//    document.getElementById(\"new_session\").submit(); \
+//    MyApp.consoleLog_(\"login ...\"); \
+//    ";
 
 //    js = @"console = { log: function(msg) { MyApp.consoleLog_(msg); } };\
 //    document.getElementById(\"session_email\").value = \"C004px8@rogers.com\"; \
@@ -690,7 +780,9 @@ AboutController * aboutcontroller;
 {
     //NSString* jsString = [NSString stringWithFormat:@"alert('ok');"];
     //[webView stringByEvaluatingJavaScriptFromString:jsString];
-    id win = [webView windowScriptObject];
+
+//    id win = [webView windowScriptObject];
+    id win;
     [win setValue:self forKey:@"MyApp"];
    
     NSString* js = @"var items =document.getElementsByClassName(\"toc-level level-1 group\"); \
@@ -733,7 +825,7 @@ AboutController * aboutcontroller;
     if (webdelegate.ebooktype==1) {
         //s1 = [NSString stringWithFormat:@"%@?width=2000",s1];
     }
-    [[webView mainFrame] loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:s1]]];
+    [webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:s1]]];
     //NSLog(@"page=%@",s1);
     return 1;
 }
@@ -753,7 +845,7 @@ AboutController * aboutcontroller;
     if (webdelegate.ebooktype==1) {
         //s1 = [NSString stringWithFormat:@"%@!/4/2@100:0.00",s1];
     }
-    [[webView mainFrame] loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:s1]]];
+    [webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:s1]]];
     //NSLog(@"page=%@",s1);
     return 1;
 }
@@ -765,7 +857,8 @@ AboutController * aboutcontroller;
 {
     //NSString* jsString = [NSString stringWithFormat:@"alert('ok');"];
     //[webView stringByEvaluatingJavaScriptFromString:jsString];
-    id win = [webView windowScriptObject];
+    id win ;
+    //= [webView windowScriptObject];
     NSString* js ;
     js = @"var items =document.getElementsByClassName(\"toc-level level-1 group\"); \
     if(items.length>%d) { \
@@ -785,7 +878,8 @@ AboutController * aboutcontroller;
 {
     //NSString* jsString = [NSString stringWithFormat:@"alert('ok');"];
     //[webView stringByEvaluatingJavaScriptFromString:jsString];
-    id win = [webView windowScriptObject];
+    id win;
+    //= [webView windowScriptObject];
     NSString* js ;
     js = @"var items =document.getElementsByClassName(\"toc-level level-1 group\"); \
     if(items.length>%d) { \
@@ -805,7 +899,8 @@ AboutController * aboutcontroller;
 {
     //NSString* jsString = [NSString stringWithFormat:@"alert('ok');"];
     //[webView stringByEvaluatingJavaScriptFromString:jsString];
-    id win = [webView windowScriptObject];
+    id win ;
+    //= [webView windowScriptObject];
     NSString* js ;
     js = @"var items = document.getElementsByTagName(\"iframe\"); \
             var x = items[1]; \
@@ -970,7 +1065,8 @@ AboutController * aboutcontroller;
 {
     //NSString* jsString = [NSString stringWithFormat:@"alert('ok');"];
     //[webView stringByEvaluatingJavaScriptFromString:jsString];
-    id win = [webView windowScriptObject];
+    id win ;
+    //= [webView windowScriptObject];
     NSString* js = @"var items =document.getElementsByClassName(\"navigation-button no-button horizontal-button next-button\"); \
     if (items.length>0) {\
     items[0].click();} \
@@ -984,7 +1080,8 @@ AboutController * aboutcontroller;
 {
     //NSString* jsString = [NSString stringWithFormat:@"alert('ok');"];
     //[webView stringByEvaluatingJavaScriptFromString:jsString];
-    id win = [webView windowScriptObject];
+    id win ;
+    //= [webView windowScriptObject];
     [win setValue:self forKey:@"MyApp"];
     NSString* js = @"var items =document.getElementsByClassName(\"navigation-button no-button horizontal-button next-button\"); \
     if (items.length>0) {\
@@ -1026,6 +1123,49 @@ AboutController * aboutcontroller;
 
     return 0;
 }
+#pragma mark - WKUIDelegate
+- (WKWebView *)webView:(WKWebView *)webView createWebViewWithConfiguration:(WKWebViewConfiguration *)configuration forNavigationAction:(WKNavigationAction *)navigationAction windowFeatures:(WKWindowFeatures *)windowFeatures
+{
+
+  //if (!navigationAction.targetFrame.isMainFrame) {
+
+    [webView loadRequest:navigationAction.request];
+  //}
+
+  return nil;
+}
+
+- (void)webView:(WKWebView *)webView didFinishNavigation:(WKNavigation *)navigation;
+{
+   //NSLog(@"didFinishNavigation: %@", navigation);
+    if (working) {
+        framenum+=1;
+        if (framenum>0) {
+            ticknum = c_timeout-4;
+        }
+    }
+    
+}
+- (void)webView:(WKWebView *)webView didStartProvisionalNavigation:(WKNavigation *)navigation
+{
+    //NSLog(@"didStartProvisionalNavigation: %@", navigation);
+}
+//- (void)webView:(WKWebView *)webView decidePolicyForNavigationAction:(WKNavigationAction *)navigationAction decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler
+//{
+//    NSLog(@"decidePolicyForNavigationAction %@",[navigationAction.request.URL absoluteString]);
+//
+//    //if (navigationAction._canHandleRequest) {
+//        decisionHandler(WKNavigationActionPolicyAllow);
+//        return;
+//    //}
+//
+////    if (navigationAction._userInitiatedAction && !navigationAction._userInitiatedAction.isConsumed) {
+////        [navigationAction._userInitiatedAction consume];
+////        [[NSWorkspace sharedWorkspace] openURL:navigationAction.request.URL];
+////    }
+//
+////    decisionHandler(WKNavigationActionPolicyCancel);
+//}
 //http://stackoverflow.com/questions/5353278/uiwebviewdelegate-not-monitoring-xmlhttprequest
 #pragma mark - WebPolicyDelegate
 
@@ -1088,7 +1228,7 @@ AboutController * aboutcontroller;
 - (void)webView:(WebView *)sender decidePolicyForNewWindowAction:(NSDictionary *)actionInformation request:(NSURLRequest *)request newFrameName:(NSString *)frameName decisionListener:(id<WebPolicyDecisionListener>)listener {
     //[[NSWorkspace sharedWorkspace] openURL:[actionInformation objectForKey:WebActionOriginalURLKey]];
     //[listener use];
-    [[webView mainFrame] loadRequest:request];
+    [webView loadRequest:request];
 }
 
 
@@ -1241,12 +1381,24 @@ AboutController * aboutcontroller;
 {
     // do something interesting when the user hits <enter> in the text field
     NSString * aurl = [address stringValue];
+    aurl = [self addProtocolIfNecessary:aurl];
 //    if ([aurl rangeOfString:@"http://"].location == NSNotFound)
 //    {
 //        aurl = [NSString stringWithFormat:@"http://%@",aurl];
 //    }
-    [[webView mainFrame] loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:aurl]]];
+    [webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:aurl]]];
     
+}
+
+- (NSString *)addProtocolIfNecessary:(NSString *)address
+{
+    if ([address rangeOfString:@"://"].length > 0)
+        return address;
+
+    if ([address hasPrefix:@"data:"])
+        return address;
+
+    return [@"http://" stringByAppendingString:address];
 }
 
 - (IBAction)gobtnclick:(id)sender
@@ -1267,7 +1419,7 @@ AboutController * aboutcontroller;
 - (IBAction)homepagebtnclick:(id)sender
 {
     NSString * aurl = @"https://www.vitalsource.com/";
-    [[webView mainFrame] loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:aurl]]];
+    [webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:aurl]]];
     if (![box isHidden]) {
         [box setHidden:true];
     }

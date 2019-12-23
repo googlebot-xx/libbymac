@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		00016C6B1EEB151D00090675 /* instru.xhtml in Resources */ = {isa = PBXBuildFile; fileRef = 00016C6A1EEB151D00090675 /* instru.xhtml */; };
+		0028ED5B2368DE9E00BD7BFD /* HybridNSURLProtocol.m in Sources */ = {isa = PBXBuildFile; fileRef = 0028ED5A2368DE9E00BD7BFD /* HybridNSURLProtocol.m */; };
 		002DF5E2201F7D3700FC44FB /* go-home.png in Resources */ = {isa = PBXBuildFile; fileRef = 002DF5E1201F7D3700FC44FB /* go-home.png */; };
 		00872C591EC2245C00542D22 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 00872C581EC2245C00542D22 /* AppDelegate.m */; };
 		00872C5C1EC2245C00542D22 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 00872C5B1EC2245C00542D22 /* main.m */; };
@@ -41,6 +42,7 @@
 		00B7F1EF1ED5E4A900C14D6A /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 00872C6E1EC2288100542D22 /* WebKit.framework */; };
 		00B7F1F11ED5E52200C14D6A /* ZipArchive.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 00B7F1BB1ED5DC0C00C14D6A /* ZipArchive.framework */; };
 		00B7F1F21ED5E52200C14D6A /* ZipArchive.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 00B7F1BB1ED5DC0C00C14D6A /* ZipArchive.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		00BBF619236792930064A101 /* NSURLProtocol+WKWebViewSupport.m in Sources */ = {isa = PBXBuildFile; fileRef = 00BBF617236792930064A101 /* NSURLProtocol+WKWebViewSupport.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -59,6 +61,8 @@
 
 /* Begin PBXFileReference section */
 		00016C6A1EEB151D00090675 /* instru.xhtml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = instru.xhtml; path = epub/instru.xhtml; sourceTree = "<group>"; };
+		0028ED592368DE9E00BD7BFD /* HybridNSURLProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HybridNSURLProtocol.h; sourceTree = "<group>"; };
+		0028ED5A2368DE9E00BD7BFD /* HybridNSURLProtocol.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HybridNSURLProtocol.m; sourceTree = "<group>"; };
 		002DF5E1201F7D3700FC44FB /* go-home.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "go-home.png"; path = "img/go-home.png"; sourceTree = "<group>"; };
 		00872C541EC2245C00542D22 /* VitalSource Downloader.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "VitalSource Downloader.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		00872C571EC2245C00542D22 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -121,6 +125,10 @@
 		00B7F1DF1ED5DF7500C14D6A /* prng.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = prng.h; path = aes/prng.h; sourceTree = "<group>"; };
 		00B7F1E11ED5DF7500C14D6A /* pwd2key.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pwd2key.h; path = aes/pwd2key.h; sourceTree = "<group>"; };
 		00B7F1E31ED5DF7500C14D6A /* sha1.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sha1.h; path = aes/sha1.h; sourceTree = "<group>"; };
+		00BBF616236763590064A101 /* VitalSource Downloader.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "VitalSource Downloader.entitlements"; sourceTree = "<group>"; };
+		00BBF617236792930064A101 /* NSURLProtocol+WKWebViewSupport.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSURLProtocol+WKWebViewSupport.m"; sourceTree = "<group>"; };
+		00BBF618236792930064A101 /* NSURLProtocol+WKWebViewSupport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSURLProtocol+WKWebViewSupport.h"; sourceTree = "<group>"; };
+		0A81DA34234EB81600A2B7D7 /* VitalSource DownloaderRelease.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "VitalSource DownloaderRelease.entitlements"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -139,6 +147,8 @@
 		00872C4B1EC2245B00542D22 = {
 			isa = PBXGroup;
 			children = (
+				00BBF616236763590064A101 /* VitalSource Downloader.entitlements */,
+				0A81DA34234EB81600A2B7D7 /* VitalSource DownloaderRelease.entitlements */,
 				00872C561EC2245C00542D22 /* vbkbrowser */,
 				00872C551EC2245C00542D22 /* Products */,
 				00872C6D1EC2288100542D22 /* Frameworks */,
@@ -156,6 +166,8 @@
 		00872C561EC2245C00542D22 /* vbkbrowser */ = {
 			isa = PBXGroup;
 			children = (
+				0028ED592368DE9E00BD7BFD /* HybridNSURLProtocol.h */,
+				0028ED5A2368DE9E00BD7BFD /* HybridNSURLProtocol.m */,
 				00872C681EC225DE00542D22 /* mainWin.h */,
 				00872C691EC225DE00542D22 /* mainWin.m */,
 				00872C6A1EC225DE00542D22 /* mainWin.xib */,
@@ -175,6 +187,8 @@
 				00B7F1A81ECDE36E00C14D6A /* RegController.xib */,
 				00872C571EC2245C00542D22 /* AppDelegate.h */,
 				00872C581EC2245C00542D22 /* AppDelegate.m */,
+				00BBF618236792930064A101 /* NSURLProtocol+WKWebViewSupport.h */,
+				00BBF617236792930064A101 /* NSURLProtocol+WKWebViewSupport.m */,
 				00872C5F1EC2245C00542D22 /* MainMenu.xib */,
 				00872C621EC2245C00542D22 /* Info.plist */,
 				00872C5D1EC2245C00542D22 /* Assets.xcassets */,
@@ -296,6 +310,9 @@
 		00872C4C1EC2245B00542D22 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				KnownAssetTags = (
+					New,
+				);
 				LastUpgradeCheck = 0820;
 				ORGANIZATIONNAME = ebookconverter;
 				TargetAttributes = {
@@ -311,6 +328,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 				Base,
 			);
@@ -362,6 +380,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0028ED5B2368DE9E00BD7BFD /* HybridNSURLProtocol.m in Sources */,
 				00872C6B1EC225DE00542D22 /* mainWin.m in Sources */,
 				00B7F1991EC9D38F00C14D6A /* webdelegate.m in Sources */,
 				00B7F1A31ECDE31700C14D6A /* RegController.m in Sources */,
@@ -369,6 +388,7 @@
 				00872C5C1EC2245C00542D22 /* main.m in Sources */,
 				00ACBB0F22F9DA9100754A94 /* MyURLProtocol.m in Sources */,
 				00872C591EC2245C00542D22 /* AppDelegate.m in Sources */,
+				00BBF619236792930064A101 /* NSURLProtocol+WKWebViewSupport.m in Sources */,
 				00B7F1A61ECDE31700C14D6A /* AboutController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -479,7 +499,8 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_OBJC_ARC = YES;
-				CODE_SIGN_IDENTITY = "Developer ID Application";
+				CODE_SIGN_ENTITLEMENTS = "VitalSource Downloader.entitlements";
+				CODE_SIGN_IDENTITY = "Developer ID Application: WENQIAN Pan (L7JSV82XX3)";
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = L7JSV82XX3;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -499,9 +520,11 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_OBJC_ARC = YES;
-				CODE_SIGN_IDENTITY = "Developer ID Application";
+				CODE_SIGN_ENTITLEMENTS = "VitalSource DownloaderRelease.entitlements";
+				CODE_SIGN_IDENTITY = "Developer ID Application: WENQIAN Pan (L7JSV82XX3)";
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = L7JSV82XX3;
+				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/vbkbrowser",

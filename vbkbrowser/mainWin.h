@@ -8,7 +8,7 @@
 
 #import <Cocoa/Cocoa.h>
 #import "WebKit/WebKit.h"
-#define c_timeout 10
+#define c_timeout 100
 
 @class WebDelegate;
 
@@ -16,11 +16,11 @@
 @class AboutController;
 @class RegController;
 
-@interface mainWin : NSWindowController <WebPolicyDelegate,WebFrameLoadDelegate,WebUIDelegate>
+@interface mainWin : NSWindowController 
 {
     
-    IBOutlet WebView * webView;
-    
+    WKWebView * webView;
+    IBOutlet NSView *containerView;
     
     NSString* datadir;
     NSString* cachedir;

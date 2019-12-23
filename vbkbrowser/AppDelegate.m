@@ -9,6 +9,7 @@
 #import "AppDelegate.h"
 #import "mainWin.h"
 #import "AboutController.h"
+#import "HybridNSURLProtocol.h"
 
 @interface AppDelegate ()
 
@@ -20,6 +21,8 @@
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
     // Insert code here to initialize your application
     [mainwin checkkey];
+    //[NSURLProtocol registerClass:[HybridNSURLProtocol class]];
+
 }
 
 

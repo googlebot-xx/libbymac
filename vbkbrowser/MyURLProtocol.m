@@ -24,12 +24,20 @@ NSString * ssfont;
 
 + (BOOL) canInitWithRequest:(NSURLRequest*)request
 {
-    static NSUInteger requestCount = 0;
+    //static NSUInteger requestCount = 0;
     if ([NSURLProtocol propertyForKey:MyURLProtocolHandledKey inRequest:request]) {
+        //NSString * url =  request.URL.absoluteString;
+        //NSLog(@"init %@",url);
         //NSLog(@"file #%u: URL = %@", requestCount++, request.URL.absoluteString);
-        return YES;
-    } else
-       return NO;
+        return NO;
+    } else {
+        NSString * url =  request.URL.absoluteString;
+        if ([url rangeOfString:@"#/books/"].location !=NSNotFound) {
+            NSLog(@"books %@",url);
+            //isbook = true;
+        }
+    }
+    return NO;
     //return b;
 }
 
@@ -66,7 +74,7 @@ NSString * ssfont;
         
     [NSURLProtocol removePropertyForKey:MyURLProtocolHandledKey inRequest:self.request];
         NSMutableURLRequest *newRequest = [self.request mutableCopy];
-        //[NSURLProtocol setProperty:@YES forKey:MyURLProtocolHandledKey inRequest:newRequest];
+        [NSURLProtocol setProperty:@YES forKey:MyURLProtocolHandledKey inRequest:newRequest];
     
         self.connection = [NSURLConnection connectionWithRequest:newRequest delegate:self];
         //NSLog(@"startLoading %@",newRequest.URL.absoluteString);
@@ -97,7 +105,7 @@ NSString * ssfont;
 - (void) connectionDidFinishLoading:(NSURLConnection *)connection {
     //NSString *str = @"console.log('test');";
     //self.mutableData = (NSMutableData *)[str dataUsingEncoding:NSUTF8StringEncoding];
-    [self findkey];
+    //[self findkey];
     [self.client URLProtocol:self didLoadData:self.mutableData];
     [self.client URLProtocolDidFinishLoading:self];
     //NSLog(@"file %@",self.request.URL.absoluteString);

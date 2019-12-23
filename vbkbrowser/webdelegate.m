@@ -14,6 +14,7 @@
 #import "ZipArchive.h"
 
 
+//https://stackoverflow.com/questions/37509990/migrating-from-uiwebview-to-wkwebview
 
 @interface WebDelegate () <WebResourceLoadDelegate>
 
@@ -90,7 +91,7 @@ fromDataSource:(WebDataSource *)dataSource
          redirectResponse:(NSURLResponse*)redirectResponse fromDataSource:(WebDataSource*)dataSource
 {
      NSString *url = [self urldecode:request];
-     NSString * j_inject=@"base64font?id";
+     NSString * j_inject=@"xxxxbase64font?id";
     // NSString * j_inject=@".js";
     // Am I interested in this request?
     if ([url rangeOfString:j_inject].location !=NSNotFound) {
