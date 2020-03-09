@@ -18,6 +18,8 @@
 		00872C611EC2245C00542D22 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 00872C5F1EC2245C00542D22 /* MainMenu.xib */; };
 		00872C6B1EC225DE00542D22 /* mainWin.m in Sources */ = {isa = PBXBuildFile; fileRef = 00872C691EC225DE00542D22 /* mainWin.m */; };
 		00872C6C1EC225DE00542D22 /* mainWin.xib in Resources */ = {isa = PBXBuildFile; fileRef = 00872C6A1EC225DE00542D22 /* mainWin.xib */; };
+		008D40CE2416B19000BA9476 /* v1.png in Resources */ = {isa = PBXBuildFile; fileRef = 008D40CC2416B19000BA9476 /* v1.png */; };
+		008D40CF2416B19000BA9476 /* c1.png in Resources */ = {isa = PBXBuildFile; fileRef = 008D40CD2416B19000BA9476 /* c1.png */; };
 		009F57281ED70EE500B596C9 /* share-sign.png in Resources */ = {isa = PBXBuildFile; fileRef = 009F57241ED70EE500B596C9 /* share-sign.png */; };
 		009F57291ED70EE500B596C9 /* go-sign.png in Resources */ = {isa = PBXBuildFile; fileRef = 009F57251ED70EE500B596C9 /* go-sign.png */; };
 		009F572A1ED70EE500B596C9 /* sign-left.png in Resources */ = {isa = PBXBuildFile; fileRef = 009F57261ED70EE500B596C9 /* sign-left.png */; };
@@ -78,6 +80,8 @@
 		00872C691EC225DE00542D22 /* mainWin.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = mainWin.m; sourceTree = "<group>"; };
 		00872C6A1EC225DE00542D22 /* mainWin.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = mainWin.xib; sourceTree = "<group>"; };
 		00872C6E1EC2288100542D22 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
+		008D40CC2416B19000BA9476 /* v1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = v1.png; path = img/v1.png; sourceTree = "<group>"; };
+		008D40CD2416B19000BA9476 /* c1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = c1.png; path = img/c1.png; sourceTree = "<group>"; };
 		009F57241ED70EE500B596C9 /* share-sign.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "share-sign.png"; path = "img/share-sign.png"; sourceTree = "<group>"; };
 		009F57251ED70EE500B596C9 /* go-sign.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "go-sign.png"; path = "img/go-sign.png"; sourceTree = "<group>"; };
 		009F57261ED70EE500B596C9 /* sign-left.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "sign-left.png"; path = "img/sign-left.png"; sourceTree = "<group>"; };
@@ -218,6 +222,8 @@
 		009F57231ED70ECA00B596C9 /* img */ = {
 			isa = PBXGroup;
 			children = (
+				008D40CD2416B19000BA9476 /* c1.png */,
+				008D40CC2416B19000BA9476 /* v1.png */,
 				002DF5E1201F7D3700FC44FB /* go-home.png */,
 				009F57381ED71DB700B596C9 /* background.jpg */,
 				009F57361ED71D7500B596C9 /* key.png */,
@@ -344,11 +350,13 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				008D40CE2416B19000BA9476 /* v1.png in Resources */,
 				00B7F1B11ED369D000C14D6A /* toc.ncx in Resources */,
 				00872C5E1EC2245C00542D22 /* Assets.xcassets in Resources */,
 				00B7F1B21ED369D000C14D6A /* mimetype in Resources */,
 				009F57281ED70EE500B596C9 /* share-sign.png in Resources */,
 				00872C611EC2245C00542D22 /* MainMenu.xib in Resources */,
+				008D40CF2416B19000BA9476 /* c1.png in Resources */,
 				009F57351ED71C7800B596C9 /* vbkbrowser48.png in Resources */,
 				00B7F1A51ECDE31700C14D6A /* AboutController.xib in Resources */,
 				009F572A1ED70EE500B596C9 /* sign-left.png in Resources */,

@@ -1452,11 +1452,13 @@ int ebooktype;
                 ticknum = ttimeout-3;
             } else if (framenum>1) {
                 ticknum = ttimeout-2;
+            } else if (framenum>0) {
+                ticknum = ttimeout-3;
             }
     } else { //find book open
        if ([addressurl rangeOfString:@"/books/"].location != NSNotFound) {
            //NSLog(@"^^^^^^^^book find");
-           //NSLog(@"url changes %@ ",[webView.URL absoluteString ]);
+           NSLog(@"url changes %@ ",[webView.URL absoluteString ]);
            [self foundjason];
        } else {
            [box setHidden:true];
@@ -1596,9 +1598,14 @@ int ebooktype;
     [aboutcontroller ShowAbout];
 }
 
-- (IBAction)gohome:(id)sender
+- (IBAction)vshome:(id)sender
 {
-    [[NSWorkspace sharedWorkspace] openURL: [NSURL URLWithString:c_home]];
+    [webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"https://www.vitalsource.com"]]];
+}
+
+- (IBAction)chegghome:(id)sender
+{
+    [webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"https://www.chegg.com"]]];
 }
 
 - (IBAction)buynowurl:(id)sender
@@ -1617,7 +1624,7 @@ int ebooktype;
     NSString * bookid=[self strFrom:addressurl from:@"#/books/" to:@"/cfi/"];
     NSString * page = [self strFrom:addressurl from:@"/cfi/" to:@"!"];
     if (!page) {
-        page = [self strFrom:addressurl from:@"/cfi/" to:@"]"];
+        page = [self strFrom:addressurl from:@"/cfi/" to:@"["];
     }
     if (!page) {
         page = [self strFrom:addressurl from:@"/cfi/" to:@";"];

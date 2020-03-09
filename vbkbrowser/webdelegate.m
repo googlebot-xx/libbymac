@@ -842,7 +842,7 @@ fromDataSource:(WebDataSource *)dataSource
                           nil ];
     
     int y = [scaledImage size].height/2;
-    NSString *string = [NSString stringWithFormat:@"%@ demo version\n%@", c_product,c_home];
+    NSString *string = [NSString stringWithFormat:@"%@ demo version\nwww.ebook-converter.com", c_product];
     [string drawAtPoint:NSMakePoint(10,y) withAttributes:attr];
     //[attr release];
     [scaledImage unlockFocus];
