@@ -1,0 +1,1 @@
+export DYLD_FRAMEWORK_PATH="/Users/aa/work/project/webkitlib"  /Users/aa/Library/Developer/Xcode/DerivedData/vbkbrowser-euirqtrshnsrsvfrrlluvqkwbqfi/Build/Products/Debug/VitalSource\ Downloader.app/Contents/MacOS/VitalSource\ Downloader

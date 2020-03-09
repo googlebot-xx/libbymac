@@ -1,0 +1,43 @@
+Object
+
+audio: {ogg: "nope", mp3: "maybe", wav: "maybe", m4a: "maybe"}
+
+browser: {ie: false, chrome: false, webdriver: false}
+
+canvas: {winding: "yes", towebp: false, blending: true, img: "0216256d65bfbb0196930b756d919ee6"}
+
+cpuClass: "unknown"
+
+doNotTrack: "unknown"
+
+indexedDb: true
+
+language: "en-ca"
+
+openDatabase: true
+
+platform: "MacIntel"
+
+plugins: "Quartz Composer Plug-In::Web Kit plug-in that renders Quartz compositions.::application/x-quartzcomposer~qtz"
+
+product: "Gecko"
+
+productSub: "20030107"
+
+screen: {width: 1920, height: 1080, availHeight: 977, availWidth: 1920, pixelDepth: 24, …}
+
+timezone: -4
+
+touch: {maxTouchPoints: 0, touchEvent: false, touchStart: false}
+
+userAgent: "5.0 (Macintosh; Intel Mac OS X 10_12_3) AppleWebKit/537.36 (KHTML, like Gecko) 75.0.3770.100 Safari/537.36"
+
+vendor: "Apple Computer, Inc."
+
+video: {ogg: "", h264: "probably", webm: ""}
+
+webGL: {img: "597e6cacd061b7bf0ed815740f867cf3", extensions: "EXT_blend_minmax;EXT_sRGB;EXT_frag_depth;OES_textu…;ANGLE_instanced_arrays;WEBGL_debug_renderer_info", aliased line width range: "[1, 7]", aliased point size range: "[1, 255]", alpha bits: 8, …}
+
+window: {historyLength: 1, iframe: false}
+
+Object Prototype

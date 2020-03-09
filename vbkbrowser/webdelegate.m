@@ -54,7 +54,7 @@
     else
         tick += 1;
 
-    if (tick>c_timeout) {
+    if (tick>ttimeout) {
         if (_mainwin.working) {
             //NSLog(@"tick %d",tick);
         }
@@ -773,15 +773,13 @@ fromDataSource:(WebDataSource *)dataSource
 
 - (bool) Buildpdf:(NSString *) afile
 {
-//        [urllist addObject:@"https://jigsaw.vitalsource.com/books/9781446297650DEMO/images/553246736447566b58312f6a624d4f4747432b504e674f7473614c397473465736735567315635486a446f3d0a/encrypted/1600"];
-//        [urllist addObject:@"https://jigsaw.vitalsource.com/books/9781446297650DEMO/images/553246736447566b583138496e4237495553664c6c335736426b6e54387236615a6b7662463358596c4b773d0a/encrypted/1600"];
-//        [urllist addObject:@"https://jigsaw.vitalsource.com/books/9781446297650DEMO/images/553246736447566b58312b756244794e2f4550664641416137476b486d796e7a4f61734543754f5a4737673d0a/encrypted/1600"];
+
     NSString * dir;
     //title = [titlelist objectAtIndex:0];
     //NSString * dir = [self getpdftmpfolder:[urllist objectAtIndex:0]];
     //NSString * dir = [_mainwin.datadir stringByAppendingPathComponent:idpath];
     //NSLog(dir);
-    [self pdfimglist];
+    //[self pdfimglist];
     //return true;
     //NSLog(@"%@",dir);
     _mainwin.outputfile = nil;
@@ -814,11 +812,12 @@ fromDataSource:(WebDataSource *)dataSource
         //[page release];
         //[img release];
     }
-    NSString * fname = [NSString stringWithFormat:@"%@.pdf",ebookid];
+    NSString * fname = [NSString stringWithFormat:@"%@.pdf",title];
+    fname =[self cleanfilename:fname];
     fname = [_mainwin.ebookdir stringByAppendingPathComponent:fname];
     
    	[pdf writeToFile:  fname];
-    [_mainwin log:@"PDF file saved %s", fname];
+    [_mainwin log:@"PDF file saved %@", fname];
     _mainwin.outputfile = fname;
     //[pdf release];
     return true;
@@ -896,13 +895,15 @@ fromDataSource:(WebDataSource *)dataSource
 
 - (NSString *) cleanfilename: (NSString *) str
 {
-    NSString * fname = [str stringByReplacingOccurrencesOfString:@":" withString:@""];
+    NSString * fname = [str stringByReplacingOccurrencesOfString:@"/" withString:@"-"];
+    fname = [fname stringByReplacingOccurrencesOfString:@"VitalSource Bookshelf" withString:@""];
+    fname = [fname stringByReplacingOccurrencesOfString:@"Chegg" withString:@""];
 //    fname = [fname stringByReplacingOccurrencesOfString:@"[" withString:@""];
 //    fname = [fname stringByReplacingOccurrencesOfString:@"]" withString:@""];
 //    fname = [fname stringByReplacingOccurrencesOfString:@"?" withString:@""];
 //    fname = [fname stringByReplacingOccurrencesOfString:@"," withString:@""];
     NSCharacterSet* illegalFileNameCharacters = [NSCharacterSet characterSetWithCharactersInString:@"/\\?%*|:,[]\"<>"];
-    fname  = [[str componentsSeparatedByCharactersInSet:illegalFileNameCharacters] componentsJoinedByString:@""];
+    fname  = [[fname componentsSeparatedByCharactersInSet:illegalFileNameCharacters] componentsJoinedByString:@""];
 
     return fname;
 }

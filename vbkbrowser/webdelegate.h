@@ -32,6 +32,8 @@
 - (NSString *) nextpage: (int)page;
 - (bool) BuildPub:(NSString *) afile;
 - (bool) Buildpdf:(NSString *) afile;
+- (BOOL) createfolder: (NSString*) folder;
+- (NSString *) cleanfilename: (NSString *) str;
 
 @property (nonatomic, assign) int tick;
 @property (nonatomic, assign) int ebooktype;
