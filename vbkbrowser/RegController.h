@@ -19,10 +19,29 @@
     NSString * activatemsg;
 	NSString * suser ;
 	NSString * ssn ;
+    
+    int status;
+    int licenseday;
+    NSString * pid;
+    int TrialDaysTotal;
+    NSString *regmsg;
+    NSDate * orderdate;
 }
+
+@property int TrialDaysTotal;
+@property int licenseday;
+@property (nonatomic,copy) NSString *pid;
+@property (nonatomic,copy) NSString *regmsg;
+@property (nonatomic,copy) NSString *ssn;
+@property (nonatomic,copy) NSString *skey;
+@property int status;
 
 - (void)opensnwindow:(id)sender;
 - (void) savekey:(NSString *) asn skey:(NSString *)akey suser:(NSString *)auser;
+- (NSString *) loadkeyfile;
+- (void) writekeyfile:(NSString *)str;
+- (int) validsn2: (NSString *) str;
+- (void) RecheckKey;
 
 
 @end

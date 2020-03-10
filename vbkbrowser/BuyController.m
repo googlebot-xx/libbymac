@@ -11,6 +11,7 @@
 #import "const.h"
 #import "RegController.h"
 //#import "AppDelegate.h"
+#import "mainWin.h"
 
 #define r_times @"times"
 #define r_ver @"version"
@@ -78,13 +79,12 @@ RegController * regcontroller;
 
 - (void) checkkey
 {
-	//AppDelegate * app = sender;
+    _isreg=false;
+    [self getkey2];
 
+    NSString * ssn = regcontroller.ssn;//  regcontroller.ssn;
+    NSString * skey = regcontroller.skey;
     
-    NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
-	NSString * ssn =  [[prefs stringForKey:[NSString stringWithFormat:@"%@sn", c_str]] copy];
-	NSString * skey = [[prefs stringForKey:[NSString stringWithFormat:@"%@key", c_str]] copy];
-
     if (ssn) {
         NSString * s1 =  [[skey stringByAppendingString:c_seed] copy];
         NSString * smd5 = [self MD5:s1];
@@ -95,6 +95,22 @@ RegController * regcontroller;
     
     times = 0;// [self loadtimes];
 
+    if (!_isreg)
+    {
+        [self checkver];
+        times = [self loadtimes];
+        [self openbuywindow:self];
+    }
+}
+
+- (void) getkey2
+{
+    NSString* str =[regcontroller loadkeyfile];
+    //NSLog(@"%@",str);
+    if (str.length<10) return;
+    [regcontroller validsn2:str];
+    
+    return;
     if (!_isreg)
     {
         [self checkver];

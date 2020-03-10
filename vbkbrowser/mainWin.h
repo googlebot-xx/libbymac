@@ -51,4 +51,5 @@ extern mainWin * _mainwin;
 extern BuyController *reg;
 extern AboutController * aboutcontroller;
 extern int ttimeout;
+extern NSString* ebookdir00;
 //extern RegController * regcontroller;

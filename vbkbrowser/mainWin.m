@@ -16,7 +16,9 @@
 #import "BuyController.h"
 #import "AboutController.h"
 #import "RegController.h"
-#import "NSURLProtocol+WKWebViewSupport.h"
+//#import "NSURLProtocol+WKWebViewSupport.h"
+#include <IOKit/pwr_mgt/IOPMLib.h>
+//#include <IOKit/pwr_mgt/IOPMLibPrivate.h>
 
 //#define tviewwidth 1200
 
@@ -34,6 +36,7 @@ static void* keyValueObservingContext = &keyValueObservingContext;
 mainWin * _mainwin;
 BuyController *reg;
 AboutController * aboutcontroller;
+NSString* ebookdir00;
 NSString * addressurl, * oldaddrees;
 NSString * booktitle;
 NSString * jsdiv;
@@ -42,6 +45,9 @@ NSRect webviewrect;
 int ttimeout;
 int tviewwidth;
 int ebooktype;
+
+IOPMAssertionID assertionID;
+IOReturn iosuccess;
 
 @implementation mainWin {
 
@@ -171,6 +177,7 @@ int ebooktype;
     ebookdir = [ebookdir stringByAppendingPathComponent:c_app];
     [self createfolder:ebookdir];
 
+    ebookdir00 = ebookdir;
     cachedir = [ebookdir stringByAppendingPathComponent:@"cache"];
     [self createfolder:cachedir];
     
@@ -492,13 +499,14 @@ int ebooktype;
         [webView setFrame:NSMakeRect(r.origin.x,r.origin.y,tviewwidth,r.size.height)];
         //mousepoint = CGPointMake(r.origin.x+r.size.width-50,[[NSScreen mainScreen] frame].size.height- (r.origin.y+r.size.height/2));
         //CGWarpMouseCursorPosition(mousepoint);
+        //[NSApplication
         
         tasktimer = [NSTimer scheduledTimerWithTimeInterval:0.8 target:self selector:@selector(epubtaskhandle:) userInfo:nil repeats:NO];
-//        if (webdelegate.ebooktype==0) { //epub
-//            tasktimer = [NSTimer scheduledTimerWithTimeInterval:0.8 target:self selector:@selector(epubtaskhandle:) userInfo:nil repeats:YES];
-//        } else if (webdelegate.ebooktype==1) { //pdf
-//            tasktimer = [NSTimer scheduledTimerWithTimeInterval:0.8 target:self selector:@selector(pdftaskhandle:) userInfo:nil repeats:YES];
-//        }
+        CFStringRef* reasonForActivity= CFSTR("vitalsource Describe Activity Type");
+//kIOPMAssertionTypePreventSystemSleep kIOPMAssertionTypeNoDisplaySleep
+        iosuccess = IOPMAssertionCreateWithName(kIOPMAssertionTypePreventSystemSleep ,
+                                            kIOPMAssertionLevelOn, reasonForActivity, &assertionID);
+        
         [self log:@"Start download, wait ...."];
         [downloadbtn setTitle:@"Stop download"];
     } else {
@@ -508,6 +516,9 @@ int ebooktype;
         [tasktimer invalidate];
         [self log:@"download end"];
         [downloadbtn setTitle:@"Download"];
+        if (iosuccess==kIOReturnSuccess) {
+            iosuccess = IOPMAssertionRelease(assertionID);
+        }
     }
     //NSLog(@"working %d",aworking);
 }
@@ -533,6 +544,8 @@ int ebooktype;
                 [self log:@"demo version only download %d pages",totalpage];
                 
             }
+            [self log:@"Title %@",webView.title];
+
 #ifdef DEBUG
             ttimeout=20;
 #else
@@ -595,8 +608,8 @@ int ebooktype;
         case 90:
             // Item 3
             [self log:@"building pdf file ...."];
-            [self setWorking:false];
             bool b = [webdelegate Buildpdf:nil];
+            [self setWorking:false];
 //            [self setWorking:false];
 //            [self openoutputfile];
             [[NSWorkspace sharedWorkspace] openFile:ebookdir withApplication:@"Finder"];
@@ -1458,7 +1471,7 @@ int ebooktype;
     } else { //find book open
        if ([addressurl rangeOfString:@"/books/"].location != NSNotFound) {
            //NSLog(@"^^^^^^^^book find");
-           NSLog(@"url changes %@ ",[webView.URL absoluteString ]);
+           //NSLog(@"url changes %@ ",[webView.URL absoluteString ]);
            [self foundjason];
        } else {
            [box setHidden:true];
@@ -1474,7 +1487,6 @@ int ebooktype;
 
     if ([keyPath isEqualToString:@"title"]) {
         if ([webView.title length]>0) {
-            [self log:@"Title %@",webView.title];
             booktitle = webView.title;
             webdelegate.title = webView.title;
         }
@@ -1702,9 +1714,9 @@ int ebooktype;
     //NSString * str = @"document.body.focus; \
     document.body.dispatchEvent(new KeyboardEvent('keypress',{'keyCode':39}));";
     NSString * str = @" var node = document.querySelector('#jigsaw-placeholder-inner > div.horizontal-button-wrapper.next-wrapper > button'); \
-        if (node) { node.click(); node.className; } \
+        if (node) { node.className; } \
         node=  document.querySelector('#jigsaw-placeholder-inner > div.vertical-button-wrapper.next-wrapper > button'); \
-        if (node) { node.click(); node.className;}";
+        if (node) { node.className;}";
     NSString* rstr=[self runjs2:str];
     if ([rstr rangeOfString:@"horizontal"].location!=NSNotFound) {
         return 2;

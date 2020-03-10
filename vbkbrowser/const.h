@@ -20,10 +20,13 @@
 #define c_home @"https://www.ebook-converter.com/download/help.php?id=46"
 #define c_web @"https://www.ebook-converter.com"
 //#define c_active @"http://www.ebook-converter.com/download/activemac.php?id=%@&pid=%@"
-#define c_active @"https://www.ebook-converter.com/download/activevsprinter.php?id=%@&pid=%@"
+//#define c_active @"https://www.ebook-converter.com/download/activevsprinter.php?id=%@&pid=%@"
+#define c_active @"https://www.ebook-converter.com/download/api/active200.php?id=%@&pid=%@"
+#define c_activem @"https://www.ebook-converter.com/download/api/activemanlong.php?id=%@&pid=%@"
 #define c_str @"vistaldownload"
 #define c_pid @"46"
 #define c_times 40
+#define c_licensefile @"converter.dat"
 
 //40ccbda02539220a
 #define c_seed @"vitaldownmac"
