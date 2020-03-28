@@ -45,6 +45,7 @@ NSRect webviewrect;
 int ttimeout;
 int tviewwidth;
 int ebooktype;
+int captcha;
 
 IOPMAssertionID assertionID;
 IOReturn iosuccess;
@@ -57,9 +58,11 @@ IOReturn iosuccess;
     IBOutlet id resetbtn; // caption in main
 
     IBOutlet NSBox * box;
+    IBOutlet NSView * bview;
     IBOutlet NSButton * downloadbtn;
     IBOutlet NSTextView *textview;
     IBOutlet NSTextField *address;
+    IBOutlet NSTextField *timeouted;
     
     IBOutlet id buybtn;
     IBOutlet id helpbtn;
@@ -70,8 +73,10 @@ IOReturn iosuccess;
     int pageindex;
     int framenum;
     int ticknum;
+    int startno;
     BOOL framewaiting;
     BOOL jswaiting;
+    BOOL pausing;
     NSString * jsmessage;
     CGPoint mousepoint;
     
@@ -154,7 +159,8 @@ IOReturn iosuccess;
 - (void)awakeFromNib
 {
     [self loadjs:configuration];
-    webView = [[WKWebView alloc] initWithFrame:[containerView bounds] configuration:configuration];
+    //webView = [[WKWebView alloc] initWithFrame:[containerView bounds] configuration:configuration];
+    webView = [[WKWebView alloc] initWithFrame:[bview bounds] configuration:configuration];
     [webView setAutoresizingMask:(NSViewWidthSizable | NSViewHeightSizable)];
     #ifdef DEBUG
         [configuration.preferences  setValue:@YES forKey:@"developerExtrasEnabled"];
@@ -194,8 +200,9 @@ IOReturn iosuccess;
     [textview setHorizontallyResizable:NO];
     [testbtn setHidden:true];
     [resetbtn setHidden:true];
-    [box setHidden:true];
-    [touchlabel setHidden:true];
+    [downloadbtn setEnabled:false];
+    //[box setHidden:true];
+    //[touchlabel setHidden:true];
 
     if ([reg isreg]) {
         [buybtn setHidden:true];
@@ -205,15 +212,16 @@ IOReturn iosuccess;
 #ifdef DEBUG
     [testbtn setHidden:false];
     [resetbtn setHidden:false];
+    [timeouted setStringValue:@"30"];
 #else
     [testbtn setHidden:true];
+    [timeouted setStringValue:@"50"];
 #endif
     
 #ifdef DEBUG
 //    [testbtn setHidden:false];
 #endif
     
-
     //[downloadbtn setWantsLayer:YES];
     //downloadbtn.layer.backgroundColor = [NSColor greenColor].CGColor;
     
@@ -260,7 +268,8 @@ IOReturn iosuccess;
     
     //[self log:@"ready %@",aurl];
     //[self log:@"go"];
-    [containerView addSubview:webView];
+    //[containerView addSubview:webView];
+    [bview addSubview:webView];
 
 }
 
@@ -398,13 +407,16 @@ IOReturn iosuccess;
 
 - (IBAction)downloadbtn:(id)sender
 {
+    if (working) {
+        pausing=true;
+    }
     [self setWorking: !working];
    // [self totalbuttonjs];
 }
 
 - (IBAction)boxclosebtn:(id)sender
 {
-    [box setHidden:true];
+    //[box setHidden:true];
 }
 
 
@@ -478,16 +490,21 @@ IOReturn iosuccess;
 - (void) setWorking:(BOOL)aworking
 {
     working = aworking;
-    [touchlabel setHidden:!aworking];
     if (aworking) {
-        [vars removeAllObjects];
-        [webdelegate clearurllist];
-        totalpage=0;
-        pageindex=0;
-        taskindex=0;
+        ttimeout= [[timeouted stringValue] intValue];
+        if (!pausing) {
+            [vars removeAllObjects];
+            [webdelegate clearurllist];
+            totalpage=0;
+            taskindex=0;
+            pageindex=0;
+            [self log:@"Start download, wait ...."];
+        }
         //webdelegate.title = nil;// @"";
         //[NSThread sleepForTimeInterval:0.5f];
         //move mouse
+        pausing=false;
+        captcha=0;
         [self scrubberjs];
         webviewrect = [webView frame];
         ebooktype = [self ebooktypejs];
@@ -501,21 +518,25 @@ IOReturn iosuccess;
         //CGWarpMouseCursorPosition(mousepoint);
         //[NSApplication
         
-        tasktimer = [NSTimer scheduledTimerWithTimeInterval:0.8 target:self selector:@selector(epubtaskhandle:) userInfo:nil repeats:NO];
+        tasktimer = [NSTimer scheduledTimerWithTimeInterval:0.6 target:self selector:@selector(epubtaskhandle:) userInfo:nil repeats:NO];
         CFStringRef* reasonForActivity= CFSTR("vitalsource Describe Activity Type");
 //kIOPMAssertionTypePreventSystemSleep kIOPMAssertionTypeNoDisplaySleep
         iosuccess = IOPMAssertionCreateWithName(kIOPMAssertionTypePreventSystemSleep ,
                                             kIOPMAssertionLevelOn, reasonForActivity, &assertionID);
         
-        [self log:@"Start download, wait ...."];
-        [downloadbtn setTitle:@"Stop download"];
+        [downloadbtn setTitle:@"Pause"];
     } else {
         working = false;
         NSRect r = webviewrect;
         [webView setFrame:NSMakeRect(r.origin.x,r.origin.y,r.size.width,r.size.height)];
         [tasktimer invalidate];
-        [self log:@"download end"];
-        [downloadbtn setTitle:@"Download"];
+        if (pausing) {
+            [self log:@"Pause at page %d",pageindex];
+            [downloadbtn setTitle:@"Resume"];
+        } else {
+            [self log:@"download end"];
+            [downloadbtn setTitle:@"Download"];
+        }
         if (iosuccess==kIOReturnSuccess) {
             iosuccess = IOPMAssertionRelease(assertionID);
         }
@@ -540,18 +561,14 @@ IOReturn iosuccess;
             //totalpage= [vars[@"Totalpages"] intValue];
             totalpage = 999;
             if (![reg isreg]) {
-                totalpage = 5;
+                totalpage = 6;
                 [self log:@"demo version only download %d pages",totalpage];
                 
             }
             [self log:@"Title %@",webView.title];
 
-#ifdef DEBUG
-            ttimeout=20;
-#else
-            ttimeout=60;
-#endif
             ticknum=ttimeout;
+            captcha = 0;
             taskindex = 20;
             oldaddrees = @"";
             break;
@@ -564,6 +581,7 @@ IOReturn iosuccess;
                 framewaiting = true;
                 framenum=0;
                 ticknum =0;
+                captcha = 0;
                 oldaddrees=addressurl;
                 taskindex = 20;
                 [self nextpage:pageindex];
@@ -576,6 +594,12 @@ IOReturn iosuccess;
             // Item 3
             ticknum +=1;
             [touchlabel setStringValue:[@(ticknum) stringValue]];
+            if (captcha>0) {
+                [self downloadbtn:nil ];
+                [self log:@"Captcha, clear captcha and click button to resume."];
+                NSBeep();
+                NSBeep();
+            }
             if (ticknum>ttimeout) {
                 if (![oldaddrees isEqualToString:addressurl]) {
                     taskindex = 30;
@@ -610,6 +634,9 @@ IOReturn iosuccess;
             [self log:@"building pdf file ...."];
             bool b = [webdelegate Buildpdf:nil];
             [self setWorking:false];
+            pausing = false;
+            NSBeep();
+            NSBeep();
 //            [self setWorking:false];
 //            [self openoutputfile];
             [[NSWorkspace sharedWorkspace] openFile:ebookdir withApplication:@"Finder"];
@@ -728,12 +755,51 @@ IOReturn iosuccess;
 
 }
 
+- (void) logupdate:(NSString *)formatString, ...
+{
+    
+    va_list args;
+    va_start(args, formatString);
+    NSString * str = [[NSString alloc] initWithFormat:formatString arguments:args];
+    va_end(args);
+    NSString *text = [[textview textStorage] string];
+    
+    NSMutableAttributedString *astr = [[NSMutableAttributedString alloc] initWithString:str attributes:
+    @{ NSForegroundColorAttributeName: NSColor.controlTextColor}];
+    
+    [textview.textStorage appendAttributedString:astr];
+    [textview.textStorage appendAttributedString:[[NSAttributedString alloc] initWithString:@"\n"]];
+    [textview scrollRangeToVisible:NSMakeRange([[textview string] length], 0)];
+
+}
+
 - (void) log1: (NSString*) msg
 {
     //[textview ]
     //NSString * str = [NSString stringWithFormat:msg,args];
     [textview.textStorage appendAttributedString:[[NSAttributedString alloc] initWithString:msg]];
     [textview.textStorage appendAttributedString:[[NSAttributedString alloc] initWithString:@"\n"]];
+}
+
+
+- (void)userContentController:(WKUserContentController *)userContentController didReceiveScriptMessage:(WKScriptMessage *)message
+{
+    // what ever were logged with console.log() in wkwebview arrives here in message.body property
+    NSString * msg=message.body;
+    //NSLog(@"%@",msg);
+    if ([msg isEqualToString:@"recaptcha"]) {
+        captcha=1;
+        NSLog(@"***captcha");
+        return;
+    }
+    NSArray * list = [msg componentsSeparatedByString:@"="];
+    if ([list[0] isEqualToString:@"#Height"]) {
+        CGFloat height = [list[1] floatValue];
+        if (height>100) {
+            frameheigh = height;
+            //NSLog(@"height: %f", frameheigh);
+        }
+    }
 }
 
 //https://developer.apple.com/reference/webkit/webframeloaddelegate/1501445-webview?language=objc
@@ -764,12 +830,12 @@ IOReturn iosuccess;
     NSString* js;
     
 #ifdef DEBUG
-//            js = @"console = { log: function(msg) { MyApp.consoleLog_(msg); } };\
-//            document.getElementById(\"session_email\").value = \"youhdtv@gmail.com\"; \
-//            document.getElementById(\"session_password\").value = \"600338qQ@\";  \
-//            document.getElementById(\"new_session\").submit(); \
-//            MyApp.consoleLog_(\"login ...\"); \
-//            ";
+            js = @"console = { log: function(msg) { MyApp.consoleLog_(msg); } };\
+            document.getElementById(\"session_email\").value = \"youhdtv@gmail.com\"; \
+            document.getElementById(\"session_password\").value = \"600338qQ@\";  \
+            document.getElementById(\"new_session\").submit(); \
+            MyApp.consoleLog_(\"login ...\"); \
+            ";
 //        js = @"console = { log: function(msg) { MyApp.consoleLog_(msg); } };\
 //        document.getElementById(\"session_email\").value = \"Mydreamgrade5@gmail.com\"; \
 //        document.getElementById(\"session_password\").value = \"MDSpass@123\";  \
@@ -782,12 +848,12 @@ IOReturn iosuccess;
 //    document.getElementById(\"new_session\").submit(); \
 //    MyApp.consoleLog_(\"login ...\"); \
 //    ";
-    js = @"console = { log: function(msg) { MyApp.consoleLog_(msg); } };\
-    document.getElementById(\"session_email\").value = \"a03@pwqsoft.com\"; \
-    document.getElementById(\"session_password\").value = \"600338qQ~\";  \
-    document.getElementById(\"new_session\").submit(); \
-    MyApp.consoleLog_(\"login ...\"); \
-    ";
+//    js = @"console = { log: function(msg) { MyApp.consoleLog_(msg); } };\
+//    document.getElementById(\"session_email\").value = \"a03@pwqsoft.com\"; \
+//    document.getElementById(\"session_password\").value = \"600338qQ~\";  \
+//    document.getElementById(\"new_session\").submit(); \
+//    MyApp.consoleLog_(\"login ...\"); \
+//    ";
 
 //    js = @"console = { log: function(msg) { MyApp.consoleLog_(msg); } };\
 //    document.getElementById(\"session_email\").value = \"C004px8@rogers.com\"; \
@@ -916,6 +982,9 @@ IOReturn iosuccess;
     return 1;
 }
 
+//first page
+//#toc-container > ul > li.toc-title.title.toc-level.level-1.group
+//#toc-container > ul > li.toc-title.title.toc-level.level-1.group > button
 - (int) nextpage:(int) page
 {
     NSString *res = [self rightkeyjs];
@@ -1384,9 +1453,9 @@ IOReturn iosuccess;
 
         
         //NSString *str = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-        if ([box isHidden]) {
+        if (![downloadbtn isEnabled]) {
 
-            [box setHidden:false];
+            [downloadbtn setEnabled:true];
             [[textview.textStorage mutableString] setString:@""];
 
             //[self log:@"ebook ready to download, click download button, \r%@",webdelegate.title];
@@ -1441,14 +1510,17 @@ IOReturn iosuccess;
 - (void)foundjason
 {
     //NSLog(@"page found");
-    if ([box isHidden]) {
-        [box setHidden:false];
+    //if ([box isHidden]) {
+    [downloadbtn setEnabled:true];
+    if (pausing) {
+        return;
+    }
         [[textview.textStorage mutableString] setString:@""];
         
         //[self log:@"ebook ready to download, click download button, \r%@",webdelegate.title];
         [self log:@"ebook ready to download, \r"];
         [self log:@"turn to first page, click download button, \r"];
-    }
+    //}
 
 }
 
@@ -1459,22 +1531,35 @@ IOReturn iosuccess;
     [address setStringValue:[webView.URL absoluteString ]];
     addressurl = [webView.URL absoluteString ];
     if (working) {
-            framenum+=1;
-            
+        framenum+=1;
+        if (ebooktype==1) { //epub
             if (framenum>2) {
-                ticknum = ttimeout-3;
+                ticknum = ttimeout-ttimeout/10;
             } else if (framenum>1) {
-                ticknum = ttimeout-2;
+                ticknum = ttimeout-ttimeout/8;
             } else if (framenum>0) {
-                ticknum = ttimeout-3;
+                ticknum = ttimeout-ttimeout/7;
             }
+        } else { //pdf
+            if (framenum>2) {
+                ticknum = ttimeout- ttimeout/10;
+            } else if (framenum>1) {
+                ticknum = ttimeout- ttimeout/5;
+            } else if (framenum>0) {
+                ticknum = ttimeout / 2;
+            }
+
+        }
     } else { //find book open
        if ([addressurl rangeOfString:@"/books/"].location != NSNotFound) {
            //NSLog(@"^^^^^^^^book find");
            //NSLog(@"url changes %@ ",[webView.URL absoluteString ]);
            [self foundjason];
        } else {
-           [box setHidden:true];
+           [downloadbtn setEnabled:false];
+           pausing =false;
+           captcha = 0;
+           //[box setHidden:true];
        }
         
     }
@@ -1502,15 +1587,6 @@ IOReturn iosuccess;
     }
 }
 
-- (void)userContentController:(WKUserContentController *)userContentController didReceiveScriptMessage:(WKScriptMessage *)message
-{
-    // what ever were logged with console.log() in wkwebview arrives here in message.body property
-    CGFloat height = [message.body floatValue];
-    if (height>100) {
-        frameheigh = height;
-        //NSLog(@"height: %f", frameheigh);
-    }
-}
 #pragma mark - Tools
 
 - (BOOL) createfolder: (NSString*) folder
@@ -1600,7 +1676,7 @@ IOReturn iosuccess;
     NSString * aurl = @"https://www.vitalsource.com/";
     [webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:aurl]]];
     if (![box isHidden]) {
-        [box setHidden:true];
+    //    [box setHidden:true];
     }
 }
 

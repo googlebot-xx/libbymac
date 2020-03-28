@@ -1,0 +1,121 @@
+[{"path":"/OEBPS/html/cover.html","absoluteURL":"/books/9780133521900/epub/OEBPS/html/cover.html","cfi":"/6/2[;vnd.vst.idref=cover]","cfiWithoutAssertions":"/6/2","linear":true,"chapterTitle":"Title Page"},{"path":"/OEBPS/html/title.html","absoluteURL":"/books/9780133521900/epub/OEBPS/html/title.html","cfi":"/6/4[;vnd.vst.idref=title]","cfiWithoutAssertions":"/6/4","linear":true,"chapterTitle":"Title Page"},{"path":"/OEBPS/html/copyright.html","absoluteURL":"/books/9780133521900/epub/OEBPS/html/copyright.html","cfi":"/6/6[;vnd.vst.idref=copy]","cfiWithoutAssertions":"/6/6","linear":true,"chapterTitle":"Copyright Page"},{"path":"/OEBPS/html/toc.html","absoluteURL":"/books/9780133521900/epub/OEBPS/html/toc.html","cfi":"/6/8[;vnd.vst.idref=toc]","cfiWithoutAssertions":"/6/8","linear":true,"chapterTitle":"Table of Contents"},{"path":"/OEBPS/html/ch01.html","absoluteURL":"/books/9780133521900/epub/OEBPS/html/ch01.html","cfi":"/6/10[;vnd.vst.idref=ch01]","cfiWithoutAssertions":"/6/10","linear":true,"chapterTitle":"Introduction"},{"path":"/OEBPS/html/ch02.html","absoluteURL":"/books/9780133521900/epub/OEBPS/html/ch02.html","cfi":"/6/12[;vnd.vst.idref=ch02]","cfiWithoutAssertions":"/6/12","linear":true,"chapterTitle":"Taking a Photo"},{"path":"/OEBPS/html/ch03.html","absoluteURL":"/books/9780133521900/epub/OEBPS/html/ch03.html","cfi":"/6/14[;vnd.vst.idref=ch03]","cfiWithoutAssertions":"/6/14","linear":true,"chapterTitle":"Editing Your Images"},{"path":"/OEBPS/html/ch04.html","absoluteURL":"/books/9780133521900/epub/OEBPS/html/ch04.html","cfi":"/6/16[;vnd.vst.idref=ch04]","cfiWithoutAssertions":"/6/16","linear":true,"chapterTitle":"Sharing Your Images"},{"path":"/OEBPS/html/ch05.html","absoluteURL":"/books/9780133521900/epub/OEBPS/html/ch05.html","cfi":"/6/18[;vnd.vst.idref=ch05]","cfiWithoutAssertions":"/6/18","linear":true,"chapterTitle":"Android Mobile Photography Accessories"}]
+
+<button class="section no-drill"><div title="Table of Contents"><!-- react-text: 420 --><!-- /react-text --><div class="title no-pages dotted" style="overflow-wrap: break-word;">Table of Contents</div></div></button>
+
+<li data-activekey="toc_level_/6/8[;vnd.vst.idref=toc]_4" class="level level-1 group"><button class="section no-drill"><div title="Table of Contents"><!-- react-text: 420 --><!-- /react-text --><div class="title no-pages dotted" style="overflow-wrap: break-word;">Table of Contents</div></div></button></li>
+
+Totalpages is 3
+title0=<img src="//covers.vitalbook.com/vbid/9781506301587DEMO/width/60?style=preview"><div class="book-title dotted" title="DEMO: Introduction to Criminal Justice: Systems, Diversity and Change Interactive eBook (Demo chapte" style="word-wrap: break-word;"><span>DEMO: Introduction to Criminal Justice: Systems, Diversity and... </span></div><div class="author">Callie Marie Rennison,&nbsp; Mary Dodge</div>
+load page 0
+title1=<div title="1 An Introduction to Crime and the Criminal Justicesystem"><div title="2" class="page" style="line-height: 40px;"><span class="hidden-page">Page</span><!-- react-text: 464 -->2<!-- /react-text --></div><div class="title dotted" style="word-wrap: break-word;">1 An Introduction to Crime and the Criminal Justicesystem</div></div>
+load page 1
+title2=<div title="5 On the Streets: Organization, Responsibilities and Challenges"><div title="118" class="page" style="line-height: 40px;"><span class="hidden-page">Page</span><!-- react-text: 476 -->118<!-- /react-text --></div><div class="title dotted" style="word-wrap: break-word;">5 On the Streets: Organization, Responsibilities and Challenges</div></div>
+load page 2
+
+
+- (void)webView:(WebView *)sender didFinishLoadForFrame:(WebFrame *)frame {
+    if (frame == [frame findFrameNamed:@"_top"]) {
+        scriptObject = [sender windowScriptObject];
+        [scriptObject setValue:self forKey:@"MyApp"];
+        [scriptObject evaluateWebScript:@"console = { log: function(msg) { MyApp.consoleLog_(msg); } }"];
+    }
+}
+
++ (BOOL)isSelectorExcludedFromWebScript:(SEL)selector {
+    NSLog(@"%@ received %@ for '%@'", self, NSStringFromSelector(_cmd), NSStringFromSelector(selector));
+    if (selector == @selector(doOutputToLog:)
+    || selector == @selector(changeJavaScriptText:)
+    || selector == @selector(reportSharedValue)) {
+        return NO;
+    }
+    return YES;
+}
+
+double delayInSeconds = 2.0;
+dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
+dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+  NSLog(@"Do some work");
+});
+
+[[NSOperationQueue mainQueue] addOperationWithBlock:^{
+     //bla bla bla
+}];
+
+- (void) methodA
+{
+//Start playing an audio file.
+
+//NSTimer calling Method B, as long the audio file is playing, every 5 seconds.
+[NSTimer scheduledTimerWithTimeInterval:5.0f 
+target:self selector:@selector(methodB:) userInfo:nil repeats:YES];
+}
+
+- (void) methodB:(NSTimer *)timer
+{
+//Do calculations.
+}
+
+ NSTimer *aTimer = [NSTimer timerWithTimeInterval:(x) target:self selector:@selector(timerFired:) userInfo:nil repeats:YES];
+
+    NSRunLoop *runner = [NSRunLoop currentRunLoop];
+    [runner addTimer:aTimer forMode: NSDefaultRunLoopMode];  
+    [popUpImageView release];
+
+- (void)timerFired:(NSTimer*)theTimer 
+{
+	if(condition)
+	{
+	  [theTimer isValid]; //recall the NSTimer
+	   //implement your methods
+	}
+	else
+	{
+	  [theTimer invalidate]; //stop the NSTimer
+
+	}
+}
+
+document.getElementById("myCheck").click(); // Click on the checkbox
+
+<form class="simple_form login-form" novalidate="novalidate" id="new_session" action="/sessions" accept-charset="UTF-8" method="post"><input name="utf8" value="✓" type="hidden">
+</form>
+
+<button class="toolbar-button toc-button /img/toc/toc.svg" id="toc-button" data-tooltip="Table Of Contents" data-tooltip-location="right" data-target-dom-id="toc-button" aria-pressed="false" style="outline: medium none;"><span class="isvg loaded" aria-hidden="true"><svg width="20" height="16" viewBox="0 0 20 16" xmlns="http://www.w3.org/2000/svg"><title>contents_icon</title><path d="M6 15.5h13a1 1 0 0 0 0-2H6a1 1 0 0 0 0 2m-4.5.5a1.5 1.5 0 0 0 0-3 1.5 1.5 0 0 0 0 3M6 9h7a1 1 0 0 0 0-2H6a1 1 0 0 0 0 2m-4.5.5a1.5 1.5 0 0 0 0-3 1.5 1.5 0 0 0 0 3m4.5-7h11a1 1 0 0 0 0-2H6a1 1 0 0 0 0 2m-6-1a1.5 1.5 0 0 1 3 0 1.5 1.5 0 0 1-3 0" fill="#FFF" fill-rule="evenodd"></path></svg></span><span class="label">Table Of Contents</span></button>
+
+=================================
+<button class="navigation-button noButton horizontal-button previous-button" style="display: block;"><span class="isvg loaded" aria-hidden="true"><svg width="20" height="11" viewBox="0 0 20 11" xmlns="http://www.w3.org/2000/svg"><title>chevron_left_large</title><path d="M10 8.579L5.923 4.502 1.714.293A.999.999 0 0 0 .3.293L.293.299a1 1 0 0 0 0 1.415L8.579 10l.645.644.016-.016c.183.222.45.372.76.372a.997.997 0 0 0 .707-.293l.003.003.711-.71 3.434-3.434 4.852-4.852a1 1 0 0 0 0-1.415L19.7.293a.999.999 0 0 0-1.414 0L10 8.579z" fill="#757575" fill-rule="evenodd"></path></svg></span><span class="offScreen">Previous</span></button>
+
+<button class="navigation-button noButton horizontal-button next-button" style="display: block; outline: medium none;"><span class="isvg loaded" aria-hidden="true"><svg width="20" height="11" viewBox="0 0 20 11" xmlns="http://www.w3.org/2000/svg"><title>chevron_left_large</title><path d="M10 8.579L5.923 4.502 1.714.293A.999.999 0 0 0 .3.293L.293.299a1 1 0 0 0 0 1.415L8.579 10l.645.644.016-.016c.183.222.45.372.76.372a.997.997 0 0 0 .707-.293l.003.003.711-.71 3.434-3.434 4.852-4.852a1 1 0 0 0 0-1.415L19.7.293a.999.999 0 0 0-1.414 0L10 8.579z" fill="#757575" fill-rule="evenodd"></path></svg></span><span class="offScreen">Next</span></button>
+=================================
+
+<li data-activekey="toc_level_/6/10[;vnd.vst.idref=ch01]_6" class="level level-1 group"><button class="section"><div title="Introduction"><!-- react-text: 429 --><!-- /react-text --><div class="title no-pages dotted" style="overflow-wrap: break-word;">Introduction</div></div></button><button class="drill"><div class="drill-border"></div><div class="arrow"><span class="isvg loaded" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="16" viewBox="-18 11 10 16"><path class="adgr" fill="#40404C" d="M-18 13.2l2.2-2.2 7.8 7.7v.5l-7.8 7.8-2.2-2.2 5.8-5.8z"></path></svg></span></div><span class="hidden">Open table of contents for Introduction</span></button></li>
+
+   js:= 'var items =document.getElementsByClassName("sheet reflowable spread"); '+
+    	'console.log("###Totaldiv="+items.length);'#9+
+    	'var n = 0;'#9+
+    	'for (i = 0; i < items.length; ++i) { '+
+      	'var itemframes =  items[i].getElementsByTagName("iframe");'#9+
+      	'var s1="###diviframe="+i+"\n";'#9+
+      	'if(itemframes.length>0) {'#9+
+//        	'var hs = itemframes[0].contentDocument.getElementsByTagName("style");'#9+
+//        	'for (var j=0, max = hs.length; j < max; i++) {'#9+
+//        	'  hs[j].parentNode.removeChild(hs[j]);}'#9+
+        	'node = itemframes[0].contentDocument.getElementsByTagName("html")[0];'#9+
+        	's1 += node.innerHTML;'#9+
+        	'n += 1;'#9+
+        	'console.log(s1);}'#9+
+    	'}'#9+
+    	'console.log("###Totaliframe="+n);'#9+
+    	'console.log("###end");';
+
+
+https://jigsaw.vitalsource.com/books/9781446297650DEMO/pages/97215413/content?create=true
+https://jigsaw.vitalsource.com/books/9781446297650DEMO/images/553246736447566b58312f6a624d4f4747432b504e674f7473614c397473465736735567315635486a446f3d0a/encrypted/1600
+https://jigsaw.vitalsource.com/books/9781446297650DEMO/images/553246736447566b583138496e4237495553664c6c335736426b6e54387236615a6b7662463358596c4b773d0a/encrypted/1600
+https://jigsaw.vitalsource.com/books/9781446297650DEMO/images/553246736447566b58312b756244794e2f4550664641416137476b486d796e7a4f61734543754f5a4737673d0a/encrypted/1600
+https://jigsaw.vitalsource.com/books/9781446297650DEMO/images/553246736447566b58312b7369452b644f57584e5438644f4d5168654d4375742f357339702b526569346f3d0a/encrypted/1600
+https://jigsaw.vitalsource.com/books/9781446297650DEMO/images/553246736447566b58312f4d6663784b344553334c584372667662586c44436b4b2b716f576c76706567733d0a/encrypted/1600
+https://jigsaw.vitalsource.com/books/9781446297650DEMO/images/553246736447566b58312b364432526e765650566c78492f492b4242592f443256354e6c4d2f7a365147733d0a/encrypted/1600
+https://jigsaw.vitalsource.com/books/9781446297650DEMO/images/553246736447566b58312f726773474d642b6a554a65425a344d75444d5933706352766b757051767263773d0a/encrypted/1600
+https://jigsaw.vitalsource.com/books/9781446297650DEMO/images/553246736447566b58312f75676e583239525849694459353650665a6d557a697a74395a556e306f42554d3d0a/encrypted/1600
+https://jigsaw.vitalsource.com/books/9781446297650DEMO/images/553246736447566b58312b67327754667543685a546b2b4f4c744d36394f78524333506e4e724c646642593d0a/encrypted/1600

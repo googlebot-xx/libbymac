@@ -1,0 +1,42 @@
+webView: resource: didReceiveResponse: fromDataSource:
+webView: willSendRequest: redirectResponse: fromDataSource:
+
+·WebView:identifierForInitialRequest:fromDataSource - 在load resource时最早发生，返回the application-defined resource identifier。
+
+·WebView:resource:willSendRequest:redirectResponse:fromDataSource - 发生多次，在资源请求被发送之前。
+
+·WebView:resource:didReceiveResponse:fromDataSource - 当请求的资源返回第一个字节时发生。
+
+·WebVew:resource:didReceiveContentLength:fromDataSource - 发送0次或多次，直到资源的所有数据返回成功。
+
+·WebView:resource:didFinishLoadingFromDataSource - 当资源的所有数据返回后发生。
+
+如果请求的资源加载失败，WebView:resource:didFailLoadingWithError:fromDataSource将发生。
+
+-(void) webView:(WebView *)sender resource:(id)identifier didFinishLoadingFromDataSource:(WebDataSource *)dataSource {
+    NSURL *url = [NSURL URLWithString:[[webView windowScriptObject] evaluateWebScript:/* javascript to grab src */]];
+    if ([dataSource subresourceForURL:url]) {
+        NSData *dataToSave = [[dataSource subresourceForURL:url] data];
+    }
+}
+
+NSString* newStr = [[[NSString alloc] initWithData:theData
+                                         encoding:NSUTF8StringEncoding] autorelease];
+
+NSData* data = [str dataUsingEncoding:NSUTF8StringEncoding];
+
+
+-(void) mockRequest:(NSURLRequest*)request data:(NSData*)data {
+    id client = [self client];
+
+    NSDictionary *headers = @{@"Access-Control-Allow-Origin" : @"*", @"Access-Control-Allow-Headers" : @"Content-Type"};
+    NSHTTPURLResponse *response = [[NSHTTPURLResponse alloc] initWithURL:request.URL statusCode:200 HTTPVersion:@"1.1" headerFields:headers];
+
+    [client URLProtocol:self didReceiveResponse:response
+     cacheStoragePolicy:NSURLCacheStorageNotAllowed];
+    [client URLProtocol:self didLoadData:data];
+    [client URLProtocolDidFinishLoading:self];
+}
+
+com.ebookconverter.vbkbrowser
+defaults write com.ebookconverter.vbkbrowser WebKitDeveloperExtras TRUE
