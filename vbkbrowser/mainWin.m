@@ -463,7 +463,7 @@ IOReturn iosuccess;
         ttimeout= [[timeouted stringValue] intValue];
         if (!pausing) {
             [vars removeAllObjects];
-            [webdelegate clearurllist];
+            //[webdelegate clearurllist];
             totalpage=0;
             taskindex=0;
             pageindex=0;
@@ -506,6 +506,7 @@ IOReturn iosuccess;
             [self log:@"download end"];
             [downloadbtn setTitle:@"Download"];
         }
+        [webdelegate saveurllist:true];
         if (iosuccess==kIOReturnSuccess) {
             iosuccess = IOPMAssertionRelease(assertionID);
         }
@@ -1525,6 +1526,7 @@ IOReturn iosuccess;
         //[self log:@"ebook ready to download, click download button, \r%@",webdelegate.title];
     [self log:@"ebook ready to download, \r"];
     [self log:@"turn to first page, click download button, \r"];
+    [webdelegate clearurllist];
     if (ebooktype==2) {
         if ([webdelegate saveurllist:false]){ //loadurllist, resume mode
             [self log:@"PDF book have downloaded %d pages",webdelegate.urllist.count];
