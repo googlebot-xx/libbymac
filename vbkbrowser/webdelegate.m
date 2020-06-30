@@ -30,6 +30,7 @@
 @synthesize ebookid;
 @synthesize ebooktype;
 @synthesize pagelist;
+@synthesize urllist;
 
 - (id)init
 {

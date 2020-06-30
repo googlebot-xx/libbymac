@@ -45,4 +45,5 @@
 @property (nonatomic, retain) NSString* ebookid;
 @property (nonatomic, retain) NSString* epubfile;
 @property (nonatomic, retain) NSArray* pagelist;
+@property (nonatomic, retain) NSMutableArray* urllist;
 @end

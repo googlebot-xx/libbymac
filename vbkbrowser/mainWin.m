@@ -1519,15 +1519,19 @@ IOReturn iosuccess;
     if (pausing) {
         return;
     }
-        [[textview.textStorage mutableString] setString:@""];
-        
+    [[textview.textStorage mutableString] setString:@""];
+    webdelegate.ebookid = [webdelegate getbookid:addressurl];
+    ebooktype = [self ebooktypejs];
         //[self log:@"ebook ready to download, click download button, \r%@",webdelegate.title];
-        [self log:@"ebook ready to download, \r"];
-        [self log:@"turn to first page, click download button, \r"];
-    //}
-
+    [self log:@"ebook ready to download, \r"];
+    [self log:@"turn to first page, click download button, \r"];
+    if (ebooktype==2) {
+        if ([webdelegate saveurllist:false]){ //loadurllist, resume mode
+            [self log:@"PDF book have downloaded %d pages",webdelegate.urllist.count];
+            NSLog(@"PDF resume");
+        }
+    }
 }
-
 
 - (void) urlchanged
 {
@@ -1558,8 +1562,13 @@ IOReturn iosuccess;
        if ([addressurl rangeOfString:@"/books/"].location != NSNotFound) {
            //NSLog(@"^^^^^^^^book find");
            //NSLog(@"url changes %@ ",[webView.URL absoluteString ]);
-           [self foundjason];
-           webdelegate.ebookid = [webdelegate getbookid:addressurl];
+           if ([addressurl rangeOfString:@"recent"].location != NSNotFound) {
+               return;
+           }
+           if (![downloadbtn isEnabled]){
+               [self foundjason];
+           }
+
        } else {
            [downloadbtn setEnabled:false];
            pausing =false;
