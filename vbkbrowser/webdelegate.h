@@ -34,6 +34,9 @@
 - (bool) Buildpdf:(NSString *) afile;
 - (BOOL) createfolder: (NSString*) folder;
 - (NSString *) cleanfilename: (NSString *) str;
+- (void) setWorking:(BOOL)aworking;
+- (BOOL) saveurllist:(BOOL)b;
+- (NSString *) getbookid: (NSString *) path;
 
 @property (nonatomic, assign) int tick;
 @property (nonatomic, assign) int ebooktype;

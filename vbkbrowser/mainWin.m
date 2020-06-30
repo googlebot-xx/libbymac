@@ -358,47 +358,16 @@ IOReturn iosuccess;
 
 - (IBAction)testbtn:(id)sender
 {
-    //[self pagefilename];
-    //return;
-    //[self takeshot];
-   // [self savepdf:@"/Users/aa/Documents/pdf1.pdf" aimg:@"/Users/aa/Documents/eBookConverter/VitalSource Downloader/test1.jpg"];
-   // return;
-    //[webdelegate BuildPub:nil];
-    //return;
-//    [self setWorking:true];
-//    NSLog(@"start");
-//    [self wait:3];
-//    NSLog(@"end");
-//    NSRect r = [[self window] frame]  ;
-//    CGPoint warpPoint = CGPointMake(r.origin.x+r.size.width-100,[[NSScreen mainScreen] frame].size.height- (r.origin.y+r.size.height/2));
-//    CGWarpMouseCursorPosition(warpPoint);
-//    NSLog(@"%4.2f %4.2f %4.2f",r.origin.x,r.origin.y,r.size.height);
-//    return;
-    //[webdelegate BuildPub:nil];
-    //return;
-    //[webdelegate Buildpdf:nil];
-    //return;
-    //test save epub
-    //[webdelegate saveepubfile:@"https://jigsaw.vitalsource.com/books/9781506301587DEMO/epub/OEBPS/images/pg141.jpg" data:nil];
-    //[webdelegate saveepubfile:@"https://jigsaw.vitalsource.com/api/v0/books/9780826904942/pages/300737558/content#cfi=/9" data:nil];
-    //return;
-    
-    //NSString * url = [webView mainFrameURL];
     NSString * url = webView.URL.absoluteString;
-    if ([url rangeOfString:@"login"].location != NSNotFound) {
+    if ([url rangeOfString:@"signin"].location != NSNotFound) {
         [self loginjs:nil];
-    } else {
-        //[self totalbuttonjs];
-        //[self checknextbutton];
-        //[self printhtmlpdf];
-        //[self takeshot];
-        [self scrubberjs];
-
-        //[self rundownload];
-        //[self performSelector: @selector(rundownload) withObject: nil afterDelay: 0.1];
-        //[self setWorking:true];
-
+        return;
     }
+    working=true;
+    [webdelegate saveurl:addressurl];
+    [webdelegate saveurllist:true];
+    working=false;
+    //[self pagefilename];
 #ifdef DEBUG
     //[regcontroller savekey:@"" skey:@"" suser:@"aa"];
     //[reg savekey:@"" skey:@"" suser:@""];
@@ -756,23 +725,31 @@ IOReturn iosuccess;
 
 }
 
-- (void) logupdate:(NSString *)formatString, ...
+- (void) updatelog:(NSString *)formatString, ...
 {
     
     va_list args;
     va_start(args, formatString);
     NSString * str = [[NSString alloc] initWithFormat:formatString arguments:args];
     va_end(args);
-    NSString *text = [[textview textStorage] string];
+    
+    NSLayoutManager *layoutManager = [textview layoutManager];
+    NSUInteger numberOfLines = 0;
+    NSUInteger numberOfGlyphs = [layoutManager numberOfGlyphs]-1;
+    NSRange lineRange;
+    [layoutManager lineFragmentRectForGlyphAtIndex:numberOfGlyphs effectiveRange:&lineRange];
+    [textview setSelectedRange:lineRange];
+    [textview delete:nil];
     
     NSMutableAttributedString *astr = [[NSMutableAttributedString alloc] initWithString:str attributes:
-    @{ NSForegroundColorAttributeName: NSColor.controlTextColor}];
+                                       @{ NSForegroundColorAttributeName: NSColor.controlTextColor, NSFontAttributeName: [NSFont systemFontOfSize:12.0f]}];
     
     [textview.textStorage appendAttributedString:astr];
     [textview.textStorage appendAttributedString:[[NSAttributedString alloc] initWithString:@"\n"]];
     [textview scrollRangeToVisible:NSMakeRange([[textview string] length], 0)];
 
 }
+
 
 - (void) log1: (NSString*) msg
 {
@@ -832,9 +809,9 @@ IOReturn iosuccess;
     
 #ifdef DEBUG
             js = @"console = { log: function(msg) { MyApp.consoleLog_(msg); } };\
-            document.getElementById(\"session_email\").value = \"youhdtv@gmail.com\"; \
-            document.getElementById(\"session_password\").value = \"600338qQ@\";  \
-            document.getElementById(\"new_session\").submit(); \
+            document.getElementById(\"email-field\").value = \"youhdtv@gmail.com\"; \
+            document.getElementById(\"password-field\").value = \"600338qQ@\";  \
+            document.getElementById(\"signin-form\").submit(); \
             MyApp.consoleLog_(\"login ...\"); \
             ";
 //        js = @"console = { log: function(msg) { MyApp.consoleLog_(msg); } };\
@@ -1265,6 +1242,32 @@ IOReturn iosuccess;
 
     return 0;
 }
+
+//  chm.DeleteCookies('jiasaw.vitalsource.com','_jigsaw_session');
+-(void) deletecookie
+{
+    WKWebsiteDataStore *dateStore = [WKWebsiteDataStore defaultDataStore];
+    [dateStore
+       fetchDataRecordsOfTypes:[WKWebsiteDataStore allWebsiteDataTypes]
+       completionHandler:^(NSArray<WKWebsiteDataRecord *> * __nonnull records) {
+         for (WKWebsiteDataRecord *record  in records) {
+           //NSLog(@"%@",record);
+           if ( [record.displayName containsString:@"vitalsource.com"]) {
+              NSLog(@"%@",record);
+             [[WKWebsiteDataStore defaultDataStore]
+                 removeDataOfTypes:record.dataTypes
+                 forDataRecords:@[record]
+                 completionHandler:^{
+                   NSLog(@"Cookies for %@ deleted successfully",record.displayName);
+                 }
+             ];
+            NSString * aurl= @"https://www.vitalsource.com/bookshelf/home";
+            [webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:aurl]]];
+           }
+         }
+       }
+     ];
+}
 #pragma mark - WKUIDelegate
 - (WKWebView *)webView:(WKWebView *)webView createWebViewWithConfiguration:(WKWebViewConfiguration *)configuration forNavigationAction:(WKNavigationAction *)navigationAction windowFeatures:(WKWindowFeatures *)windowFeatures
 {
@@ -1556,6 +1559,7 @@ IOReturn iosuccess;
            //NSLog(@"^^^^^^^^book find");
            //NSLog(@"url changes %@ ",[webView.URL absoluteString ]);
            [self foundjason];
+           webdelegate.ebookid = [webdelegate getbookid:addressurl];
        } else {
            [downloadbtn setEnabled:false];
            pausing =false;

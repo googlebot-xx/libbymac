@@ -208,6 +208,34 @@ fromDataSource:(WebDataSource *)dataSource
     //[_mainwin log:str];
 }
 
+- (void) setWorking:(BOOL)aworking
+{
+    if (aworking) {
+        
+    } else {
+        //save url
+    }
+}
+
+- (BOOL) saveurllist:(BOOL)b
+{
+    NSString * fname = [_mainwin.datadir stringByAppendingPathComponent:ebookid];
+    if (![self fileexist:fname]) {
+        [self createfolder:fname];
+    }
+    fname = [fname stringByAppendingPathComponent:@"urllist.txt"];
+    if (b) { //save
+        [urllist writeToFile:fname atomically:YES];
+        return true;
+    } else { //load
+        if ([self fileexist:fname]) {
+            urllist = [NSMutableArray arrayWithContentsOfFile:fname];
+            return true;
+        }
+        return false;
+    }
+}
+
 //OEBPS https://jigsaw.vitalsource.com/books/9781506301587DEMO/epub/OEBPS/images/pg133.jpg
 //OEBPS https://jigsaw.vitalsource.com/books/9781506301587DEMO/epub/OEBPS/images/pg141.jpg
 
@@ -1004,4 +1032,14 @@ fromDataSource:(WebDataSource *)dataSource
     }
     return true;
 }
+
+- (BOOL)fileexist: (NSString *)afile
+{
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    if (afile) {
+        return [fileManager fileExistsAtPath: afile];
+    }
+    return false;
+}
+
 @end
