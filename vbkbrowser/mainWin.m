@@ -632,6 +632,7 @@ IOReturn iosuccess;
         case 90:
             // Item 3
             [self log:@"building pdf file ...."];
+            [textview setNeedsDisplay:YES];
             bool b = [webdelegate Buildpdf:nil];
             [self setWorking:false];
             pausing = false;
