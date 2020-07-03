@@ -43,7 +43,8 @@
 - (void)foundjason;
 //- (void)log:(NSString*)msg;
 - (void) log:(NSString *)formatString, ...;
-
+- (NSString *)pagefilename:(NSString *)aurl;
+-(NSString *)strFrom:(NSString *)str from:(NSString *)from to:(NSString *)to;
 
 @end
 

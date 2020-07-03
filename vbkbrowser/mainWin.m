@@ -262,7 +262,8 @@ IOReturn iosuccess;
     NSString * aurl = @"https://www.vitalsource.com/";
     //NSString * aurl = @"https://www.google.com/";
     //NSString * aurl = @"file:///Users/aa/Public/js/dom/bt2.htm";
-    [webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:aurl]]];
+    //[webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:aurl]]];
+    [self goURL:aurl];
 
     //[self performSelector: @selector(homepagebtnclick:) withObject: nil afterDelay: 1];
     
@@ -364,8 +365,9 @@ IOReturn iosuccess;
         return;
     }
     working=true;
-    [webdelegate saveurl:addressurl];
-    [webdelegate saveurllist:true];
+    NSString * file =[self pagefilename:@"https://bookshelf.vitalsource.com/#/books/9781635672268/cfi/10"];
+    NSLog(@"%@",file);
+    //[webdelegate Buildpdf:nil];
     working=false;
     //[self pagefilename];
 #ifdef DEBUG
@@ -459,7 +461,9 @@ IOReturn iosuccess;
 - (void) setWorking:(BOOL)aworking
 {
     working = aworking;
+    BOOL bpause=pausing;
     if (aworking) {
+
         ttimeout= [[timeouted stringValue] intValue];
         if (!pausing) {
             [vars removeAllObjects];
@@ -467,19 +471,33 @@ IOReturn iosuccess;
             totalpage=0;
             taskindex=0;
             pageindex=0;
+            totalpage = 999;
+            startno=0;
+            if (![reg isreg]) {
+                totalpage = 6;
+                [self log:@"demo version only download %d pages",totalpage];
+                
+            }
             [self log:@"Start download, wait ...."];
         }
         //webdelegate.title = nil;// @"";
         //[NSThread sleepForTimeInterval:0.5f];
         //move mouse
-        pausing=false;
-        captcha=0;
         [self scrubberjs];
         webviewrect = [webView frame];
         ebooktype = [self ebooktypejs];
         tviewwidth = webviewrect.size.width;
-        if (ebooktype == 2) {
+        if (ebooktype == 2) { //pdf
             tviewwidth = 1200;
+            startno = webdelegate.urllist.count;
+            if (!pausing && startno>0) {//resume download
+                [self goURL:[webdelegate.urllist objectAtIndex:startno-1]];
+                taskindex=20;
+                ticknum=ttimeout-4; //test
+                oldaddrees=@"";
+                NSLog(@"Load page %d",startno);
+                [self updatelog:@"Load page %d",startno];
+            }
         }
         NSRect r = webviewrect;
         [webView setFrame:NSMakeRect(r.origin.x,r.origin.y,tviewwidth,r.size.height)];
@@ -494,6 +512,8 @@ IOReturn iosuccess;
                                             kIOPMAssertionLevelOn, reasonForActivity, &assertionID);
         
         [downloadbtn setTitle:@"Pause"];
+        pausing=false;
+        captcha=0;
     } else {
         working = false;
         NSRect r = webviewrect;
@@ -529,12 +549,7 @@ IOReturn iosuccess;
         case 0:
             //taskindex = [self totalbuttonjs];
             //totalpage= [vars[@"Totalpages"] intValue];
-            totalpage = 999;
-            if (![reg isreg]) {
-                totalpage = 6;
-                [self log:@"demo version only download %d pages",totalpage];
-                
-            }
+
             [self log:@"Title %@",webView.title];
 
             ticknum=ttimeout;
@@ -545,7 +560,7 @@ IOReturn iosuccess;
         case 10:
             // Item 3
             if ((framenum>0) || (![addressurl isEqualToString:oldaddrees] )) {
-                [self log:@"load page %d",pageindex+1];
+                [self updatelog:@"load page %d",pageindex+1+startno];
                 //[self pagebuttonjs:pageindex]; ////goback page button click
                 //[self nextpage:pageindex];
                 framewaiting = true;
@@ -606,7 +621,7 @@ IOReturn iosuccess;
             bool b = [webdelegate Buildpdf:nil];
             [self setWorking:false];
             pausing = false;
-            NSBeep();
+            NSBeep();NSBeep();
             NSBeep();
 //            [self setWorking:false];
 //            [self openoutputfile];
@@ -1721,18 +1736,31 @@ IOReturn iosuccess;
 #pragma mark - take shot
 //https://github.com/paul99/webkit-mips/blob/master/Tools/TestWebKitAPI/Tests/WebKitCocoa/WKWebViewSnapshot.mm
 
--(NSString *)pagefilename
+-(NSString *)pagefilename:(NSString *)aurl
 {
     //addressurl=@"https://bookshelf.vitalsource.com/#/books/VCS-0074009900852/cfi/6/10!/4/6/4/2/2/2/2/2@0:0";
-    addressurl= [addressurl stringByRemovingPercentEncoding];
-    NSString * bookid=[self strFrom:addressurl from:@"#/books/" to:@"/cfi/"];
-    NSString * page = [self strFrom:addressurl from:@"/cfi/" to:@"!"];
-    if (!page) {
-        page = [self strFrom:addressurl from:@"/cfi/" to:@"["];
+    NSString * url= [aurl stringByRemovingPercentEncoding];
+    NSString * bookid=[self strFrom:url from:@"#/books/" to:@"/cfi/"];
+    NSString * page;
+    if ([url rangeOfString:@"!"].location!=NSNotFound) {
+        page = [self strFrom:url from:@"/cfi/" to:@"!"];
+    } else if ([url rangeOfString:@"["].location!=NSNotFound) {
+        page = [self strFrom:url from:@"/cfi/" to:@"["];
+    } else if ([url rangeOfString:@";"].location!=NSNotFound) {
+        page = [self strFrom:url from:@"/cfi/" to:@";"];
+    } else if ([url rangeOfString:@"@"].location!=NSNotFound) {
+        page = [self strFrom:url from:@"/cfi/" to:@"@"];
+    } else {
+        page = [url lastPathComponent];
     }
-    if (!page) {
-        page = [self strFrom:addressurl from:@"/cfi/" to:@";"];
-    }
+//
+//    NSString * page = [self strFrom:url from:@"/cfi/" to:@"!"];
+//    if (!page) {
+//        page = [self strFrom:url from:@"/cfi/" to:@"["];
+//    }
+//    if (!page) {
+//        page = [self strFrom:url from:@"/cfi/" to:@";"];
+//    }
     page = [page stringByTrimmingCharactersInSet:[NSCharacterSet illegalCharacterSet]];
     page =[webdelegate cleanfilename:page];
 
@@ -1777,9 +1805,10 @@ IOReturn iosuccess;
             //NSDictionary *imageProps = [NSDictionary dictionaryWithObject:[NSNumber numberWithFloat:1.0] forKey:NSImageCompressionFactor];
             //NSPNGFileType NSJPEGFileType
             imageData = [imageRep representationUsingType:NSPNGFileType properties:nil];
-            NSString * fname = [self pagefilename];
+            NSString * fname = [self pagefilename:addressurl];
             [imageData writeToFile:fname atomically:NO];
-            [webdelegate saveurl:fname];
+            //[webdelegate saveurl:fname];
+            [webdelegate saveurl:addressurl];
             //isDone = true;
             NSRect r1 = webviewrect;
             [webView setFrame:NSMakeRect(r1.origin.x,r1.origin.y,tviewwidth,r1.size.height)];
@@ -1891,6 +1920,10 @@ IOReturn iosuccess;
 }
 
 #pragma mark - tools
+- (void) goURL:(NSString *) aurl
+{
+    [webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:aurl]]];
+}
 
 - (int) PosRight: (NSString *)str substr:(NSString*)substr
 {

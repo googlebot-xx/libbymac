@@ -240,12 +240,13 @@ fromDataSource:(WebDataSource *)dataSource
 //OEBPS https://jigsaw.vitalsource.com/books/9781506301587DEMO/epub/OEBPS/images/pg133.jpg
 //OEBPS https://jigsaw.vitalsource.com/books/9781506301587DEMO/epub/OEBPS/images/pg141.jpg
 
-
+//https://bookshelf.vitalsource.com/#/books/9781635672268/cfi/15!/4/4@0.00:0.00
 - (void) saveurl: (NSString *)url
 {
-    //if (_mainwin.working && [url rangeOfString:@"xhtm"].location != NSNotFound) {
-    if (_mainwin.working) {
-        [urllist addObject:url];
+    NSString * newurl = [self urlleft:url];
+    //NSLog(@"%@",newurl);
+    if (_mainwin.working && ![urllist containsObject:newurl]) {
+        [urllist addObject:newurl];
         //NSLog(@"save url %@",url);
     }
 }
@@ -818,7 +819,7 @@ fromDataSource:(WebDataSource *)dataSource
     [_mainwin log:@"Load pdf pages %d ...", [urllist count]];
     for (NSString *url in urllist) {
         
-        NSString * path = url ;//[self urltopath:url];
+        NSString * path = [_mainwin pagefilename:url ];//[self urltopath:url];
         //path = [dir stringByAppendingPathComponent:path];
         //NSLog(@"%@", path);
         
@@ -841,6 +842,9 @@ fromDataSource:(WebDataSource *)dataSource
         //[page release];
         //[img release];
     }
+    //if ([title length]<4) {
+    title = [ebookid stringByAppendingString:title];
+    //}
     NSString * fname = [NSString stringWithFormat:@"%@.pdf",title];
     fname =[self cleanfilename:fname];
     fname = [_mainwin.ebookdir stringByAppendingPathComponent:fname];
@@ -1041,6 +1045,21 @@ fromDataSource:(WebDataSource *)dataSource
         return [fileManager fileExistsAtPath: afile];
     }
     return false;
+}
+
+-(NSString *)urlleft:(NSString *)str
+{
+    NSRange r1 = [str rangeOfString:@"!" options:NSBackwardsSearch];
+    if (r1.location==NSNotFound)
+        r1 = [str rangeOfString:@"@" options:NSBackwardsSearch];
+    NSRange r2 ;
+    if ((r1.location != NSNotFound))
+    {
+        r2.location = 0;
+        r2.length =  r1.location;
+        return [str substringWithRange:r2];
+    }
+    return str;
 }
 
 @end
