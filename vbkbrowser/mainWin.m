@@ -465,13 +465,16 @@ IOReturn iosuccess;
     if (aworking) {
 
         ttimeout= [[timeouted stringValue] intValue];
+        webdelegate.ebookid = [webdelegate getbookid:addressurl];
+        ebooktype = [self ebooktypejs];
+        webdelegate.ebooktype = ebooktype;
         if (!pausing) {
             [vars removeAllObjects];
             //[webdelegate clearurllist];
             totalpage=0;
             taskindex=0;
             pageindex=0;
-            totalpage = 999;
+            totalpage = 99999;
             startno=0;
             if (![reg isreg]) {
                 totalpage = 6;
@@ -479,6 +482,11 @@ IOReturn iosuccess;
                 
             }
             [self log:@"Start download, wait ...."];
+        } else {
+            taskindex=20;
+            captcha=0;
+            pausing=false;
+            ticknum=ttimeout;
         }
         //webdelegate.title = nil;// @"";
         //[NSThread sleepForTimeInterval:0.5f];
@@ -487,18 +495,7 @@ IOReturn iosuccess;
         webviewrect = [webView frame];
         ebooktype = [self ebooktypejs];
         tviewwidth = webviewrect.size.width;
-        if (ebooktype == 2) { //pdf
-            tviewwidth = 1200;
-            startno = webdelegate.urllist.count;
-            if (!pausing && startno>0) {//resume download
-                [self goURL:[webdelegate.urllist objectAtIndex:startno-1]];
-                taskindex=20;
-                ticknum=ttimeout-4; //test
-                oldaddrees=@"";
-                NSLog(@"Load page %d",startno);
-                [self updatelog:@"Load page %d",startno];
-            }
-        }
+
         NSRect r = webviewrect;
         [webView setFrame:NSMakeRect(r.origin.x,r.origin.y,tviewwidth,r.size.height)];
         //mousepoint = CGPointMake(r.origin.x+r.size.width-50,[[NSScreen mainScreen] frame].size.height- (r.origin.y+r.size.height/2));
@@ -512,8 +509,6 @@ IOReturn iosuccess;
                                             kIOPMAssertionLevelOn, reasonForActivity, &assertionID);
         
         [downloadbtn setTitle:@"Pause"];
-        pausing=false;
-        captcha=0;
     } else {
         working = false;
         NSRect r = webviewrect;
@@ -544,18 +539,36 @@ IOReturn iosuccess;
 - (void) epubtaskhandle:(NSTimer*)theTimer
 {
     if (!working) return;
+    NSString * url=@"";
     //NSLog(@"task %d tick %d",taskindex,ticknum);
     switch (taskindex) {
         case 0:
-            //taskindex = [self totalbuttonjs];
-            //totalpage= [vars[@"Totalpages"] intValue];
-
             [self log:@"Title %@",webView.title];
+            startno=0;
+            if (ebooktype == 2) { //pdf
+                tviewwidth = 1200;
+                startno = webdelegate.urllist.count;
+                if (!pausing && startno>0) { //resume download
+                    url=[webdelegate.urllist objectAtIndex:startno-1];
+                    taskindex=20;
+                    [self goURL:url];
+                    [self log:@"Load page %d",startno];
+                    ticknum=0; //test
+                    framewaiting = true;
+                }
+            } else { //epub
+                //move to first page ?
+                ticknum=ttimeout; //test
+                taskindex=20;
+                [webdelegate.urllist removeAllObjects]; //clear log file
+            }
 
-            ticknum=ttimeout;
+            //NSLog(@"Load page %d",startno);
+
             captcha = 0;
             taskindex = 20;
             oldaddrees = @"";
+            pausing=false;
             break;
         case 10:
             // Item 3
@@ -1537,16 +1550,18 @@ IOReturn iosuccess;
     }
     [[textview.textStorage mutableString] setString:@""];
     webdelegate.ebookid = [webdelegate getbookid:addressurl];
-    ebooktype = [self ebooktypejs];
+    ebooktype = [self ebooktypejs]; //not correct
+    webdelegate.ebooktype = ebooktype;
         //[self log:@"ebook ready to download, click download button, \r%@",webdelegate.title];
     [self log:@"ebook ready to download, \r"];
-    [self log:@"turn to first page, click download button, \r"];
+    //[self log:@"turn to first page, click download button, \r"];
     [webdelegate clearurllist];
-    if (ebooktype==2) {
+    if (true) {
         if ([webdelegate saveurllist:false]){ //loadurllist, resume mode
-            [self log:@"PDF book have downloaded %d pages",webdelegate.urllist.count];
-            NSLog(@"PDF resume");
-        }
+            [self log:@"Book have downloaded %d pages",webdelegate.urllist.count];
+            //NSLog(@"PDF resume");
+        } else
+            [self log:@"turn to first page, click download button, \r"];
     }
 }
 
@@ -1611,10 +1626,10 @@ IOReturn iosuccess;
     } else if ([keyPath isEqualToString:@"estimatedProgress"] && object == webView) {
         //[self.progressView setAlpha:1.0f];
         //[self.progressView setProgress:self.webView.estimatedProgress animated:YES];
-        NSLog(@"estimatedProgress ",webView.estimatedProgress);
-        if(webView.estimatedProgress >= 1.0f) {
-            NSLog(@"estimatedProgress ",webView.estimatedProgress);
-        }
+        NSLog(@"estimatedProgress %f",webView.estimatedProgress);
+//        if(webView.estimatedProgress >= 1.0f) {
+//            NSLog(@"estimatedProgress ",webView.estimatedProgress);
+//        }
     }
 }
 
