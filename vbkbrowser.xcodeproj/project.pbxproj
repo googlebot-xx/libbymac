@@ -172,8 +172,6 @@
 		00872C561EC2245C00542D22 /* vbkbrowser */ = {
 			isa = PBXGroup;
 			children = (
-				0028ED592368DE9E00BD7BFD /* HybridNSURLProtocol.h */,
-				0028ED5A2368DE9E00BD7BFD /* HybridNSURLProtocol.m */,
 				00872C681EC225DE00542D22 /* mainWin.h */,
 				00872C691EC225DE00542D22 /* mainWin.m */,
 				00872C6A1EC225DE00542D22 /* mainWin.xib */,
@@ -198,6 +196,8 @@
 				00872C581EC2245C00542D22 /* AppDelegate.m */,
 				00872C5F1EC2245C00542D22 /* MainMenu.xib */,
 				00872C621EC2245C00542D22 /* Info.plist */,
+				0028ED592368DE9E00BD7BFD /* HybridNSURLProtocol.h */,
+				0028ED5A2368DE9E00BD7BFD /* HybridNSURLProtocol.m */,
 				002CAAF82406CD73001F97B9 /* cssrule.js */,
 				004D48B424140C0F00FB84AE /* frameheight.js */,
 				00872C5D1EC2245C00542D22 /* Assets.xcassets */,

@@ -16,9 +16,7 @@
 #import "BuyController.h"
 #import "AboutController.h"
 #import "RegController.h"
-//#import "NSURLProtocol+WKWebViewSupport.h"
 #include <IOKit/pwr_mgt/IOPMLib.h>
-//#include <IOKit/pwr_mgt/IOPMLibPrivate.h>
 
 //#define tviewwidth 1200
 
@@ -77,6 +75,7 @@ IOReturn iosuccess;
     BOOL framewaiting;
     BOOL jswaiting;
     BOOL pausing;
+    int c_captcha;
     NSString * jsmessage;
     CGPoint mousepoint;
     
@@ -476,6 +475,7 @@ IOReturn iosuccess;
             pageindex=0;
             totalpage = 99999;
             startno=0;
+            c_captcha=15;
             if (![reg isreg]) {
                 totalpage = 6;
                 [self log:@"demo version only download %d pages",totalpage];
@@ -620,12 +620,20 @@ IOReturn iosuccess;
                     [self takeshot];
                     //save page
             }
+            if (webdelegate.ebooktype==2 && pageindex>c_captcha) {
+                taskindex = 80; //delete cookie
+            }
             if (pageindex>totalpage) {
                 taskindex = 90; //goback page button click
             }
             break;
-        case 12:
+        case 80:
             // do nothing ...
+            [self setWorking:false];
+            [self log:@"Download stop at page %d, login and open same book to resume download rest pages",pageindex+startno];
+            [self deletecookie];
+            NSBeep();NSBeep();
+            NSBeep();
             break;
         case 90:
             // Item 3
