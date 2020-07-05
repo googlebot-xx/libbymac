@@ -363,10 +363,10 @@ IOReturn iosuccess;
         [self loginjs:nil];
         return;
     }
-    working=true;
-    NSString * file =[self pagefilename:@"https://bookshelf.vitalsource.com/#/books/9781635672268/cfi/10"];
-    NSLog(@"%@",file);
-    //[webdelegate Buildpdf:nil];
+//    working=true;
+//    NSString * file =[self pagefilename:@"https://bookshelf.vitalsource.com/#/books/9781635672268/cfi/10"];
+//    NSLog(@"%@",file);
+   [webdelegate Buildpdf:nil];
     working=false;
     //[self pagefilename];
 #ifdef DEBUG
@@ -1775,7 +1775,7 @@ IOReturn iosuccess;
     } else if ([url rangeOfString:@"@"].location!=NSNotFound) {
         page = [self strFrom:url from:@"/cfi/" to:@"@"];
     } else {
-        page = [url lastPathComponent];
+        page = [self strFrom:url from:@"/cfi/" to:@"***"];
     }
 //
 //    NSString * page = [self strFrom:url from:@"/cfi/" to:@"!"];
@@ -1966,6 +1966,12 @@ IOReturn iosuccess;
     NSRange r2 = [str rangeOfString:to];
     if ((r1.location != NSNotFound)&&(r2.location != NSNotFound))
     {
+        r1.location = r1.location+r1.length;
+        r1.length = r2.location-r1.location;
+        rs= [str substringWithRange:r1];
+    } else if ((r1.location != NSNotFound)&&(r2.location == NSNotFound))
+    {
+        r2.location = [str length];
         r1.location = r1.location+r1.length;
         r1.length = r2.location-r1.location;
         rs= [str substringWithRange:r1];
