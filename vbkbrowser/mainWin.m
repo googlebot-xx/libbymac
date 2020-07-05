@@ -475,7 +475,7 @@ IOReturn iosuccess;
             pageindex=0;
             totalpage = 99999;
             startno=0;
-            c_captcha=15;
+            c_captcha=90;
             if (![reg isreg]) {
                 totalpage = 6;
                 [self log:@"demo version only download %d pages",totalpage];
@@ -630,6 +630,7 @@ IOReturn iosuccess;
         case 80:
             // do nothing ...
             [self setWorking:false];
+            [self log:@"-----------------------------"];
             [self log:@"Download stop at page %d, login and open same book to resume download rest pages",pageindex+startno];
             [self deletecookie];
             NSBeep();NSBeep();
