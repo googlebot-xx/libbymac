@@ -11,7 +11,7 @@
 #import "const.h"
 #import "MyURLProtocol.h"
 #import "mainWin.h"
-#import "ZipArchive.h"
+//#import "SSZipArchive.h"
 
 
 //https://stackoverflow.com/questions/37509990/migrating-from-uiwebview-to-wkwebview
@@ -714,11 +714,12 @@ fromDataSource:(WebDataSource *)dataSource
 {
     NSString * fname = [self cleanfilename:title];
     epubfile = [NSString stringWithFormat:@"%@/%@.epub",_mainwin.ebookdir,fname];
-    
     //NSLog(@"%@",fname);
     //SSZipArchive *archiver = [[SSZipArchive alloc] init];
-    BOOL success = [SSZipArchive createZipFileAtPath:epubfile
-                             withContentsOfDirectory:path];
+    
+//    BOOL success = [SSZipArchive createZipFileAtPath:epubfile
+//                             withContentsOfDirectory:path];
+    BOOL success = true;
     _mainwin.outputfile = epubfile;
     return success;
 

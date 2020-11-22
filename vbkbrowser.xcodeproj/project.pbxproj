@@ -46,8 +46,6 @@
 		00B7F1B11ED369D000C14D6A /* toc.ncx in Resources */ = {isa = PBXBuildFile; fileRef = 00B7F1AD1ED369D000C14D6A /* toc.ncx */; };
 		00B7F1B21ED369D000C14D6A /* mimetype in Resources */ = {isa = PBXBuildFile; fileRef = 00B7F1AE1ED369D000C14D6A /* mimetype */; };
 		00B7F1EF1ED5E4A900C14D6A /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 00872C6E1EC2288100542D22 /* WebKit.framework */; };
-		00B7F1F11ED5E52200C14D6A /* ZipArchive.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 00B7F1BB1ED5DC0C00C14D6A /* ZipArchive.framework */; };
-		00B7F1F21ED5E52200C14D6A /* ZipArchive.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 00B7F1BB1ED5DC0C00C14D6A /* ZipArchive.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -57,7 +55,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				00B7F1F21ED5E52200C14D6A /* ZipArchive.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -116,15 +113,6 @@
 		00B7F1AC1ED369D000C14D6A /* container.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = container.xml; path = epub/container.xml; sourceTree = "<group>"; };
 		00B7F1AD1ED369D000C14D6A /* toc.ncx */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = toc.ncx; path = epub/toc.ncx; sourceTree = "<group>"; };
 		00B7F1AE1ED369D000C14D6A /* mimetype */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = mimetype; path = epub/mimetype; sourceTree = "<group>"; };
-		00B7F1BB1ED5DC0C00C14D6A /* ZipArchive.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ZipArchive.framework; path = vbkbrowser/zip/ZipArchive.framework; sourceTree = "<group>"; };
-		00B7F1BE1ED5DC2700C14D6A /* crypt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = crypt.h; path = zip/crypt.h; sourceTree = "<group>"; };
-		00B7F1C01ED5DC2700C14D6A /* ioapi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ioapi.h; path = zip/ioapi.h; sourceTree = "<group>"; };
-		00B7F1C21ED5DC2700C14D6A /* mztools.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mztools.h; path = zip/mztools.h; sourceTree = "<group>"; };
-		00B7F1C31ED5DC2700C14D6A /* SSZipArchive.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SSZipArchive.h; path = zip/SSZipArchive.h; sourceTree = "<group>"; };
-		00B7F1C41ED5DC2700C14D6A /* SSZipCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SSZipCommon.h; path = zip/SSZipCommon.h; sourceTree = "<group>"; };
-		00B7F1C61ED5DC2700C14D6A /* unzip.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = unzip.h; path = zip/unzip.h; sourceTree = "<group>"; };
-		00B7F1C81ED5DC2700C14D6A /* zip.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = zip.h; path = zip/zip.h; sourceTree = "<group>"; };
-		00B7F1C91ED5DC2700C14D6A /* ZipArchive.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZipArchive.h; path = zip/ZipArchive.h; sourceTree = "<group>"; };
 		00B7F1CF1ED5DF7500C14D6A /* aes_via_ace.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = aes_via_ace.h; path = aes/aes_via_ace.h; sourceTree = "<group>"; };
 		00B7F1D01ED5DF7500C14D6A /* aes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = aes.h; path = aes/aes.h; sourceTree = "<group>"; };
 		00B7F1D31ED5DF7500C14D6A /* aesopt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = aesopt.h; path = aes/aesopt.h; sourceTree = "<group>"; };
@@ -144,7 +132,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				00B7F1F11ED5E52200C14D6A /* ZipArchive.framework in Frameworks */,
 				00B7F1EF1ED5E4A900C14D6A /* WebKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -202,7 +189,6 @@
 				004D48B424140C0F00FB84AE /* frameheight.js */,
 				00872C5D1EC2245C00542D22 /* Assets.xcassets */,
 				009F57231ED70ECA00B596C9 /* img */,
-				00B7F1BD1ED5DC1700C14D6A /* zip */,
 				00B7F1CE1ED5DF5E00C14D6A /* aes */,
 				00B7F1AA1ED369BA00C14D6A /* epub */,
 				00872C5A1EC2245C00542D22 /* Supporting Files */,
@@ -221,7 +207,6 @@
 		00872C6D1EC2288100542D22 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				00B7F1BB1ED5DC0C00C14D6A /* ZipArchive.framework */,
 				00872C6E1EC2288100542D22 /* WebKit.framework */,
 			);
 			name = Frameworks;
@@ -258,21 +243,6 @@
 				00B7F1AE1ED369D000C14D6A /* mimetype */,
 			);
 			name = epub;
-			sourceTree = "<group>";
-		};
-		00B7F1BD1ED5DC1700C14D6A /* zip */ = {
-			isa = PBXGroup;
-			children = (
-				00B7F1BE1ED5DC2700C14D6A /* crypt.h */,
-				00B7F1C01ED5DC2700C14D6A /* ioapi.h */,
-				00B7F1C21ED5DC2700C14D6A /* mztools.h */,
-				00B7F1C31ED5DC2700C14D6A /* SSZipArchive.h */,
-				00B7F1C41ED5DC2700C14D6A /* SSZipCommon.h */,
-				00B7F1C61ED5DC2700C14D6A /* unzip.h */,
-				00B7F1C81ED5DC2700C14D6A /* zip.h */,
-				00B7F1C91ED5DC2700C14D6A /* ZipArchive.h */,
-			);
-			name = zip;
 			sourceTree = "<group>";
 		};
 		00B7F1CE1ED5DF5E00C14D6A /* aes */ = {
@@ -525,6 +495,10 @@
 					"$(PROJECT_DIR)/vbkbrowser",
 					"$(PROJECT_DIR)/vbkbrowser/zip",
 				);
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
 				INFOPLIST_FILE = vbkbrowser/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
@@ -548,6 +522,7 @@
 					"$(PROJECT_DIR)/vbkbrowser",
 					"$(PROJECT_DIR)/vbkbrowser/zip",
 				);
+				GCC_PREPROCESSOR_DEFINITIONS = "";
 				INFOPLIST_FILE = vbkbrowser/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
