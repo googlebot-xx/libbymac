@@ -463,6 +463,8 @@ IOReturn iosuccess;
     [theTimer invalidate]; //stop the NSTimer
 }
 
+//save current page to start,
+//scan file to build book
 - (void) setWorking:(BOOL)aworking
 {
     working = aworking;
@@ -471,6 +473,7 @@ IOReturn iosuccess;
 
         ttimeout= [[timeouted stringValue] intValue];
         webdelegate.ebookid = [webdelegate getbookid:addressurl];
+        startno = [self urlpageno:addressurl];
         ebooktype = [self ebooktypejs];
         webdelegate.ebooktype = ebooktype;
         if (!pausing) {
@@ -480,20 +483,24 @@ IOReturn iosuccess;
             taskindex=0;
             pageindex=0;
             totalpage = 99999;
-            startno=0;
+//            startno=0;
             c_captcha=90;
             if (![reg isreg]) {
                 totalpage = 6;
                 [self log:@"demo version only download %d pages",totalpage];
                 
             }
-            [self log:@"Start download, wait ...."];
+            [self log:@"Start download, not read book in other browser, wait ...."];
         } else {
             taskindex=20;
             captcha=0;
             pausing=false;
             ticknum=ttimeout;
         }
+#ifdef DEBUG
+        c_captcha=50;
+        totalpage = 999;
+#endif
         //webdelegate.title = nil;// @"";
         //[NSThread sleepForTimeInterval:0.5f];
         //move mouse
@@ -550,8 +557,8 @@ IOReturn iosuccess;
     switch (taskindex) {
         case 0:
             [self log:@"Title %@",webView.title];
-            startno=0;
-            if (ebooktype == 2) { //pdf
+            //startno=0;
+            if (ebooktype == 20) { //pdf
                 tviewwidth = 1200;
                 startno = webdelegate.urllist.count;
                 if (!pausing && startno>0) { //resume download
@@ -566,7 +573,8 @@ IOReturn iosuccess;
                 //move to first page ?
                 ticknum=ttimeout; //test
                 taskindex=20;
-                [webdelegate.urllist removeAllObjects]; //clear log file
+                if (ebooktype != 2)
+                    [webdelegate.urllist removeAllObjects]; //clear log file
             }
 
             //NSLog(@"Load page %d",startno);
@@ -576,10 +584,10 @@ IOReturn iosuccess;
             oldaddrees = @"";
             pausing=false;
             break;
-        case 10:
+        case 10:  //click next button
             // Item 3
             if ((framenum>0) || (![addressurl isEqualToString:oldaddrees] )) {
-                [self updatelog:@"load page %d",pageindex+1+startno];
+                [self updatelog:@"load page %d-%d",startno, pageindex+1];
                 //[self pagebuttonjs:pageindex]; ////goback page button click
                 //[self nextpage:pageindex];
                 framewaiting = true;
@@ -594,8 +602,7 @@ IOReturn iosuccess;
                 taskindex = 90; //goback page button click
             }
             break;
-        case 20:
-            // Item 3
+        case 20: //wait timeout
             ticknum +=1;
             [touchlabel setStringValue:[@(ticknum) stringValue]];
             if (captcha>0) {
@@ -617,7 +624,7 @@ IOReturn iosuccess;
                 }
             }
             break;
-        case 30:
+        case 30:  //takeshot
             // Item 3
             ticknum +=1;
             [touchlabel setStringValue:[@(ticknum) stringValue]];
@@ -637,7 +644,7 @@ IOReturn iosuccess;
             // do nothing ...
             [self setWorking:false];
             [self log:@"-----------------------------"];
-            [self log:@"Download stop at page %d, login and open same book to resume download rest pages",pageindex+startno];
+            [self log:@"Download stop , login and open same book to resume download rest pages",pageindex+startno];
             [self deletecookie];
             NSBeep();NSBeep();
             NSBeep();
@@ -1815,6 +1822,43 @@ IOReturn iosuccess;
 
 #pragma mark - take shot
 //https://github.com/paul99/webkit-mips/blob/master/Tools/TestWebKitAPI/Tests/WebKitCocoa/WKWebViewSnapshot.mm
+
+-(int)urlpageno:(NSString *)aurl
+{
+    //addressurl=@"https://bookshelf.vitalsource.com/#/books/VCS-0074009900852/cfi/6/10!/4/6/4/2/2/2/2/2@0:0";
+    NSString * url= [aurl stringByRemovingPercentEncoding];
+    NSString * page;
+    if ([url rangeOfString:@"!"].location!=NSNotFound) {
+        page = [self strFrom:url from:@"/cfi/" to:@"!"];
+    } else if ([url rangeOfString:@"["].location!=NSNotFound) {
+        page = [self strFrom:url from:@"/cfi/" to:@"["];
+    } else if ([url rangeOfString:@";"].location!=NSNotFound) {
+        page = [self strFrom:url from:@"/cfi/" to:@";"];
+    } else if ([url rangeOfString:@"@"].location!=NSNotFound) {
+        page = [self strFrom:url from:@"/cfi/" to:@"@"];
+    } else {
+        page = [self strFrom:url from:@"/cfi/" to:@"***"];
+    }
+//
+//    NSString * page = [self strFrom:url from:@"/cfi/" to:@"!"];
+//    if (!page) {
+//        page = [self strFrom:url from:@"/cfi/" to:@"["];
+//    }
+//    if (!page) {
+//        page = [self strFrom:url from:@"/cfi/" to:@";"];
+//    }
+    page = [page stringByTrimmingCharactersInSet:[NSCharacterSet illegalCharacterSet]];
+    page = [[page componentsSeparatedByCharactersInSet:
+                  [[NSCharacterSet characterSetWithCharactersInString:@"+0123456789"]
+                  invertedSet]]
+                  componentsJoinedByString:@""];
+    page =[webdelegate cleanfilename:page];
+    
+    int p ;
+    p = [page intValue];
+    
+    return p;
+}
 
 -(NSString *)pagefilename:(NSString *)aurl
 {

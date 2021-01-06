@@ -801,8 +801,168 @@ fromDataSource:(WebDataSource *)dataSource
     return true;
 }
 
+-(NSString *)pagenofilename:(int )p
+{
+    //addressurl=@"https://bookshelf.vitalsource.com/#/books/VCS-0074009900852/cfi/6/10!/4/6/4/2/2/2/2/2@0:0";
+
+    NSString * fname=[_mainwin.datadir stringByAppendingPathComponent:ebookid];
+    [self createfolder:fname];
+    fname=[NSString stringWithFormat:@"%@/%d.png",fname,p ];
+    //NSLog(@"%@ %@ %@",bookid,page,fname);
+    return fname;
+}
 
 - (bool) Buildpdf:(NSString *) afile
+{
+
+    //NSString * dir;
+    //title = [titlelist objectAtIndex:0];
+    //NSString * dir = [self getpdftmpfolder:[urllist objectAtIndex:0]];
+    //NSString * dir = [_mainwin.datadir stringByAppendingPathComponent:idpath];
+    //NSLog(dir);
+    //[self pdfimglist];
+    //return true;
+    //NSLog(@"%@",dir);
+    _mainwin.outputfile = nil;
+    NSString * dir = [_mainwin.datadir stringByAppendingPathComponent:ebookid];
+
+    NSArray * alist =  [[NSFileManager defaultManager] contentsOfDirectoryAtPath:dir error:nil];
+    NSString *str              = @".png";
+    NSPredicate *sPredicate    = [NSPredicate predicateWithFormat:@"SELF contains[c] %@",str];
+    NSArray *list    = [alist filteredArrayUsingPredicate:sPredicate];
+    list = [list sortedArrayUsingComparator:
+         ^NSComparisonResult(id file1, id file2)
+         {
+             // compare
+            NSString * p1 = [[(NSString *)file1 lastPathComponent] stringByDeletingPathExtension];
+            NSString * p2 = [[(NSString *)file2 lastPathComponent] stringByDeletingPathExtension];
+            p1 = [[p1 componentsSeparatedByCharactersInSet:
+                          [[NSCharacterSet characterSetWithCharactersInString:@"+0123456789"]
+                          invertedSet]]
+                          componentsJoinedByString:@""];
+            p2 = [[p2 componentsSeparatedByCharactersInSet:
+                          [[NSCharacterSet characterSetWithCharactersInString:@"+0123456789"]
+                          invertedSet]]
+                      componentsJoinedByString:@""];
+            int n1  = [p1 intValue];
+            int n2 =  [p2 intValue];
+            if (n1>n2) {
+              return (NSComparisonResult)NSOrderedDescending;
+            }
+
+            if (n1 < n2) {
+              return (NSComparisonResult)NSOrderedAscending;
+            }
+            return (NSComparisonResult)NSOrderedSame;
+             // Ascending:
+         }];
+    NSLog(@"%@",list);
+    PDFDocument *pdf = [[PDFDocument alloc] init];
+    //NSImage * img = scaledImage;
+    [_mainwin log:@"Load pdf pages %d ...", [list count]];
+    int i = 0;
+    int m =0;
+    for (NSString *url in list) {
+
+        //NSString * path = [self pagenofilename:i];//[self urltopath:url];
+        NSString * path = [dir stringByAppendingPathComponent:url];
+        //NSLog(@"%@", path);
+        
+        NSFileManager *fileManager = [NSFileManager defaultManager];
+        
+        if (![fileManager fileExistsAtPath:path]) {
+            continue;
+        }
+        
+        NSImage *img = [[NSImage alloc]initWithContentsOfFile:path];
+        
+        if (![reg isreg])
+            [self drawtext:img];
+        
+        PDFPage * page;
+        
+        page = [[PDFPage alloc] init];
+        [page initWithImage: (NSImage *) img];
+        [pdf insertPage: page atIndex: [pdf pageCount]];
+        i++;
+        //[page release];
+        //[img release];
+    }
+    //if ([title length]<4) {
+    title = [ebookid stringByAppendingString:title];
+    //}
+    NSString * fname = [NSString stringWithFormat:@"%@.pdf",title];
+    fname =[self cleanfilename:fname];
+    fname = [_mainwin.ebookdir stringByAppendingPathComponent:fname];
+    
+       [pdf writeToFile:  fname];
+    [_mainwin log:@"PDF file saved %@", fname];
+    _mainwin.outputfile = fname;
+    //[pdf release];
+    return true;
+}
+
+- (bool) Buildpdf3:(NSString *) afile
+{
+
+    NSString * dir;
+    //title = [titlelist objectAtIndex:0];
+    //NSString * dir = [self getpdftmpfolder:[urllist objectAtIndex:0]];
+    //NSString * dir = [_mainwin.datadir stringByAppendingPathComponent:idpath];
+    //NSLog(dir);
+    //[self pdfimglist];
+    //return true;
+    //NSLog(@"%@",dir);
+    _mainwin.outputfile = nil;
+
+    PDFDocument *pdf = [[PDFDocument alloc] init];
+    //NSImage * img = scaledImage;
+    [_mainwin log:@"Load pdf pages %d ...", [urllist count]];
+    int i = 0;
+    int m =0;
+    while (m<20) {
+        
+        NSString * path = [self pagenofilename:i];//[self urltopath:url];
+        //path = [dir stringByAppendingPathComponent:path];
+        //NSLog(@"%@", path);
+        
+        NSFileManager *fileManager = [NSFileManager defaultManager];
+        
+        if (![fileManager fileExistsAtPath:path]) {
+            m++;
+            i++;
+            continue;
+        }
+        
+        NSImage *img = [[NSImage alloc]initWithContentsOfFile:path];
+        
+        if (![reg isreg])
+            [self drawtext:img];
+        
+        PDFPage * page;
+        
+        page = [[PDFPage alloc] init];
+        [page initWithImage: (NSImage *) img];
+        [pdf insertPage: page atIndex: [pdf pageCount]];
+        i++;
+        //[page release];
+        //[img release];
+    }
+    //if ([title length]<4) {
+    title = [ebookid stringByAppendingString:title];
+    //}
+    NSString * fname = [NSString stringWithFormat:@"%@.pdf",title];
+    fname =[self cleanfilename:fname];
+    fname = [_mainwin.ebookdir stringByAppendingPathComponent:fname];
+    
+   	[pdf writeToFile:  fname];
+    [_mainwin log:@"PDF file saved %@", fname];
+    _mainwin.outputfile = fname;
+    //[pdf release];
+    return true;
+}
+
+- (bool) Buildpdf2:(NSString *) afile
 {
 
     NSString * dir;
@@ -850,7 +1010,7 @@ fromDataSource:(WebDataSource *)dataSource
     fname =[self cleanfilename:fname];
     fname = [_mainwin.ebookdir stringByAppendingPathComponent:fname];
     
-   	[pdf writeToFile:  fname];
+       [pdf writeToFile:  fname];
     [_mainwin log:@"PDF file saved %@", fname];
     _mainwin.outputfile = fname;
     //[pdf release];
