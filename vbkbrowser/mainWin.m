@@ -28,6 +28,9 @@ static void* keyValueObservingContext = &keyValueObservingContext;
 
 
 @interface mainWin ()< WKNavigationDelegate, WKUIDelegate>
+{
+    WKFrameInfo * epubframe;
+}
 
 @end
 
@@ -237,8 +240,8 @@ IOReturn iosuccess;
     //[webView setFrameLoadDelegate:self];
     
     //NSString * us =@"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_1) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/12.0.1   Safari/605.1.15";
-    NSString * us = @"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15) AppleWebKit/605.1.15 (KHTML, like Gecko)"; //@" Version/13.0.2 Safari/605.1.15";
-    us = [us stringByAppendingString:@" Version/13.0.2 Safari/605.1.15"];
+    NSString * us = @"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.1 Safari/605.1.15"; //@" Version/13.0.2 Safari/605.1.15";
+    //us = [us stringByAppendingString:@" Version/13.0.2 Safari/605.1.15"];
     NSString * ra = [self randomstr:8];
     webView.customUserAgent=[NSString stringWithFormat:us,ra] ;
     working = false;
@@ -249,7 +252,7 @@ IOReturn iosuccess;
     //[NSURLProtocol registerClass:[MyURLProtocol class]];
     //[NSURLProtocol registerClass:[HybridNSURLProtocol class]];
     
-    [self setssfont];
+    //[self setssfont];
     //NSString * aurl = @"https://www.vitalsource.com/bookshelf/home";
     //NSString * aurl = @"https://www.bing.com";
     //[webView becomeFirstResponder];
@@ -366,6 +369,9 @@ IOReturn iosuccess;
 //    working=true;
 //    NSString * file =[self pagefilename:@"https://bookshelf.vitalsource.com/#/books/9781635672268/cfi/10"];
 //    NSLog(@"%@",file);
+    //[self pageiframejs:1];
+    [self printwkview];
+    return;
    [webdelegate Buildpdf:nil];
     working=false;
     //[self pagefilename];
@@ -802,7 +808,9 @@ IOReturn iosuccess;
 {
     // what ever were logged with console.log() in wkwebview arrives here in message.body property
     NSString * msg=message.body;
-    //NSLog(@"%@",msg);
+    epubframe = message.frameInfo;
+    NSString * url = epubframe.request.URL.absoluteString;
+    NSLog(@"frame url %@ \n%@",url,msg);
     if ([msg isEqualToString:@"recaptcha"]) {
         captcha=1;
         NSLog(@"***captcha");
@@ -1052,6 +1060,7 @@ IOReturn iosuccess;
     return 1;
 }
 
+//https://developer.apple.com/documentation/webkit/wkwebview/3656442-evaluatejavascript
 - (int) pageiframejs:(int) page
 {
     //NSString* jsString = [NSString stringWithFormat:@"alert('ok');"];
@@ -1059,15 +1068,23 @@ IOReturn iosuccess;
     id win ;
     //= [webView windowScriptObject];
     NSString* js ;
-    js = @"var items = document.getElementsByTagName(\"iframe\"); \
-            var x = items[1]; \
-            var y = (x.contentWindow || x.contentDocument); \
-            MyApp.consoleLog_('y ');\
-            if (y.document)y = y.document; \
-            var html = y.getElementsByTagName(\"html\")[0];\
-            MyApp.consoleLog_('html doc '+y.innerHTML);\
-            ";
-    [win evaluateWebScript: js];
+//    js = @"var items = document.getElementsByTagName(\"iframe\"); \
+//            var x = items[1]; \
+//            var y = (x.contentWindow || x.contentDocument); \
+//            MyApp.consoleLog_('y ');\
+//            if (y.document)y = y.document; \
+//            var html = y.getElementsByTagName(\"html\")[0];\
+//            MyApp.consoleLog_('html doc '+y.innerHTML);\
+//            ";
+//    [win evaluateWebScript: js];
+    js = @" msg = window.location.href; \
+    window.webkit.messageHandlers.logging.postMessage(msg); \
+    ";
+    [webView evaluateJavaScript:js completionHandler:^(NSString *result, NSError *error)
+    {
+        //NSLog(@"Error %@",error);
+        //NSLog(@"Result %@",result);
+    }];
     return 1;
 }
 #pragma mark - PDF ebook handle
@@ -1379,6 +1396,45 @@ IOReturn iosuccess;
     [webView evaluateJavaScript:js completionHandler:nil];
     // [webView print:nil];
     //NSLog(@"%@",s);
+}
+
+-(void)printwkview
+{
+    SEL printSelector = NSSelectorFromString(@"_printOperationWithPrintInfo:"); // This is SPI on WKWebView. Apparently existing since 10.11 ?
+
+     NSMutableDictionary *printInfoDict = [[[NSPrintInfo sharedPrintInfo] dictionary] mutableCopy];
+     printInfoDict[NSPrintJobDisposition] = NSPrintSaveJob; // means you want a PDF file, not printing to a real printer.
+     printInfoDict[NSPrintJobSavingURL] = [NSURL fileURLWithPath:[@"~/Documents/print_test.pdf" stringByExpandingTildeInPath]]; // path of the generated pdf file
+     printInfoDict[NSPrintDetailedErrorReporting] = @YES; // not necessary
+
+     // customize the layout of the "printing"
+     NSPrintInfo *customPrintInfo = [[NSPrintInfo alloc] initWithDictionary:printInfoDict];
+     [customPrintInfo setHorizontalPagination: NSPrintingPaginationModeAutomatic];
+     [customPrintInfo setVerticalPagination: NSPrintingPaginationModeAutomatic];
+     [customPrintInfo setVerticallyCentered:NO];
+     [customPrintInfo setHorizontallyCentered:NO];
+     customPrintInfo.leftMargin = 10;
+     customPrintInfo.rightMargin = 10;
+     customPrintInfo.topMargin = 5;
+     customPrintInfo.bottomMargin = 5;
+
+     NSPrintOperation *printOperation = (NSPrintOperation*) [webView performSelector:printSelector withObject:customPrintInfo];
+
+     //[printOperation setShowsPrintPanel:NO];
+     [printOperation setShowsPrintPanel:NO];
+     [printOperation setShowsProgressPanel:NO];
+
+//    BOOL printSuccess = [printOperation runOperation]; // THIS DOES NOT WORK WITH WKWEBVIEW! Use runOperationModalForWindow: instead (asynchronous)
+     [printOperation runOperationModalForWindow:self.window delegate:self didRunSelector:@selector(printPanelDidEnd:returnCode:contextInfo:) contextInfo:nil]; // THIS WILL WORK, but is async
+}
+// NSPrintOperation  knowsPageRange
+//NSPrintOperation view's frame was not initialized properly before knowsPageRange: returned. (WKPrintingView)
+//http://mirror.informatimago.com/next/developer.apple.com/documentation/Cocoa/Conceptual/Printing/Tasks/PaginatingViews.html
+
+- (void)printPanelDidEnd:(NSPrintPanel *)printPanel returnCode:(NSInteger) returnCode contextInfo:(void *)contextInfo {
+    if (returnCode == NSCancelButton) {
+        NSLog(@"Cancel button was selected");
+    }
 }
 //- (void)webView:(WKWebView *)webView decidePolicyForNavigationAction:(WKNavigationAction *)navigationAction decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler
 //{
