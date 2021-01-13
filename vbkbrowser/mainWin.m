@@ -17,7 +17,8 @@
 #import "AboutController.h"
 #import "RegController.h"
 #include <IOKit/pwr_mgt/IOPMLib.h>
-
+#define c_agent16 @"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.1 Safari/605.1.15"
+#define c_agent15 @"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.1 Safari/605.1.15"
 //#define tviewwidth 1200
 
 // 0.99
@@ -243,7 +244,8 @@ IOReturn iosuccess;
     NSString * us = @"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.1 Safari/605.1.15"; //@" Version/13.0.2 Safari/605.1.15";
     //us = [us stringByAppendingString:@" Version/13.0.2 Safari/605.1.15"];
     NSString * ra = [self randomstr:8];
-    webView.customUserAgent=[NSString stringWithFormat:us,ra] ;
+    //webView.customUserAgent=[NSString stringWithFormat:us,ra] ;
+    webView.customUserAgent= c_agent15;
     working = false;
     
     //[NSURLProtocol wk_registerScheme:@"http"];
@@ -262,13 +264,18 @@ IOReturn iosuccess;
     //[webView addObserver:self forKeyPath:@"estimatedProgress" options:0 context:keyValueObservingContext];
     //NSString * aurl = @"http://flyos.net/bt4.htm";
     NSString * aurl = @"https://www.vitalsource.com/";
+    //NSString * aurl = @"http://flyos.net/js/iframe/bt1.html";
+    //NSString * aurl = @"https://www.vitalsource.com/bookshelf/home";
     //NSString * aurl = @"https://www.google.com/";
     //NSString * aurl = @"file:///Users/aa/Public/js/dom/bt2.htm";
     //[webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:aurl]]];
     [self goURL:aurl];
 
     //[self performSelector: @selector(homepagebtnclick:) withObject: nil afterDelay: 1];
-    
+    [self log:@"Login Account, Open book, click download button when ready"];
+    [self log:@"\r========================="];
+    [self log:@"Close Bookshelf app when downloading, it may cause login problem"];
+    [self log:@"=========================\r"];
     //[self log:@"ready %@",aurl];
     //[self log:@"go"];
     //[containerView addSubview:webView];
@@ -366,10 +373,19 @@ IOReturn iosuccess;
         [self loginjs:nil];
         return;
     }
+    
+//    webView.customUserAgent= c_agent16 ;
+//    [self goURL:@"http://flyos.net/bt4.htm"];
+//    return;
+    
 //    working=true;
 //    NSString * file =[self pagefilename:@"https://bookshelf.vitalsource.com/#/books/9781635672268/cfi/10"];
 //    NSLog(@"%@",file);
     //[self pageiframejs:1];
+    //[self runjs2:jsdiv];
+    //sleep(200);
+    //[NSThread sleepForTimeInterval:0.3f];
+    //[self wait:200];
     [self printwkview];
     return;
    [webdelegate Buildpdf:nil];
@@ -501,6 +517,9 @@ IOReturn iosuccess;
         c_captcha=50;
         totalpage = 999;
 #endif
+        [self log:@"\r========================="];
+        [self log:@"Close Bookshelf app when downloading,"];
+        [self log:@"=========================\r"];
         //webdelegate.title = nil;// @"";
         //[NSThread sleepForTimeInterval:0.5f];
         //move mouse
@@ -1427,8 +1446,8 @@ IOReturn iosuccess;
 
      NSPrintOperation *printOperation = (NSPrintOperation*) [webView performSelector:printSelector withObject:customPrintInfo];
 
+     [printOperation setShowsPrintPanel:YES];
      //[printOperation setShowsPrintPanel:NO];
-     [printOperation setShowsPrintPanel:NO];
      [printOperation setShowsProgressPanel:NO];
 
 //    BOOL printSuccess = [printOperation runOperation]; // THIS DOES NOT WORK WITH WKWEBVIEW! Use runOperationModalForWindow: instead (asynchronous)

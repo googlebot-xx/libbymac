@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		00016C6B1EEB151D00090675 /* instru.xhtml in Resources */ = {isa = PBXBuildFile; fileRef = 00016C6A1EEB151D00090675 /* instru.xhtml */; };
+		000CB68625AF279B00CD7124 /* Mkwebview.m in Sources */ = {isa = PBXBuildFile; fileRef = 000CB68525AF279A00CD7124 /* Mkwebview.m */; };
 		0028ED5B2368DE9E00BD7BFD /* HybridNSURLProtocol.m in Sources */ = {isa = PBXBuildFile; fileRef = 0028ED5A2368DE9E00BD7BFD /* HybridNSURLProtocol.m */; };
 		002CAAF92406CD73001F97B9 /* cssrule.js in Resources */ = {isa = PBXBuildFile; fileRef = 002CAAF82406CD73001F97B9 /* cssrule.js */; };
 		002DF5E2201F7D3700FC44FB /* go-home.png in Resources */ = {isa = PBXBuildFile; fileRef = 002DF5E1201F7D3700FC44FB /* go-home.png */; };
@@ -63,6 +64,8 @@
 
 /* Begin PBXFileReference section */
 		00016C6A1EEB151D00090675 /* instru.xhtml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = instru.xhtml; path = epub/instru.xhtml; sourceTree = "<group>"; };
+		000CB68425AF279A00CD7124 /* Mkwebview.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Mkwebview.h; sourceTree = "<group>"; };
+		000CB68525AF279A00CD7124 /* Mkwebview.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Mkwebview.m; sourceTree = "<group>"; };
 		0028ED592368DE9E00BD7BFD /* HybridNSURLProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HybridNSURLProtocol.h; sourceTree = "<group>"; };
 		0028ED5A2368DE9E00BD7BFD /* HybridNSURLProtocol.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HybridNSURLProtocol.m; sourceTree = "<group>"; };
 		002CAAF82406CD73001F97B9 /* cssrule.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = cssrule.js; sourceTree = "<group>"; };
@@ -166,6 +169,8 @@
 				00B7F1981EC9D38F00C14D6A /* webdelegate.m */,
 				00ACBB0D22F9DA9100754A94 /* MyURLProtocol.h */,
 				00ACBB0E22F9DA9100754A94 /* MyURLProtocol.m */,
+				000CB68425AF279A00CD7124 /* Mkwebview.h */,
+				000CB68525AF279A00CD7124 /* Mkwebview.m */,
 				00B7F19C1ECDE31700C14D6A /* const.h */,
 				00B7F19B1ECDE31700C14D6A /* BuyController.h */,
 				00B7F19A1ECDE31700C14D6A /* BuyController.m */,
@@ -366,6 +371,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				000CB68625AF279B00CD7124 /* Mkwebview.m in Sources */,
 				0028ED5B2368DE9E00BD7BFD /* HybridNSURLProtocol.m in Sources */,
 				00872C6B1EC225DE00542D22 /* mainWin.m in Sources */,
 				00B7F1991EC9D38F00C14D6A /* webdelegate.m in Sources */,
