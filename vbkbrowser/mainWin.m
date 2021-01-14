@@ -164,6 +164,7 @@ IOReturn iosuccess;
     [self loadjs:configuration];
     //webView = [[WKWebView alloc] initWithFrame:[containerView bounds] configuration:configuration];
     webView = [[WKWebView alloc] initWithFrame:[bview bounds] configuration:configuration];
+//    webView = [[Mkwebview alloc] initWithFrame:[bview bounds] configuration:configuration];
     [webView setAutoresizingMask:(NSViewWidthSizable | NSViewHeightSizable)];
     #ifdef DEBUG
         [configuration.preferences  setValue:@YES forKey:@"developerExtrasEnabled"];
@@ -181,7 +182,6 @@ IOReturn iosuccess;
     ebookdir = docdir;
     ebookdir = [ebookdir stringByAppendingPathComponent:c_company];
     [self createfolder:ebookdir];
-    
     
     ebookdir = [ebookdir stringByAppendingPathComponent:c_app];
     [self createfolder:ebookdir];
@@ -264,6 +264,7 @@ IOReturn iosuccess;
     //[webView addObserver:self forKeyPath:@"estimatedProgress" options:0 context:keyValueObservingContext];
     //NSString * aurl = @"http://flyos.net/bt4.htm";
     NSString * aurl = @"https://www.vitalsource.com/";
+    //NSString * aurl = @"https://bookshelf.vitalsource.com/#/";
     //NSString * aurl = @"http://flyos.net/js/iframe/bt1.html";
     //NSString * aurl = @"https://www.vitalsource.com/bookshelf/home";
     //NSString * aurl = @"https://www.google.com/";
@@ -1426,6 +1427,7 @@ IOReturn iosuccess;
 
 -(void)printwkview
 {
+    [self Setwebviewheight];
     SEL printSelector = NSSelectorFromString(@"_printOperationWithPrintInfo:"); // This is SPI on WKWebView. Apparently existing since 10.11 ?
 
      NSMutableDictionary *printInfoDict = [[[NSPrintInfo sharedPrintInfo] dictionary] mutableCopy];
@@ -1441,27 +1443,34 @@ IOReturn iosuccess;
      [customPrintInfo setHorizontallyCentered:NO];
      customPrintInfo.leftMargin = 10;
      customPrintInfo.rightMargin = 10;
-     customPrintInfo.topMargin = 5;
-     customPrintInfo.bottomMargin = 5;
+     customPrintInfo.topMargin = 25;
+     customPrintInfo.bottomMargin = 25;
+    //[customPrintInfo setPaperSize:NSMakeSize(612,792)];
+    //customPrintInfo.orientation = NSPaperOrientationPortrait;
 
+//#pragma clang diagnostic push
+//#pragma clang diagnostic ignored "-Warc-performSelector-leaks"
      NSPrintOperation *printOperation = (NSPrintOperation*) [webView performSelector:printSelector withObject:customPrintInfo];
-
-     [printOperation setShowsPrintPanel:YES];
-     //[printOperation setShowsPrintPanel:NO];
+//#pragma clang diagnostic pop
+    
+     //[printOperation setShowsPrintPanel:YES];
+     [printOperation setShowsPrintPanel:NO];
      [printOperation setShowsProgressPanel:NO];
+//    [[printOperation printPanel] setOptions:[[printOperation printPanel] options] | NSPrintPanelShowsPaperSize | NSPrintPanelShowsOrientation | NSPrintPanelShowsScaling];
 
 //    BOOL printSuccess = [printOperation runOperation]; // THIS DOES NOT WORK WITH WKWEBVIEW! Use runOperationModalForWindow: instead (asynchronous)
-     [printOperation runOperationModalForWindow:self.window delegate:self didRunSelector:@selector(printPanelDidEnd:returnCode:contextInfo:) contextInfo:nil]; // THIS WILL WORK, but is async
+//     [printOperation runOperationModalForWindow:self.window delegate:self didRunSelector:@selector(printPanelDidEnd:returnCode:contextInfo:) contextInfo:nil]; // THIS WILL WORK, but is async
+    [printOperation runOperationModalForWindow:self.window delegate:self didRunSelector:@selector(printOperationDidRun:success:contextInfo:) contextInfo:nil]; // THIS WILL WORK, but is async
+}
+
+- (void)printOperationDidRun:(NSPrintOperation *)printOperation  success:(BOOL)success  contextInfo:(void *)contextInfo
+{
+    NSLog(@"print done");
 }
 // NSPrintOperation  knowsPageRange
 //NSPrintOperation view's frame was not initialized properly before knowsPageRange: returned. (WKPrintingView)
 //http://mirror.informatimago.com/next/developer.apple.com/documentation/Cocoa/Conceptual/Printing/Tasks/PaginatingViews.html
 
-- (void)printPanelDidEnd:(NSPrintPanel *)printPanel returnCode:(NSInteger) returnCode contextInfo:(void *)contextInfo {
-    if (returnCode == NSCancelButton) {
-        NSLog(@"Cancel button was selected");
-    }
-}
 //- (void)webView:(WKWebView *)webView decidePolicyForNavigationAction:(WKNavigationAction *)navigationAction decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler
 //{
 //    NSLog(@"decidePolicyForNavigationAction %@",[navigationAction.request.URL absoluteString]);
@@ -1919,7 +1928,7 @@ IOReturn iosuccess;
     [self runjs2:jsdiv];
     //NSLog(@"%@",[webView.scrollView]);
     NSRect r1 ;
-    int h = frameheigh+200;// [self webviewheight];
+    int h = frameheigh+100;// [self webviewheight];
     //block BOOL isDone = false;
     NSRect r = [webView frame];
     if (h>100) {
@@ -1927,6 +1936,16 @@ IOReturn iosuccess;
         r1 = r;
         //NSLog(@"change height %d %f",h,r1.size.height);
         //[webView setFrame:NSMakeRect(r.origin.x,r.size.height-h+r.origin.y,r.size.width,h)];
+        [webView setFrame:NSMakeRect(r.origin.x,r.origin.y,r.size.width,h)];
+    }
+}
+
+-(void)Setwebviewheight
+{
+    [self runjs2:jsdiv];
+    int h = frameheigh+100;// [self webviewheight];
+    NSRect r = [webView frame];
+    if (h>100) {
         [webView setFrame:NSMakeRect(r.origin.x,r.origin.y,r.size.width,h)];
     }
 }
@@ -2065,6 +2084,7 @@ IOReturn iosuccess;
 #pragma mark - tools
 - (void) goURL:(NSString *) aurl
 {
+    frameheigh=0;
     [webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:aurl]]];
 }
 

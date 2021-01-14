@@ -20,6 +20,7 @@
 {
     
     IBOutlet WKWebView * webView;
+//    IBOutlet Mkwebview * webView;
     IBOutlet NSView *containerView;
     
     NSString* datadir;

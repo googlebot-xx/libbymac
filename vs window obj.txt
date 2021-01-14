@@ -1,0 +1,58 @@
+
+bookshelf
+jigsaw-placeholder-outer
+#jigsaw-placeholder-outer
+position static
+
+window.frameElement = "iframe id="epub-content"
+const frameEl = window.frameElement;
+// If we're embedded, change the containing element's URL to 'https://mozilla.org/'
+if (frameEl) {
+  frameEl.src = 'https://mozilla.org/';
+}
+
+https://bookshelf.vitalsource.com/#/
+
+//easyXDM
+typeof window.easyXDM
+window.name "easyXDM_default9909_provider" 
+typeof window.VST = "object"
+=====================
+window.vstPageLoadEventData: Object
+cfi: "/6/62[;vnd.vst.idref=vst-6d6266f0-4b68-4b7d-a0e0-1322c62e6389]!"
+cfiwithoutAssertions: "/6/62!"
+docViewportWidth: NaN
+documentIndex: 0
+dps: false
+page: "31"
+scrollHeight: 2105
+scrollTop: 0
+============================
+window.VST
+window.VST.Book.pageBreakList array
+object
+cfi: "/6/2[;vnd.vst.idref=vst-4b4cfacf-80a2-440c-acaf-70ed8fb158f1]"
+cfiWithoutAssertions: "/6/2"
+label: "1"
+url: "/EPUB/screens/cover.xhtml"
+====================
+window.VST.currentBookData.isbn "VCS-0074009900852"
+window.VST.currentBookData.format "epub"
+window.VST.currentBookData.title "Bookshelf Online Introductory Course"
+window.VST.currentBookData.vbkType: "epub"
+============================
+window.VST.currentPageData
+window.VST.currentPageData.cfi: "/24"
+//window.VST.currentPageData.index: 24
+window.VST.currentPageData.page: "3"
+window.VST.currentPageData.nextPage:
+window.VST.currentPageData.scrollHeight: 2105
+
+==============
+window.frameElement.id = epub-content
+
+page data
+cfi: "/6/62[;vnd.vst.idref=vst-6d6266f0-4b68-4b7d-a0e0-1322c62e6389]"
+cfiWithoutAssertions: "/6/62"
+label: "31"
+url: "/EPUB/screens/manage-your-notebook.xhtml"

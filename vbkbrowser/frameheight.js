@@ -12,46 +12,9 @@ function inIframe () {
     }
 }
 
-function cleanRules2(doc,media)
+function positionchange()
 {
-      var rule;
-      var plist = [];
-      var ss = document.styleSheets;
-      for (var i = 0; i < ss.length; ++i) {
-          // loop through all the rules!
-          //if (!ss[i].cssRules) continue;
-          //console.log(ss[i].cssRules.length);
-          //mylog(ss[i].cssRules.length);
-          var sheet =  ss[i];
-          if (String(sheet.media).toLowerCase() == media) {
-              //sheet.media.item(0).disabled = true;
-              console.log("sheet %s %s",i,sheet.href);
-              for (var x = sheet.cssRules.length-1; x >=0; --x) {
-                  rule = sheet.cssRules[x];
-                    //console.log(rule);
-                    sheet.deleteRule(x);
-                }
-          } else {
-              var href = sheet.href;
-              console.log("sheet %s %s",i,href);
-              if ((!href) || (href.indexOf('vitalsource') !== -1)) {
-                  for (var x = ss[i].cssRules.length-1; x >=0; --x) {
-                      rule = ss[i].cssRules[x];
-                      //console.log(rule);
-                        if (rule.type == 4) // CSSMediaRule
-                        {
-                            console.log(rule);
-                            if (rule.cssText.indexOf("print")!== -1) {
-                                    //console.log(rule);
-                                    ss[i].deleteRule(x);
-                            }
-                        }
-                    }
-                }
-          }
-      }
 }
-
 //function cleanRules(doc,media)
 function cleanRules()
 {
@@ -64,41 +27,72 @@ function cleanRules()
           //console.log(ss[i].cssRules.length);
           var sheet =  ss[i];
           if (!ss[i].cssRules) continue;
-//          if (String(sheet.media).toLowerCase() == media) {
           if (sheet.media.mediaText.indexOf("print") !== -1) {
               // css in html
               //console.log("sheet %s %s",i,sheet.href);
               for (var x = sheet.cssRules.length-1; x >=0; --x) {
-              //for (var x=0; x<sheet.cssRules.length; x++) {
                   rule = sheet.cssRules[x];
-                  //rule.cssText = "";
-                  //key =  rule.keyText;
-                  console.log(rule);
-                  console.log("rule %s %s",x,sheet.href);
+                  //console.log(rule);
+                  //console.log("rule %s %s",x,sheet.href);
                   sheet.deleteRule(x);
                 }
-              console.log("rule nums %d",sheet.cssRules.length);
+              //console.log("rule nums %d",sheet.cssRules.length);
 
           } else {
               // css in css
-            //console.log("sheet %s %s",i,sheet.href);
-              //if (!ss[i].cssRules) continue;
+              var b = false;
               for (var x = ss[i].cssRules.length-1; x >=0; --x) {
                   rule = ss[i].cssRules[x];
-                  //console.log(rule);
                     if ((rule.type == 4) && (rule.media.mediaText.indexOf("print")!==-1)) // CSSMediaRule
                     {
-                        if ((rule.cssText.indexOf("body")!== -1)) {
+                        if ((rule.cssText.indexOf("body >")!== -1)) {
                         //if (rule.media.mediaText=="print") {
-                                console.log(rule);
-                                console.log(sheet.href);
+                                //console.log(rule);
                                 ss[i].deleteRule(x);
+                            
                         }
+                        //b=true;
+                        //console.log(rule);
                     }
                 }
           }
+          //console.log('sheet '+sheet.href);
       }
-    //window.print = oldPrintFunction;
+}
+
+function bookinfo() {
+    //    if (url.indexOf("bt4") !== -1) {
+    if (document.body.scrollHeight>100) {
+        //mylog("#body="+document.body.innerHTML.length.toString());
+        mylog("#Height="+document.body.scrollHeight.toString());
+    }
+    if (typeof window.VST !=="object") return;
+    
+    working = window.navigator.userAgent.indexOf("15_6")!==-1;
+    vsbook = {}
+    currentpage = {}
+    if (typeof window.VST.currentPageData =="object") {
+        currentpage.cfi = window.VST.currentPageData.cfi;
+        currentpage.page = window.VST.currentPageData.page;
+        currentpage.scrollHeight = window.VST.currentPageData.scrollHeight;
+    }
+    if(!working){ //book meta
+        if (typeof window.VST.currentBookData =="object") {
+                vsbook.isbn = window.VST.currentBookData.isbn;
+                vsbook.vbkType = window.VST.currentBookData.vbkType;
+                vsbook.title = window.VST.currentBookData.title;
+                vsbook.pageList = window.VST.Book.pageBreakList;
+        }
+        //console.log(vsbook);
+    }
+    //send
+    if (Object.keys(currentpage).length>0) {
+    //if (typeof vsbook.currentpage =="object") {
+        console.log("book object");
+        if(!working)
+            console.log(vsbook);
+        console.log(currentpage);
+    }
 }
 
 function onload () {
@@ -109,19 +103,19 @@ function onload () {
     }
     var url=document.URL;
     console.log("onlond "+url);
-    if (url.indexOf("/books/") !== -1) {
-//    if (url.indexOf("bt4") !== -1) {
-        if (document.body.scrollHeight>100) {
-            //mylog("#body="+document.body.innerHTML.length.toString());
-            mylog("#Height="+document.body.scrollHeight.toString());
-        }
+    var iframe = window.frameElement ;
+//    console.log(window.frameElement);
+    //if (url.indexOf("/books/") !== -1) {
+    if ((iframe !== null) && (iframe.id.indexOf("epub-content") !== -1)) {
+        console.log("iframe "+iframe.id);
+        bookinfo();
     }
     else if (url.indexOf("recaptcha") !== -1) {
          if (document.documentElement.clientWidth>200)
                 //mylog("#recaptcha="+document.documentElement.clientWidth.toString());
              mylog("recaptcha");
     }
-    //cleanRules(document,"print");
+
     //onPrint(() => console.log('printing!'));
     //onPrint(cleanRules);
     cleanRules();
@@ -133,18 +127,6 @@ function onPrint(callback) {
     window.addEventListener('beforeprint', () => callback());
 }
 
-var oldPrintFunction = window.print;
 window.addEventListener('load', (event) => {
-
     setTimeout(onload, 500);
-
 });
-window.aaa = 1;
-
-Window.prototype.print=function(){
-    console.log("print disabled");
-}
-//window.print = function () {
-//    console.log('print function');
-//    oldPrintFunction();
-//};
