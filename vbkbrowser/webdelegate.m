@@ -42,6 +42,7 @@
         //timer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(timerFired:) userInfo:nil repeats:YES];
         title = @"test epub";
         ebooktype = 0;
+        ebookid=@"123";
         //_mainwin = self;
     }
     
@@ -251,6 +252,26 @@ fromDataSource:(WebDataSource *)dataSource
     }
 }
 
+- (void) findbook:(NSDictionary *)dict
+{
+    NSString * s1 = [dict objectForKey:@"isbn"];
+    if ([ebookid isEqualToString:s1]) return;
+    ebookid = s1;
+    title =  [dict objectForKey:@"title"];
+
+    s1 = [dict objectForKey:@"vbkType"];
+    if ([s1 isEqualToString:@"epub"])
+        ebooktype = 0; //pdf
+    else ebooktype = 1; //pdf
+
+    pagelist = NULL;
+    pagelist = [dict objectForKey:@"pageList"];
+    //pagelist = [NSArray arrayWithArray: [dict objectForKey:@"pageList"]];
+    NSLog(@"pagelist %d",pagelist.count);
+    [self buildurllist];
+    NSLog(@"page 0 %@",[urllist objectAtIndex:0]);
+
+}
 //By implementing and registering a subclass of NSURLProtocol you can capture all the request from your UIWebView.
 //https://stackoverflow.com/questions/5353278/uiwebviewdelegate-not-monitoring-xmlhttprequest
 //https://stackoverflow.com/questions/3155359/in-webkit-how-do-i-get-the-content-of-a-resource
@@ -284,7 +305,6 @@ fromDataSource:(WebDataSource *)dataSource
     pagelist = NULL;
     pagelist = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
     
-    //pagelist.retain;
     //check ebooktype
     NSDictionary *urldict = [pagelist objectAtIndex:0];
     NSString * s1 = [urldict objectForKey:@"absoluteURL"];
@@ -313,11 +333,12 @@ fromDataSource:(WebDataSource *)dataSource
     for (int i=0; i<[pagelist count]; i++) {
         NSDictionary *urldict = [pagelist objectAtIndex:i];
         //NSString * s1 = [urldict objectForKey:@"cfi"];
-        NSString * s1 = [urldict objectForKey:@"absoluteURL"];
+        NSString * s1 = [urldict objectForKey:@"cfiWithoutAssertions"];
         if (ebooktype==1)
-           s1 = [NSString stringWithFormat:@"https://jigsaw.vitalsource.com%@?width=2000",s1];
+//           s1 = [NSString stringWithFormat:@"https://jigsaw.vitalsource.com%@?width=2000",s1];
+            s1 = [NSString stringWithFormat:@"https://bookshelf.vitalsource.com/#/books/%@/cfi%@",ebookid,s1];
         else
-            s1 = [NSString stringWithFormat:@"https://jigsaw.vitalsource.com%@",s1];
+            s1 = [NSString stringWithFormat:@"https://bookshelf.vitalsource.com/#/books/%@/cfi%@",ebookid,s1];
         //s1 = [NSString stringWithFormat:@"https://jigsaw.vitalsource.com/books/%@/cfi%@",ebookid, s1];
         [urllist addObject:s1];
     }

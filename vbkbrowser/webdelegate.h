@@ -37,6 +37,8 @@
 - (void) setWorking:(BOOL)aworking;
 - (BOOL) saveurllist:(BOOL)b;
 - (NSString *) getbookid: (NSString *) path;
+- (void) findbook:(NSDictionary *)dict;
+- (BOOL)fileexist: (NSString *)afile;
 
 @property (nonatomic, assign) int tick;
 @property (nonatomic, assign) int ebooktype;

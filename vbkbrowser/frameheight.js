@@ -89,9 +89,12 @@ function bookinfo() {
     if (Object.keys(currentpage).length>0) {
     //if (typeof vsbook.currentpage =="object") {
         console.log("book object");
-        if(!working)
+        if(!working) {
             console.log(vsbook);
+            mylog("#book="+JSON.stringify(vsbook));
+        }
         console.log(currentpage);
+        mylog("#currentpage="+JSON.stringify(currentpage));
     }
 }
 
