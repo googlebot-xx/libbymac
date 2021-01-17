@@ -19,6 +19,8 @@
 #include <IOKit/pwr_mgt/IOPMLib.h>
 #define c_agent16 @"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.1 Safari/605.1.15"
 #define c_agent15 @"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.1 Safari/605.1.15"
+#define c_agent14 @"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_4) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.1 Safari/605.1.15"
+#define c_end 9998
 //#define tviewwidth 1200
 
 // 0.99
@@ -41,7 +43,8 @@ NSString* ebookdir00;
 NSString * addressurl, * oldaddrees;
 NSString * booktitle;
 NSString * jsdiv;
-CGFloat frameheigh;
+//CGFloat frameheigh;
+int frameheigh;
 NSRect webviewrect;
 int ttimeout;
 int tviewwidth;
@@ -82,6 +85,7 @@ IOReturn iosuccess;
     BOOL jswaiting;
     BOOL pausing;
     BOOL loading;
+    BOOL printing;
     int c_captcha;
     NSString * jsmessage;
     CGPoint mousepoint;
@@ -208,6 +212,9 @@ IOReturn iosuccess;
     [testbtn setHidden:true];
     [resetbtn setHidden:true];
     [downloadbtn setEnabled:false];
+    [ended setStringValue:[NSString stringWithFormat:@"%d",c_end]];
+    //[ended setStringValue:@"12"];
+    //[started setStringValue:@"5"];
     //[box setHidden:true];
     //[touchlabel setHidden:true];
 
@@ -392,6 +399,11 @@ IOReturn iosuccess;
     //sleep(200);
     //[NSThread sleepForTimeInterval:0.3f];
     //[self wait:200];
+    //[webdelegate joinPDF];
+    //return;
+    [self Setwebviewheight];
+    [self runjs2:jsdiv];
+    pageindex++;
     [self printwkview];
     return;
    [webdelegate Buildpdf:nil];
@@ -505,22 +517,24 @@ IOReturn iosuccess;
         //webdelegate.ebooktype = ebooktype;
         [vars removeAllObjects];
         //[webdelegate clearurllist];
-        totalpage=0;
         taskindex=0;
-        pageindex=0;
-        totalpage = 99999;
+        pageindex=startno;
+        totalpage = webdelegate.pagelist.count ;
+        webView.customUserAgent= c_agent16;
 //            startno=0;
         c_captcha=90;
+#ifdef DEBUG
+        c_captcha=50;
+        //endno = startno+99;
+        totalpage = startno+999;
+#endif
         if (![reg isreg]) {
-            totalpage = 6;
+            totalpage = pageindex+6;
             [self log:@"demo version only download %d pages",totalpage];
             
         }
         [self log:@"Start download, not read book in other browser, wait ...."];
-#ifdef DEBUG
-        c_captcha=50;
-        totalpage = 999;
-#endif
+
         [self log:@"\r========================="];
         [self log:@"Close Bookshelf app while downloading,"];
         [self log:@"=========================\r"];
@@ -533,7 +547,7 @@ IOReturn iosuccess;
         tviewwidth = webviewrect.size.width;
 
         NSRect r = webviewrect;
-        [webView setFrame:NSMakeRect(r.origin.x,r.origin.y,tviewwidth,r.size.height)];
+        //[webView setFrame:NSMakeRect(r.origin.x,r.origin.y,tviewwidth,r.size.height)];
         //mousepoint = CGPointMake(r.origin.x+r.size.width-50,[[NSScreen mainScreen] frame].size.height- (r.origin.y+r.size.height/2));
         //CGWarpMouseCursorPosition(mousepoint);
         //[NSApplication
@@ -547,6 +561,7 @@ IOReturn iosuccess;
         [downloadbtn setTitle:@"Stop"];
     } else {
         working = false;
+        webView.customUserAgent= c_agent15;
         NSRect r = webviewrect;
         [webView setFrame:NSMakeRect(r.origin.x,r.origin.y,r.size.width,r.size.height)];
         [tasktimer invalidate];
@@ -577,10 +592,13 @@ IOReturn iosuccess;
             //startno=0;
 
             url=[webdelegate.urllist objectAtIndex:startno];
+            pageindex = startno;
             [self goURL:url];
             //[self nextpage1:startno];
             [self log:@"Load page %d",startno];
             //NSLog(@"Load page %d",startno);
+            [self runjs2:jsdiv];
+
             loading = true;
             captcha = 0;
             taskindex = 20;
@@ -589,8 +607,10 @@ IOReturn iosuccess;
             break;
         case 10:  //click next button
             // Item 3
-            if ((framenum>0) || (![addressurl isEqualToString:oldaddrees] )) {
-                [self updatelog:@"load page %d-%d",startno, pageindex+1];
+            //if ((framenum>0) || (![addressurl isEqualToString:oldaddrees] )) {
+            pageindex+=1;
+            if (pageindex<endno && pageindex<totalpage && pageindex< webdelegate.pagelist.count) {
+                //[self updatelog:@"load page %d-%d",pageindex+1,pageindex-startno+1];
                 //[self pagebuttonjs:pageindex]; ////goback page button click
                 //[self nextpage:pageindex];
                 framewaiting = true;
@@ -606,7 +626,7 @@ IOReturn iosuccess;
             }
             break;
         case 20: //wait timeout
-            ticknum +=1;
+            ticknum++;
             [touchlabel setStringValue:[@(ticknum) stringValue]];
             if (captcha>0) {
                 [self downloadbtn:nil ];
@@ -617,31 +637,56 @@ IOReturn iosuccess;
             if (ticknum>ttimeout) {
                 if (!loading) {
                     taskindex = 30;
-                    pageindex+=1;
+                    //[self printwkview];
                     //resize webview
-                    [self resizewebview];
-                    ticknum=ttimeout-1;
+                    //[self resizewebview];
+                    [self Setwebviewheight];
+                    //ticknum=ttimeout-1;
                     //save page
                 } else {
-                    taskindex = 90;
+                    [webView reload];
+                    ticknum=0;
                 }
             }
             break;
         case 30:  //takeshot
             // Item 3
-            ticknum +=1;
+            ticknum ++;
             [touchlabel setStringValue:[@(ticknum) stringValue]];
-            if (ticknum>ttimeout) {
+            taskindex = 30;
+            if (ticknum>ttimeout+2){
+                if (!printing) {
+                    //NSRect r1 = webviewrect; //restore webview
+                    [webView setFrame:webviewrect];
+                    //[webView setFrame:NSMakeRect(r1.origin.x,r1.origin.y,tviewwidth,r1.size.height)];
                     taskindex = 10;
-                    [self takeshot];
-                    //save page
+                    if (webdelegate.ebooktype==2 && pageindex>startno+c_captcha) {
+                        taskindex = 80; //delete cookie
+                    }
+                }
+            } else if(ticknum==ttimeout+2){
+                [self runjs2:jsdiv];
+                [self printwkview];
+            } else if (ticknum>ttimeout+1){
+//                [self runjs2:jsdiv];
             }
-            if (webdelegate.ebooktype==2 && pageindex>c_captcha) {
-                taskindex = 80; //delete cookie
+            break;
+        case 31:  //takeshot
+            // Item 3
+            ticknum ++;
+            [touchlabel setStringValue:[@(ticknum) stringValue]];
+            if (!printing) {
+                //NSRect r1 = webviewrect; //restore webview
+                [webView setFrame:webviewrect];
+                //[webView setFrame:NSMakeRect(r1.origin.x,r1.origin.y,tviewwidth,r1.size.height)];
+                taskindex = 10;
+                if (webdelegate.ebooktype==2 && pageindex>startno+c_captcha) {
+                    taskindex = 80; //delete cookie
+                }
             }
-            if (pageindex>totalpage) {
-                taskindex = 90; //goback page button click
-            }
+//            if (pageindex>totalpage) {
+//                taskindex = 90; //goback page button click
+//            }
             break;
         case 80:
             // do nothing ...
@@ -656,7 +701,8 @@ IOReturn iosuccess;
             // Item 3
             [self log:@"building pdf file ...."];
             [textview setNeedsDisplay:YES];
-            bool b = [webdelegate Buildpdf:nil];
+            //bool b = [webdelegate Buildpdf:nil];
+            [webdelegate joinPDF];
             [self setWorking:false];
             pausing = false;
             NSBeep();NSBeep();
@@ -887,7 +933,7 @@ IOReturn iosuccess;
 - (void) currentpage:(NSString *) str
 {
     NSDictionary * obj = [NSJSONSerialization JSONObjectWithData:[str dataUsingEncoding:NSUTF8StringEncoding] options:0 error:nil];
-    frameheigh = [[obj objectForKey:@"scrollHeight"] intValue] ;
+    //frameheigh = [[obj objectForKey:@"scrollHeight"] intValue] ;
     curpage = [obj objectForKey:@"page"];
     loading = false;
     ticknum=ttimeout;
@@ -1008,14 +1054,17 @@ IOReturn iosuccess;
                        NSMakeRange(r1.location+1,[msg length]-r1.location-1)];
     //NSLog(item);
     //NSLog(data);
-    NSLog(@"message %@ ",item);
+    NSLog(@"message %@ %d",item, pageindex);
     if ([item isEqualToString:@"#currentpage"]) {
         [self currentpage:data];
     }
     else if ([item isEqualToString:@"#book"]) {
         [self findbook:data];
     }
-    
+    else if ([item isEqualToString:@"#height"]) {
+        CGFloat height = [data floatValue];
+        frameheigh = height;
+    }
 //    NSArray * list = [msg componentsSeparatedByString:@"="];
 //    if ([list[0] isEqualToString:@"#Height"]) {
 //        CGFloat height = [list[1] floatValue];
@@ -1601,12 +1650,15 @@ IOReturn iosuccess;
 
 -(void)printwkview
 {
-    [self Setwebviewheight];
+    //[self Setwebviewheight];
+    //webView.customUserAgent = c_agent14;
     SEL printSelector = NSSelectorFromString(@"_printOperationWithPrintInfo:"); // This is SPI on WKWebView. Apparently existing since 10.11 ?
 
      NSMutableDictionary *printInfoDict = [[[NSPrintInfo sharedPrintInfo] dictionary] mutableCopy];
      printInfoDict[NSPrintJobDisposition] = NSPrintSaveJob; // means you want a PDF file, not printing to a real printer.
-     printInfoDict[NSPrintJobSavingURL] = [NSURL fileURLWithPath:[@"~/Documents/print_test.pdf" stringByExpandingTildeInPath]]; // path of the generated pdf file
+    NSString * fname = [webdelegate pagefilename:pageindex];
+    printInfoDict[NSPrintJobSavingURL] = [NSURL fileURLWithPath:[fname stringByExpandingTildeInPath]];
+    //printInfoDict[NSPrintJobSavingURL] = [NSURL fileURLWithPath:[@"~/Documents/print_test.pdf" stringByExpandingTildeInPath]]; // path of the generated pdf file
      printInfoDict[NSPrintDetailedErrorReporting] = @YES; // not necessary
 
      // customize the layout of the "printing"
@@ -1615,10 +1667,10 @@ IOReturn iosuccess;
      [customPrintInfo setVerticalPagination: NSPrintingPaginationModeAutomatic];
      [customPrintInfo setVerticallyCentered:NO];
      [customPrintInfo setHorizontallyCentered:NO];
-     customPrintInfo.leftMargin = 10;
-     customPrintInfo.rightMargin = 10;
-     customPrintInfo.topMargin = 25;
-     customPrintInfo.bottomMargin = 25;
+     customPrintInfo.leftMargin = 15;
+     customPrintInfo.rightMargin = 15;
+     customPrintInfo.topMargin = 30;
+     customPrintInfo.bottomMargin = 30;
     //[customPrintInfo setPaperSize:NSMakeSize(612,792)];
     //customPrintInfo.orientation = NSPaperOrientationPortrait;
 
@@ -1634,12 +1686,17 @@ IOReturn iosuccess;
 
 //    BOOL printSuccess = [printOperation runOperation]; // THIS DOES NOT WORK WITH WKWEBVIEW! Use runOperationModalForWindow: instead (asynchronous)
 //     [printOperation runOperationModalForWindow:self.window delegate:self didRunSelector:@selector(printPanelDidEnd:returnCode:contextInfo:) contextInfo:nil]; // THIS WILL WORK, but is async
+    printing = true;
     [printOperation runOperationModalForWindow:self.window delegate:self didRunSelector:@selector(printOperationDidRun:success:contextInfo:) contextInfo:nil]; // THIS WILL WORK, but is async
 }
 
 - (void)printOperationDidRun:(NSPrintOperation *)printOperation  success:(BOOL)success  contextInfo:(void *)contextInfo
 {
+    //webView.customUserAgent = c_agent16;
+    //NSRect r1 = webviewrect;
+    //[webView setFrame:NSMakeRect(r1.origin.x,r1.origin.y,tviewwidth,r1.size.height)];
     NSLog(@"print done");
+    printing = false;
 }
 // NSPrintOperation  knowsPageRange
 //NSPrintOperation view's frame was not initialized properly before knowsPageRange: returned. (WKPrintingView)
@@ -1807,9 +1864,9 @@ IOReturn iosuccess;
     //if (pageindex==0 && [framename isEqualToString:@"epub-content"]) {
     //if (working && (webdelegate.title ==nil) ) {
     if ((webdelegate.title ==nil) || ([webdelegate.title length]==0) ) {
-       webdelegate.title = atitle;
-       NSLog(@"[%@] title %@",framename,atitle);
-        [self log:@"Title %@",atitle];
+       //webdelegate.title = atitle;
+       //NSLog(@"[%@] title %@",framename,atitle);
+       // [self log:@"Title %@",atitle];
         
     }
 }
@@ -1868,8 +1925,8 @@ IOReturn iosuccess;
 
     if ([keyPath isEqualToString:@"title"]) {
         if ([webView.title length]>0) {
-            booktitle = webView.title;
-            webdelegate.title = webView.title;
+            //booktitle = webView.title;
+            //webdelegate.title = webView.title;
         }
     } else if ([keyPath isEqualToString:@"URL"]) {
         [self urlchanged];
@@ -2053,7 +2110,7 @@ IOReturn iosuccess;
     } else if ([url rangeOfString:@"@"].location!=NSNotFound) {
         page = [self strFrom:url from:@"/cfi/" to:@"@"];
     } else {
-        page = [self strFrom:url from:@"/cfi/" to:@"***"];
+        page = url;
     }
 //
 //    NSString * page = [self strFrom:url from:@"/cfi/" to:@"!"];
@@ -2075,7 +2132,7 @@ IOReturn iosuccess;
 
 -(void)resizewebview
 {
-    [self runjs2:jsdiv];
+    //[self runjs2:jsdiv];
     //NSLog(@"%@",[webView.scrollView]);
     NSRect r1 ;
     int h = frameheigh+100;// [self webviewheight];
@@ -2092,12 +2149,19 @@ IOReturn iosuccess;
 
 -(void)Setwebviewheight
 {
-    [self runjs2:jsdiv];
-    int h = frameheigh+100;// [self webviewheight];
-    NSRect r = [webView frame];
-    if (h>100) {
-        [webView setFrame:NSMakeRect(r.origin.x,r.origin.y,r.size.width,h)];
+    //return;
+    int h = frameheigh+250;// [self webviewheight];
+    NSRect r = webviewrect;// [webView frame];
+    [self log:@"%d h %d %f",pageindex,frameheigh,r.size.height];
+//    h = (round(frameheigh/1300)+1)*1300;
+//    if (r.size.height>frameheigh+100) {
+    if (frameheigh<1300) {
+//        //h = frameheigh+40;// [self webviewheight];
+        //h = 1300;
+        //return;
     }
+    int h2 = h-r.size.height;
+    [webView setFrame:NSMakeRect(r.origin.x,r.origin.y,r.size.width,h)];
 }
 
 -(void)takeshot

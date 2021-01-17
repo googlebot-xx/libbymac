@@ -45,12 +45,12 @@ function cleanRules()
                   rule = ss[i].cssRules[x];
                     if ((rule.type == 4) && (rule.media.mediaText.indexOf("print")!==-1)) // CSSMediaRule
                     {
-                        if ((rule.cssText.indexOf("body >")!== -1)) {
+                        //if ((rule.cssText.indexOf("body >")!== -1)) {
                         //if (rule.media.mediaText=="print") {
                                 //console.log(rule);
                                 ss[i].deleteRule(x);
                             
-                        }
+                        //}
                         //b=true;
                         //console.log(rule);
                     }
@@ -62,11 +62,16 @@ function cleanRules()
 
 function bookinfo() {
     //    if (url.indexOf("bt4") !== -1) {
+    //if (navigator.userAgent.indexOf("14_") !== -1)
+    if (typeof window.VST !=="object") return;
+
+    if (typeof navigator !== "object")
+        return;
+
     if (document.body.scrollHeight>100) {
         //mylog("#body="+document.body.innerHTML.length.toString());
-        mylog("#Height="+document.body.scrollHeight.toString());
+        mylog("#height="+document.body.scrollHeight.toString());
     }
-    if (typeof window.VST !=="object") return;
     
     working = window.navigator.userAgent.indexOf("15_6")!==-1;
     vsbook = {}
@@ -99,7 +104,7 @@ function bookinfo() {
 }
 
 function onload () {
-
+    
     var node = document.querySelector("#recaptcha");
     if (node) {
        mylog("recaptcha");
@@ -131,5 +136,5 @@ function onPrint(callback) {
 }
 
 window.addEventListener('load', (event) => {
-    setTimeout(onload, 500);
+        setTimeout(onload, 500);
 });

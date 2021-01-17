@@ -28,13 +28,15 @@ function hidediv(estr) {
 	var banner=document.querySelector(estr);
 	if (!banner) return;
 	banner.style.display = 'none';
+    banner.style.height=1;
 }
 
 function hidediv2(estr) {
     var banner=document.querySelector(estr);
     if (!banner) return;
     banner.style.display = 'none';
-    banner.style.height=1;
+    banner.style.bottom = "-44px";
+    //banner.style.height=1;
 }
 
 
@@ -42,27 +44,27 @@ function positionchange()
 {
     var node = document.querySelector("#bookshelf");
     if (node) {
-       node.style.position="static";
+       node.style.position="absolute";
         var node2 = node.querySelector("#jigsaw-placeholder-outer");
         if (node2) {
-            console.log(node2);
-            node2.style.position="static";
+            //console.log(node2);
+            node2.style.position="absolute";  //
         }
     }
 }
 
 function changediv()
 {
-     hidediv("#jigsaw-placeholder-inner > div.vertical-button-wrapper.previous-wrapper");
+    hidediv("#jigsaw-placeholder-inner > div.vertical-button-wrapper.previous-wrapper");
     hidediv("#jigsaw-placeholder-inner > div.vertical-button-wrapper.next-wrapper");
-    hidediv2("#reader-handler > div.cookie-banner");
+    //hidediv2("#reader-handler > div.cookie-banner");
     hidediv2("#scrubber-container");
-    hidediv("#jigsaw-placeholder-inner > div.horizontal-button-wrapper.next-wrapper");
-    hidediv("#jigsaw-placeholder-inner > div.horizontal-button-wrapper.previous-wrapper");
+    //hidediv("#jigsaw-placeholder-inner > div.horizontal-button-wrapper.next-wrapper");
+    //hidediv("#jigsaw-placeholder-inner > div.horizontal-button-wrapper.previous-wrapper");
     //hidediv("");
     //cleanRules(document,"print");
-    console.log("done cssrule");
+    //console.log("done cssrule");
 }
 
 positionchange();
-//changediv();
+changediv();

@@ -32,6 +32,7 @@
 - (NSString *) nextpage: (int)page;
 - (bool) BuildPub:(NSString *) afile;
 - (bool) Buildpdf:(NSString *) afile;
+- (void)joinPDF;
 - (BOOL) createfolder: (NSString*) folder;
 - (NSString *) cleanfilename: (NSString *) str;
 - (void) setWorking:(BOOL)aworking;
@@ -39,6 +40,9 @@
 - (NSString *) getbookid: (NSString *) path;
 - (void) findbook:(NSDictionary *)dict;
 - (BOOL)fileexist: (NSString *)afile;
+- (NSString *) pagefilename:(int) i;
+- (NSString *) pageurl:(int) i;
+
 
 @property (nonatomic, assign) int tick;
 @property (nonatomic, assign) int ebooktype;
