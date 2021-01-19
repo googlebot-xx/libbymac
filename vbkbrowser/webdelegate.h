@@ -31,7 +31,7 @@
 - (void) savetitle: (NSString *)atitle;
 - (NSString *) nextpage: (int)page;
 - (bool) BuildPub:(NSString *) afile;
-- (bool) Buildpdf:(NSString *) afile;
+- (void) Buildpdf;
 - (void)joinPDF;
 - (BOOL) createfolder: (NSString*) folder;
 - (NSString *) cleanfilename: (NSString *) str;
@@ -42,6 +42,8 @@
 - (BOOL)fileexist: (NSString *)afile;
 - (NSString *) pagefilename:(int) i;
 - (NSString *) pageurl:(int) i;
+- (int) indexofcfi:(NSString *)cfi;
+
 
 
 @property (nonatomic, assign) int tick;

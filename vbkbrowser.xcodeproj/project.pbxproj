@@ -12,6 +12,7 @@
 		002CAAF92406CD73001F97B9 /* cssrule.js in Resources */ = {isa = PBXBuildFile; fileRef = 002CAAF82406CD73001F97B9 /* cssrule.js */; };
 		002DF5E2201F7D3700FC44FB /* go-home.png in Resources */ = {isa = PBXBuildFile; fileRef = 002DF5E1201F7D3700FC44FB /* go-home.png */; };
 		004D48B524140C0F00FB84AE /* frameheight.js in Resources */ = {isa = PBXBuildFile; fileRef = 004D48B424140C0F00FB84AE /* frameheight.js */; };
+		004E382925B4B0FC00216708 /* jsstring.m in Sources */ = {isa = PBXBuildFile; fileRef = 004E382825B4B0FC00216708 /* jsstring.m */; };
 		00872C591EC2245C00542D22 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 00872C581EC2245C00542D22 /* AppDelegate.m */; };
 		00872C5C1EC2245C00542D22 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 00872C5B1EC2245C00542D22 /* main.m */; };
 		00872C5E1EC2245C00542D22 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 00872C5D1EC2245C00542D22 /* Assets.xcassets */; };
@@ -68,6 +69,7 @@
 		002CAAF82406CD73001F97B9 /* cssrule.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = cssrule.js; sourceTree = "<group>"; };
 		002DF5E1201F7D3700FC44FB /* go-home.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "go-home.png"; path = "img/go-home.png"; sourceTree = "<group>"; };
 		004D48B424140C0F00FB84AE /* frameheight.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = frameheight.js; sourceTree = "<group>"; };
+		004E382825B4B0FC00216708 /* jsstring.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = jsstring.m; sourceTree = "<group>"; };
 		00872C541EC2245C00542D22 /* VitalSource Downloader.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "VitalSource Downloader.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		00872C571EC2245C00542D22 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		00872C581EC2245C00542D22 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -182,6 +184,7 @@
 				00872C571EC2245C00542D22 /* AppDelegate.h */,
 				00872C581EC2245C00542D22 /* AppDelegate.m */,
 				00872C5F1EC2245C00542D22 /* MainMenu.xib */,
+				004E382825B4B0FC00216708 /* jsstring.m */,
 				00872C621EC2245C00542D22 /* Info.plist */,
 				0028ED592368DE9E00BD7BFD /* HybridNSURLProtocol.h */,
 				0028ED5A2368DE9E00BD7BFD /* HybridNSURLProtocol.m */,
@@ -370,6 +373,7 @@
 				00872C6B1EC225DE00542D22 /* mainWin.m in Sources */,
 				00B7F1991EC9D38F00C14D6A /* webdelegate.m in Sources */,
 				00B7F1A31ECDE31700C14D6A /* RegController.m in Sources */,
+				004E382925B4B0FC00216708 /* jsstring.m in Sources */,
 				00B7F1A21ECDE31700C14D6A /* BuyController.m in Sources */,
 				008D40D32416D20E00BA9476 /* ActiveManualler.m in Sources */,
 				00872C5C1EC2245C00542D22 /* main.m in Sources */,
@@ -504,6 +508,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				PRODUCT_BUNDLE_IDENTIFIER = com.ebookconverter.vbkbrowserwk;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRINGS_FILE_OUTPUT_ENCODING = binary;
 			};
 			name = Debug;
 		};
@@ -528,6 +533,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				PRODUCT_BUNDLE_IDENTIFIER = com.ebookconverter.vbkbrowserwk;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRINGS_FILE_OUTPUT_ENCODING = binary;
 			};
 			name = Release;
 		};

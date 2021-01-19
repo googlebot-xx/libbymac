@@ -261,15 +261,15 @@ fromDataSource:(WebDataSource *)dataSource
 
     s1 = [dict objectForKey:@"vbkType"];
     if ([s1 isEqualToString:@"epub"])
-        ebooktype = 0; //pdf
+        ebooktype = 0; //epub
     else ebooktype = 1; //pdf
 
     pagelist = NULL;
     pagelist = [dict objectForKey:@"pageList"];
     //pagelist = [NSArray arrayWithArray: [dict objectForKey:@"pageList"]];
-    NSLog(@"pagelist %d",pagelist.count);
+    //NSLog(@"pagelist %d",pagelist.count);
     [self buildurllist];
-    NSLog(@"page 0 %@",[urllist objectAtIndex:0]);
+    //NSLog(@"page 0 %@",[urllist objectAtIndex:0]);
 
 }
 //By implementing and registering a subclass of NSURLProtocol you can capture all the request from your UIWebView.
@@ -356,6 +356,17 @@ fromDataSource:(WebDataSource *)dataSource
     return  s1;
 }
 
+- (int) indexofcfi:(NSString *)cfi
+{
+    for (int i=0; i<[pagelist count]; i++) {
+        NSDictionary *obj = [pagelist objectAtIndex:i];
+        if ([cfi isEqualToString:[obj objectForKey:@"cfiWithoutAssertions"]])
+            return i;
+    }
+    
+    return -1;
+}
+
 - (NSString *) pagefilename:(int) i
 {
     NSDictionary *urldict = [pagelist objectAtIndex:i];
@@ -367,7 +378,10 @@ fromDataSource:(WebDataSource *)dataSource
 
     NSString * fname=[_mainwin.datadir stringByAppendingPathComponent:ebookid];
     [self createfolder:fname];
-    fname=[NSString stringWithFormat:@"%@/%@.pdf",fname,page];
+    if (ebooktype==0) {
+        fname=[NSString stringWithFormat:@"%@/%@.pdf",fname,page];
+    } else
+        fname=[NSString stringWithFormat:@"%@/%@.png",fname,page];
     //NSLog(@"%@ %@ %@",bookid,page,fname);
     return fname;
     //return @"";
@@ -874,6 +888,10 @@ fromDataSource:(WebDataSource *)dataSource
     fname =[self cleanfilename:fname];
     fname = [_mainwin.ebookdir stringByAppendingPathComponent:fname];
 
+    int num = [pagelist count];
+    if (![reg isreg]) {
+        num = 10;
+    }
 
     CFURLRef pdfURLOutput = (__bridge CFURLRef)[NSURL fileURLWithPath:fname];
     NSInteger numberOfPages = 0;
@@ -882,7 +900,7 @@ fromDataSource:(WebDataSource *)dataSource
     CGContextRef writeContext = CGPDFContextCreateWithURL(pdfURLOutput, NULL, NULL);
 
     NSString * missing = @"";
-    for (int i=0; i<[pagelist count]; i++) {
+    for (int i=0; i<num; i++) {
 
         NSString * htmlpdf = [self pagefilename:i];
         if(![self fileexist:htmlpdf]){
@@ -915,7 +933,8 @@ fromDataSource:(WebDataSource *)dataSource
         CGPDFDocumentRelease(pdfRef);
         CFRelease(pdfURL);
     }
-    [_mainwin log:@"Missging pages %@",missing];
+    if ([missing length]>1)
+        [_mainwin log:@"Missging pages %@",missing];
     [_mainwin log:@"pdf total page %d",totalPages];
     [_mainwin log:@"pdf saved  %@",fname];
     //CFRelease(pdfURLOutput);
@@ -925,7 +944,57 @@ fromDataSource:(WebDataSource *)dataSource
     CGContextRelease(writeContext);
 }
 
-- (bool) Buildpdf:(NSString *) afile
+- (void)Buildpdf
+{
+    //[_mainwin log:@"building pdf ...."];
+
+    _mainwin.outputfile = nil;
+//    NSString * dir = [_mainwin.datadir stringByAppendingPathComponent:ebookid];
+
+    NSString * fname = [ebookid stringByAppendingFormat:@" %@.pdf",title];
+    fname =[self cleanfilename:fname];
+    fname = [_mainwin.ebookdir stringByAppendingPathComponent:fname];
+
+    int num = [pagelist count];
+    if (![reg isreg]) {
+        num = 10;
+    }
+
+    PDFDocument *pdf = [[PDFDocument alloc] init];
+    NSInteger numberOfPages = 0;
+    int totalPages = 0;
+    // Create the output context
+
+    NSString * missing = @"";
+    for (int i=0; i<num; i++) {
+
+        NSString * path = [self pagefilename:i];
+        if(![self fileexist:path]){
+            //[self log:@"page pdf not found %@",htmlpdf];
+            missing = [missing stringByAppendingFormat:@" %d", i];
+            continue;
+        }
+        //[self log:@"add pdf %@",htmlpdf];
+        NSImage *img = [[NSImage alloc]initWithContentsOfFile:path];
+        
+        PDFPage * page;
+        totalPages++;
+        
+        page = [[PDFPage alloc] init];
+        [page initWithImage: (NSImage *) img];
+        [pdf insertPage: page atIndex: [pdf pageCount]];
+    }
+    [pdf writeToFile:  fname];
+    if ([missing length]>1)
+        [_mainwin log:@"Missging pages %@",missing];
+    [_mainwin log:@"pdf total page %d",totalPages];
+    [_mainwin log:@"pdf saved  %@",fname];
+    //CFRelease(pdfURLOutput);
+    //
+    //    // Finalize the output file
+}
+
+- (bool) Buildpdf4:(NSString *) afile
 {
 
     //NSString * dir;
@@ -1015,7 +1084,7 @@ fromDataSource:(WebDataSource *)dataSource
     return true;
 }
 
-- (bool) Buildpdf3:(NSString *) afile
+- (bool) Buildpdf2:(NSString *) afile
 {
 
     NSString * dir;
@@ -1075,7 +1144,7 @@ fromDataSource:(WebDataSource *)dataSource
     return true;
 }
 
-- (bool) Buildpdf2:(NSString *) afile
+- (bool) Buildpdf3:(NSString *) afile
 {
 
     NSString * dir;

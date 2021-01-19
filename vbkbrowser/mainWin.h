@@ -54,4 +54,8 @@ extern BuyController *reg;
 extern AboutController * aboutcontroller;
 extern int ttimeout;
 extern NSString* ebookdir00;
+extern NSString* js_cssrule;
+extern NSString* js_frameheight;
+extern NSString* js_nextpage;
+
 //extern RegController * regcontroller;

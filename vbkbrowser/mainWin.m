@@ -17,6 +17,7 @@
 #import "AboutController.h"
 #import "RegController.h"
 #include <IOKit/pwr_mgt/IOPMLib.h>
+
 #define c_agent16 @"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.1 Safari/605.1.15"
 #define c_agent15 @"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.1 Safari/605.1.15"
 #define c_agent14 @"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_4) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.1 Safari/605.1.15"
@@ -86,6 +87,7 @@ IOReturn iosuccess;
     BOOL pausing;
     BOOL loading;
     BOOL printing;
+    BOOL hasimg;
     int c_captcha;
     NSString * jsmessage;
     CGPoint mousepoint;
@@ -153,12 +155,14 @@ IOReturn iosuccess;
 //https://developer.mozilla.org/en-US/docs/Web/API/Document/DOMContentLoaded_event
 - (void)loadjs:(WKWebViewConfiguration *) configuration
 {
+//    NSLog(@"%@",js_cssrule);
     NSString * fname =[[NSBundle mainBundle]
                        pathForResource:@"cssrule" ofType:@"js"];
     jsdiv=[self loadfile:fname];
     fname =[[NSBundle mainBundle]
                        pathForResource:@"frameheight" ofType:@"js"];
     NSString * js=[self loadfile:fname];
+    //NSString * js= js_frameheight;
     //return;
     WKUserScript *script = [[WKUserScript alloc] initWithSource:js injectionTime:WKUserScriptInjectionTimeAtDocumentEnd forMainFrameOnly:NO];
     WKUserContentController *userContentController = [[WKUserContentController alloc] init];
@@ -213,6 +217,7 @@ IOReturn iosuccess;
     [resetbtn setHidden:true];
     [downloadbtn setEnabled:false];
     [ended setStringValue:[NSString stringWithFormat:@"%d",c_end]];
+    c_captcha=90;
     //[ended setStringValue:@"12"];
     //[started setStringValue:@"5"];
     //[box setHidden:true];
@@ -399,14 +404,13 @@ IOReturn iosuccess;
     //sleep(200);
     //[NSThread sleepForTimeInterval:0.3f];
     //[self wait:200];
-    //[webdelegate joinPDF];
-    //return;
+    [webdelegate Buildpdf];
+    return;
     [self Setwebviewheight];
     [self runjs2:jsdiv];
     pageindex++;
     [self printwkview];
     return;
-   [webdelegate Buildpdf:nil];
     working=false;
     //[self pagefilename];
 #ifdef DEBUG
@@ -510,28 +514,30 @@ IOReturn iosuccess;
         ttimeout= [[timeouted stringValue] intValue];
         startno = [[started stringValue] intValue];
         if(startno>0) startno--;
+        totalpage = webdelegate.pagelist.count ;
+        if (startno>= totalpage)
+            startno= totalpage-1;
+
         endno = [[ended stringValue] intValue];
         //webdelegate.ebookid = [webdelegate getbookid:addressurl];
         //startno = [self urlpageno:addressurl];
         //ebooktype = [self ebooktypejs];
         //webdelegate.ebooktype = ebooktype;
-        [vars removeAllObjects];
+        //[vars removeAllObjects];
         //[webdelegate clearurllist];
         taskindex=0;
         pageindex=startno;
-        totalpage = webdelegate.pagelist.count ;
         webView.customUserAgent= c_agent16;
 //            startno=0;
-        c_captcha=90;
+
 #ifdef DEBUG
-        c_captcha=50;
+        //c_captcha=6;
         //endno = startno+99;
-        totalpage = startno+999;
+        totalpage = startno+55;
 #endif
         if (![reg isreg]) {
             totalpage = pageindex+6;
             [self log:@"demo version only download %d pages",totalpage];
-            
         }
         [self log:@"Start download, not read book in other browser, wait ...."];
 
@@ -551,8 +557,10 @@ IOReturn iosuccess;
         //mousepoint = CGPointMake(r.origin.x+r.size.width-50,[[NSScreen mainScreen] frame].size.height- (r.origin.y+r.size.height/2));
         //CGWarpMouseCursorPosition(mousepoint);
         //[NSApplication
-        
-        tasktimer = [NSTimer scheduledTimerWithTimeInterval:0.6 target:self selector:@selector(epubtaskhandle:) userInfo:nil repeats:NO];
+        if (webdelegate.ebooktype==0)
+            tasktimer = [NSTimer scheduledTimerWithTimeInterval:0.6 target:self selector:@selector(epubtaskhandle:) userInfo:nil repeats:NO];
+        else
+            tasktimer = [NSTimer scheduledTimerWithTimeInterval:0.6 target:self selector:@selector(pdftaskhandle:) userInfo:nil repeats:NO];
         CFStringRef* reasonForActivity= CFSTR("vitalsource Describe Activity Type");
 //kIOPMAssertionTypePreventSystemSleep kIOPMAssertionTypeNoDisplaySleep
         iosuccess = IOPMAssertionCreateWithName(kIOPMAssertionTypePreventSystemSleep ,
@@ -567,6 +575,7 @@ IOReturn iosuccess;
         [tasktimer invalidate];
         //[self log:@"download end"];
         [downloadbtn setTitle:@"Download"];
+        [self savevars:true];
         //[webdelegate saveurllist:true];
         if (iosuccess==kIOReturnSuccess) {
             iosuccess = IOPMAssertionRelease(assertionID);
@@ -590,13 +599,13 @@ IOReturn iosuccess;
     switch (taskindex) {
         case 0:
             //startno=0;
-
-            url=[webdelegate.urllist objectAtIndex:startno];
-            pageindex = startno;
-            [self goURL:url];
-            //[self nextpage1:startno];
+            [self firstpage];
             [self log:@"Load page %d",startno];
-            //NSLog(@"Load page %d",startno);
+//            url=[webdelegate.urllist objectAtIndex:startno];
+//            pageindex = startno;
+//            [self goURL:url];
+//            //[self nextpage1:startno];
+//            [self log:@"Load page %d",startno];
             [self runjs2:jsdiv];
 
             loading = true;
@@ -609,11 +618,12 @@ IOReturn iosuccess;
             // Item 3
             //if ((framenum>0) || (![addressurl isEqualToString:oldaddrees] )) {
             pageindex+=1;
+            [vars setValue:[NSString stringWithFormat:@"%d",pageindex ] forKey:@"download"];
+
             if (pageindex<endno && pageindex<totalpage && pageindex< webdelegate.pagelist.count) {
                 //[self updatelog:@"load page %d-%d",pageindex+1,pageindex-startno+1];
                 //[self pagebuttonjs:pageindex]; ////goback page button click
                 //[self nextpage:pageindex];
-                framewaiting = true;
                 framenum=0;
                 ticknum =0;
                 captcha = 0;
@@ -701,6 +711,9 @@ IOReturn iosuccess;
             // Item 3
             [self log:@"building pdf file ...."];
             [textview setNeedsDisplay:YES];
+            [[self window] setViewsNeedDisplay:YES];
+            [[self window] display];
+
             //bool b = [webdelegate Buildpdf:nil];
             [webdelegate joinPDF];
             [self setWorking:false];
@@ -721,6 +734,124 @@ IOReturn iosuccess;
     }
     if (working)
         tasktimer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(epubtaskhandle:) userInfo:nil repeats:NO];
+}
+
+- (void) pdftaskhandle:(NSTimer*)theTimer
+{
+    if (!working) return;
+    NSString * url=@"";
+    //NSLog(@"task %d tick %d",taskindex,ticknum);
+    switch (taskindex) {
+        case 0:
+            //startno=0;
+
+            //url=[webdelegate.urllist objectAtIndex:startno];
+            //pageindex = startno;
+            //[self goURL:url];
+            //[self runjs2:jsdiv];
+            [self firstpage];
+            taskindex = 20;
+            [self log:@"Load page %d",startno];
+            [vars setValue:[NSString stringWithFormat:@"%d",pageindex ] forKey:@"download"];
+            //[self nextpage1:startno];
+            //NSLog(@"Load page %d",startno);
+
+            loading = true;
+            captcha = 0;
+            hasimg = false;
+            oldaddrees = @"";
+            pausing=false;
+            break;
+        case 10:  //click next button
+            // Item 3
+            //if ((framenum>0) || (![addressurl isEqualToString:oldaddrees] )) {
+            pageindex+=1;
+            [vars setValue:[NSString stringWithFormat:@"%d",pageindex ] forKey:@"download"];
+            
+            if (captcha) {
+                taskindex = 80; //captcha
+            } else
+            if ([addressurl rangeOfString:@"login"].location != NSNotFound) {
+                taskindex = 80; //login show
+            } else //logout
+            if (webdelegate.ebooktype==1 && pageindex>startno+c_captcha) {
+                taskindex = 80; //delete cookie
+            } else
+            if (pageindex<endno && pageindex<totalpage && pageindex< webdelegate.pagelist.count) {
+                [self updatelog:@"load page %d-%d",pageindex+1,pageindex-startno+1];
+                //[self pagebuttonjs:pageindex]; ////goback page button click
+                //[self nextpage:pageindex];
+                framenum=0;
+                ticknum =0;
+                hasimg = false;
+                captcha = 0;
+                oldaddrees=addressurl;
+                taskindex = 20;
+                [self nextpage:pageindex];
+                //press nextpage
+            } else { //end
+                taskindex = 90; //goback page button click
+            }
+            break;
+        case 20: //wait timeout
+            ticknum++;
+            [touchlabel setStringValue:[@(ticknum) stringValue]];
+            if (captcha>0) {
+                [self downloadbtn:nil ];
+                [self log:@"Captcha, close downloader and wait 5 hours, restart downloader to download rest pages."];
+                NSBeep();
+                NSBeep();
+            }
+            if (ticknum>ttimeout) {
+                //NSLog(@"task 20 %d %d",pageindex,[webdelegate.pagelist count]-1);
+                if (!loading || pageindex==[webdelegate.pagelist count]-1) {
+                    taskindex = 10;
+                    //[self printwkview];
+                    //resize webview
+                    //[self resizewebview];
+                    //[self Setwebviewheight];
+                    //ticknum=ttimeout-1;
+                    //save page
+                } else {
+                    [webView reload];
+                    ticknum=0;
+                }
+            }
+            break;
+        case 80:
+            // do nothing ...
+            [self setWorking:false];
+            [self log:@"-----------------------------"];
+            [self log:@"Download stop to avoid captcha , login and open same book to resume download rest pages",pageindex+startno];
+            [self deletecookie];
+            NSBeep();NSBeep();
+            NSBeep();
+            break;
+        case 90:
+            // Item 3
+            [self log:@"building pdf file ...."];
+            [textview setNeedsDisplay:YES];
+            [[self window] setViewsNeedDisplay:YES];
+            [[self window] display];
+            [webdelegate Buildpdf];
+            [self setWorking:false];
+            pausing = false;
+            NSBeep();NSBeep();
+            NSBeep();
+//            [self setWorking:false];
+//            [self openoutputfile];
+            [[NSWorkspace sharedWorkspace] openFile:ebookdir withApplication:@"Finder"];
+            break;
+        default:
+            break;
+    }
+
+    if (pageindex>4) {
+        //taskindex = 20; //goback page button click
+        //working = false;
+    }
+    if (working)
+        tasktimer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(pdftaskhandle:) userInfo:nil repeats:NO];
 }
 
 - (void) epubtaskhandle2:(NSTimer*)theTimer
@@ -826,7 +957,7 @@ IOReturn iosuccess;
             // Item 3
             [self log:@"building pdf file ...."];
             [textview setNeedsDisplay:YES];
-            bool b = [webdelegate Buildpdf:nil];
+            [webdelegate Buildpdf];
             [self setWorking:false];
             pausing = false;
             NSBeep();NSBeep();
@@ -857,61 +988,6 @@ IOReturn iosuccess;
     
 }
 
-- (void) epubtaskhandle_js:(NSTimer*)theTimer
-{
-    if (!working) return;
-    
-    switch (taskindex) {
-        case 0:
-            taskindex = [self totalbuttonjs];
-            //totalpage= [vars[@"Totalpages"] intValue];
-            [self log:@"Total pages = %d",totalpage];
-            break;
-        case 1:
-            // check totalpages
-            if ([self checkdictkey:@"Totalpages"] == 1) {
-                totalpage= [vars[@"Totalpages"] intValue];
-                taskindex = 10;
-            }
-            break;
-        case 10:
-            // Item 3
-            webdelegate.ticked =false;
-            if (pageindex<totalpage) {
-                [self log:@"load page %d",pageindex+1];
-                [self pagebuttonjs:pageindex]; ////goback page button click
-                taskindex = 11;
-            }
-            break;
-        case 11:
-            // Item 3
-            if( webdelegate.ticked ){
-                pageindex += 1;
-                taskindex = 10; //goback page button click
-            }
-            if (pageindex==totalpage) {
-                taskindex = 20; //goback page button click
-            }
-            break;
-        case 20:
-            // Item 3
-            [self log:@"building epub file ...."];
-            bool b = [webdelegate BuildPub:nil];
-            [self setWorking:false];
-            [self openoutputfile];
-            [[NSWorkspace sharedWorkspace] openFile:ebookdir withApplication:@"Finder"];
-            
-            break;
-        default:
-            break;
-    }
-    
-    if (pageindex>4) {
-        //taskindex = 20; //goback page button click
-        //working = false;
-    }
-}
-
 
 - (void) consolecheck:(NSString *) item
 {
@@ -930,13 +1006,32 @@ IOReturn iosuccess;
     return -1;
 }
 
+-(void) firstpage
+{
+    int i = [webdelegate indexofcfi:curpage];
+//    NSDictionary * obj = [webdelegate.pagelist objectAtIndex:pageindex] ;
+//    NSString * url = [webdelegate pageurl:pageindex];
+//    NSString * cfi = [obj objectForKey:@"cfi"];
+    if (i == pageindex) {
+    //if ( [cfi isEqualToString:curpage]) {
+        webView.reload;
+    } else {
+        NSString * url = [webdelegate pageurl:pageindex];
+        [self goURL:url];
+    }
+}
+
 - (void) currentpage:(NSString *) str
 {
     NSDictionary * obj = [NSJSONSerialization JSONObjectWithData:[str dataUsingEncoding:NSUTF8StringEncoding] options:0 error:nil];
     //frameheigh = [[obj objectForKey:@"scrollHeight"] intValue] ;
-    curpage = [obj objectForKey:@"page"];
-    loading = false;
-    ticknum=ttimeout;
+    curpage = [obj objectForKey:@"cfi"];
+    NSString * vbktype = [obj objectForKey:@"vbktype"];
+    //NSLog(@"curpage %@",curpage);
+    if ([vbktype isEqualToString:@"epub"]) {
+        loading = false;
+        ticknum=ttimeout;
+    }
 }
 
 - (void) findbook:(NSString *) str
@@ -946,6 +1041,19 @@ IOReturn iosuccess;
     [self foundjason];
 }
 
+- (void) savepdfimg:(NSString *) str cfi:(NSString*)cfi
+{
+    //int i = [str length];
+    int i = [webdelegate indexofcfi:cfi];
+    if (i<0) return;
+    
+    NSString * s1 = [str substringFromIndex:22];
+    //NSData* data = [s1 dataUsingEncoding:NSUTF8StringEncoding];
+    NSData *data = [[NSData alloc] initWithBase64EncodedString:s1 options:0];
+    NSString * fname = [webdelegate pagefilename:i];
+    [data writeToFile:fname atomically:NO];
+    //[data writeToFile:@"/Users/aa/Documents/img1.png" atomically:NO];
+}
 
 - (void)foundjason
 {
@@ -972,12 +1080,43 @@ IOReturn iosuccess;
     [self log:@"total page %d \r",webdelegate.pagelist.count];
     //[self log:@"turn to first page, click download button, \r"];
     //[webdelegate clearurllist];
+    if ((webdelegate.ebooktype==1)) {
+        if ([self savevars:false]) { //vars
+            NSString * s = [vars objectForKey:@"download"];
+            int n = [s intValue];
+            if (n<[webdelegate.pagelist count]) {
+                [started setStringValue:s];
+                [self log:@"downloaded pages %@ \r",s];
+                [ended setStringValue:[NSString stringWithFormat:@"%d",n+c_captcha]];
+            }
+        } else { //new
+            [ended setStringValue:[NSString stringWithFormat:@"%d",1+c_captcha]];
+        }
+    }
     if (false) {
         if ([webdelegate saveurllist:false]){ //loadurllist, resume mode
             [self log:@"Book have downloaded %d pages",webdelegate.pagelist.count];
             //NSLog(@"PDF resume");
         } else
             [self log:@"turn to first page, click download button, \r"];
+    }
+}
+
+- (BOOL) savevars:(BOOL)b
+{
+    NSString * fname = [datadir stringByAppendingPathComponent:webdelegate.ebookid];
+    fname = [fname stringByAppendingPathComponent:@"urllist.dat"];
+    if (b) { //save
+        [vars writeToFile:fname atomically:YES];
+        return true;
+    } else { //load
+        if ([webdelegate fileexist:fname]) {
+            
+            vars  = [NSMutableDictionary dictionaryWithContentsOfFile:fname];
+            if([[vars allKeys] containsObject:@"download"])
+                return true;
+        }
+        return false;
     }
 }
 
@@ -1054,12 +1193,28 @@ IOReturn iosuccess;
                        NSMakeRange(r1.location+1,[msg length]-r1.location-1)];
     //NSLog(item);
     //NSLog(data);
+    //([aMessage rangeOfString:@"title"].location!= NSNotFound)
+    //NSLog(@"message %@ %d",item, pageindex);
+#ifdef DEBUG
     NSLog(@"message %@ %d",item, pageindex);
+#endif
     if ([item isEqualToString:@"#currentpage"]) {
         [self currentpage:data];
     }
     else if ([item isEqualToString:@"#book"]) {
         [self findbook:data];
+    }
+    else if ([item rangeOfString:@"#img"].location!=NSNotFound) {
+        NSString * cfi =  [item stringByReplacingOccurrencesOfString:@"#img" withString:@""];
+        //NSLog(@"img  %@ %@",item,cfi);
+        [self savepdfimg:data cfi:cfi];
+    }
+    else if ([item rangeOfString:@"#nextimg"].location!=NSNotFound) {
+        NSString * cfi =  [item stringByReplacingOccurrencesOfString:@"#nextimg" withString:@""];
+        //NSLog(@"img  %@ %@",item,cfi);
+        [self savepdfimg:data cfi:cfi];
+        loading = false;
+        ticknum=ttimeout;
     }
     else if ([item isEqualToString:@"#height"]) {
         CGFloat height = [data floatValue];
@@ -1169,7 +1324,7 @@ IOReturn iosuccess;
         NSString * astr = [aMessage stringByReplacingOccurrencesOfString:@"###" withString:@""];
         //[self log:astr];
         NSArray * list = [astr componentsSeparatedByString:@"="];
-        [vars setValue:[list objectAtIndex:1] forKey:[list objectAtIndex:0]];
+        //[vars setValue:[list objectAtIndex:1] forKey:[list objectAtIndex:0]];
         if ([aMessage rangeOfString:@"title"].location!= NSNotFound)
         {
             [webdelegate savetitle:[list objectAtIndex:1]];
@@ -1338,152 +1493,6 @@ IOReturn iosuccess;
     return 1;
 }
 #pragma mark - PDF ebook handle
-- (void) pdftaskhandle:(NSTimer*)theTimer
-{
-    if (!working) return;
-    
-    switch (taskindex) {
-        case 0:
-            //taskindex = [self totalbuttonjs];
-            //totalpage= [vars[@"Totalpages"] intValue];
-            totalpage = [webdelegate.pagelist count];
-#ifdef DEBUG
-            //totalpage = 8;//[webdelegate.pagelist count];
-#endif
-            [self log:@"PDF total pages = %d",totalpage];
-            if (![reg isreg]) {
-                totalpage = 6;
-                if (totalpage>[webdelegate.pagelist count])
-                    totalpage =[webdelegate.pagelist count];
-                [self log:@"demo version only download %d pages",totalpage];
-                
-            }
-            taskindex = 10;
-            break;
-        case 10:
-            // Item 3
-            webdelegate.ticked =false;
-            if (pageindex<totalpage) {
-                [self log:@"download page %d",pageindex+1];
-                //[self pagebuttonjs:pageindex]; ////goback page button click
-                [self nextpage:pageindex];
-                //[self nextbuttonjs];
-                framewaiting = true;
-                ticknum = 0;
-                framenum = 0;
-                taskindex = 11;
-            }
-            break;
-            
-        case 11:
-            // Item 3
-            ticknum +=1;
-            if (ticknum>ttimeout) {
-                taskindex = 10;
-                pageindex+=1;
-            }
-            if (pageindex==totalpage) {
-                taskindex = 20; //goback page button click
-            }
-            break;
-        case 12:
-            // do nothing ...
-            break;
-            
-        case 111:
-            // Item 3
-            if( !framewaiting ){
-                pageindex += 1;
-                taskindex = 10; //goback page button click
-            }
-            if (pageindex==totalpage) {
-                taskindex = 20; //goback page button click
-            }
-            break;
-        case 20:
-            // Item 3
-            [self log:@"building pdf file ...."];
-            bool b = [webdelegate Buildpdf:nil];
-            [self setWorking:false];
-            [self openoutputfile];
-            [[NSWorkspace sharedWorkspace] openFile:ebookdir withApplication:@"Finder"];
-            
-            break;
-        default:
-            break;
-    }
-    
-}
-
-- (void) pdftaskhandle_js:(NSTimer*)theTimer
-{
-    if (!working) return;
-    
-    switch (taskindex) {
-        case 0:
-            webdelegate.ticked =false;
-            int n = pageindex % 10;
-            if (n==8) {
-                CGPoint p1 = CGPointMake(mousepoint.x+arc4random_uniform(10), mousepoint.y+arc4random_uniform(10));
-                //CGWarpMouseCursorPosition(p1);
-                [self movemouse:p1];
-            }
-            if (pageindex == 0) {
-                [epubcontent reload];
-            } else {
-                taskindex = [self nextbuttonjs];
-                [self log:@"load page %d",pageindex+1];
-            }
-            taskindex = 11;
-            //totalpage= [vars[@"Totalpages"] intValue];
-            break;
-        case 1:
-            // check totalpages
-            if ([self checkdictkey:@"Totalpages"] == 1) {
-                totalpage= [vars[@"Totalpages"] intValue];
-                taskindex = 10;
-            }
-            break;
-        case 10:
-            // Item 3
-            webdelegate.ticked =false;
-            if (pageindex<totalpage) {
-                [self log:@"load page %d",pageindex+1];
-                [self pagebuttonjs:pageindex]; ////goback page button click
-                taskindex = 11;
-            }
-            break;
-        case 11:
-            // Item 3
-            if( webdelegate.ticked ){
-                pageindex += 1;
-                taskindex = 0; //goback page button click
-                if (webdelegate.tick>ttimeout) {
-                    [self checknextbutton];
-                    if ([self checkdictkey:@"nextvisible"] != 1) {
-                        taskindex = 20;
-                    }
-                }
-            }
-            if (pageindex>9999) {
-                taskindex = 20; //goback page button click
-            }
-            break;
-        case 20:
-            // Item 3
-            [self log:@"building pdf file ...."];
-            bool b = [webdelegate Buildpdf:nil];
-            [self setWorking:false];
-            [self openoutputfile];
-            [[NSWorkspace sharedWorkspace] openFile:ebookdir withApplication:@"Finder"];
-            
-            break;
-        default:
-            break;
-    }
-
-}
-
 
 - (int) nextbuttonjs
 {
@@ -2195,13 +2204,17 @@ IOReturn iosuccess;
 
 -(NSString *)rightkeyjs
 {
+    NSString* rstr=[self runjs2:js_nextpage];
+    //NSLog(@"%@",rstr);
+    return rstr;
     //NSString * str = @"document.body.focus; \
     document.body.dispatchEvent(new KeyboardEvent('keypress',{'keyCode':39}));";
-    NSString * str = @" var node = document.querySelector('#jigsaw-placeholder-inner > div.horizontal-button-wrapper.next-wrapper > button'); \
-        if (node) { node.click(); node.className; } \
-        node=  document.querySelector('#jigsaw-placeholder-inner > div.vertical-button-wrapper.next-wrapper > button'); \
-        if (node) { node.click(); node.className;}";
-    NSString* rstr=[self runjs2:str];
+    
+//    NSString * str = @" var node = document.querySelector('#jigsaw-placeholder-inner > div.horizontal-button-wrapper.next-wrapper > button'); \
+//        if (node) { node.click(); node.className; } \
+//        node=  document.querySelector('#jigsaw-placeholder-inner > div.vertical-button-wrapper.next-wrapper > button'); \
+//        if (node) { node.click(); node.className;}";
+//   rstr=[self runjs2:str];
     //NSLog(@"%@",rstr);
     return rstr;
 }
