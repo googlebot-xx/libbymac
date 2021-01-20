@@ -40,24 +40,29 @@ function cleanRules()
 
           } else {
               // css in css
+			  //pas books print css
+			  //if (sheet.href.indexof("/books/")!==-1)  continue;
               var b = false;
               for (var x = ss[i].cssRules.length-1; x >=0; --x) {
                   rule = ss[i].cssRules[x];
                     if ((rule.type == 4) && (rule.media.mediaText.indexOf("print")!==-1)) // CSSMediaRule
                     {
-                        //if ((rule.cssText.indexOf("body >")!== -1)) {
+                        if (rule.cssText.indexOf("body >")!== -1) {
                         //if (rule.media.mediaText=="print") {
                                 //console.log(rule);
                                 ss[i].deleteRule(x);
                             
-                        //}
+                        } else {
+							//rule.selectorText = "aaaa";
+							console.log(rule.cssText);
+                        }
                         //b=true;
                         //console.log(rule);
-                    }
-                }
-          }
+                  } //if
+             } //for
           //console.log('sheet '+sheet.href);
-      }
+      } //else
+   } //for
 }
 
 function getpdfpage(cfi) {
@@ -90,10 +95,7 @@ function bookinfo() {
     if (typeof navigator !== "object")
         return;
 
-    if (document.body.scrollHeight>100) {
-        //mylog("#body="+document.body.innerHTML.length.toString());
-        mylog("#height="+document.body.scrollHeight.toString());
-    }
+
     
     var vst = window.VST;
     working = window.navigator.userAgent.indexOf("15_6")!==-1;
@@ -103,12 +105,16 @@ function bookinfo() {
     currentpage = {}
     
     if (iframe.id.indexOf("epub-content") !== -1) {
+	    if (document.body.scrollHeight>100) {
+	        //mylog("#body="+document.body.innerHTML.length.toString());
+	        mylog("#height="+document.body.scrollHeight.toString());
+	    }
         var page = vst.currentPageData;
         //if (typeof window.VST.currentPageData =="object") {
         if (typeof page =="object") {
             //currentpage.cfi = window.VST.currentPageData.cfiwithoutAssertions;
             //console.log(vst.currentPageData);
-            currentpage.cfi = page.cfi; //cfiwithoutAssertions;
+            currentpage.cfi = page.cfiwithoutAssertions;
             currentpage.page = page.cfi;
             currentpage.vbktype = vbktype;
             currentpage.scrollHeight = page.scrollHeight;
@@ -184,7 +190,7 @@ function onload () {
     //if (url.indexOf("/books/") !== -1) {
 //    if ((iframe !== null) && (iframe.id.indexOf("epub-content") !== -1)) {
     if ((iframe !== null) && (url.indexOf("/books/") !== -1)) {
-        console.log("iframeonload ",iframe.id,url);
+        //console.log("iframeonload ",iframe.id,url);
         bookinfo();
     }
     else if (url.indexOf("recaptcha") !== -1) {

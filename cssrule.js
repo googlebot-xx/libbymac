@@ -28,14 +28,14 @@ function hidediv(estr) {
 	var banner=document.querySelector(estr);
 	if (!banner) return;
 	banner.style.display = 'none';
-    banner.style.height=1;
 }
 
 function hidediv2(estr) {
     var banner=document.querySelector(estr);
     if (!banner) return;
     banner.style.display = 'none';
-    banner.style.bottom = "-44px";
+    //banner.style.bottom = "-44px";
+    banner.style.height=1;
     //banner.style.height=1;
 }
 
@@ -57,10 +57,10 @@ function changediv()
 {
     hidediv("#jigsaw-placeholder-inner > div.vertical-button-wrapper.previous-wrapper");
     hidediv("#jigsaw-placeholder-inner > div.vertical-button-wrapper.next-wrapper");
-    //hidediv2("#reader-handler > div.cookie-banner");
+    hidediv2("#reader-handler > div.cookie-banner");
     hidediv2("#scrubber-container");
-    //hidediv("#jigsaw-placeholder-inner > div.horizontal-button-wrapper.next-wrapper");
-    //hidediv("#jigsaw-placeholder-inner > div.horizontal-button-wrapper.previous-wrapper");
+    hidediv("#jigsaw-placeholder-inner > div.horizontal-button-wrapper.next-wrapper");
+    hidediv("#jigsaw-placeholder-inner > div.horizontal-button-wrapper.previous-wrapper");
     //hidediv("");
     //cleanRules(document,"print");
     //console.log("done cssrule");

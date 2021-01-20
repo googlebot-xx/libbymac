@@ -358,9 +358,12 @@ fromDataSource:(WebDataSource *)dataSource
 
 - (int) indexofcfi:(NSString *)cfi
 {
+    cfi =  [cfi stringByReplacingOccurrencesOfString:@"!" withString:@""];
+
     for (int i=0; i<[pagelist count]; i++) {
         NSDictionary *obj = [pagelist objectAtIndex:i];
         if ([cfi isEqualToString:[obj objectForKey:@"cfiWithoutAssertions"]])
+//        if ([cfi rangeOfString:[obj objectForKey:@"cfiWithoutAssertions"]].location!=NSNotFound)
             return i;
     }
     
@@ -947,7 +950,8 @@ fromDataSource:(WebDataSource *)dataSource
 - (void)Buildpdf
 {
     //[_mainwin log:@"building pdf ...."];
-
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow: 0.1]];
+    
     _mainwin.outputfile = nil;
 //    NSString * dir = [_mainwin.datadir stringByAppendingPathComponent:ebookid];
 
@@ -967,7 +971,6 @@ fromDataSource:(WebDataSource *)dataSource
 
     NSString * missing = @"";
     for (int i=0; i<num; i++) {
-
         NSString * path = [self pagefilename:i];
         if(![self fileexist:path]){
             //[self log:@"page pdf not found %@",htmlpdf];

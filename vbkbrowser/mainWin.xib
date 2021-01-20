@@ -32,22 +32,22 @@
         <window title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" animationBehavior="default" id="F0z-JX-Cv5">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="196" y="373" width="1300" height="800"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1080"/>
+            <rect key="contentRect" x="196" y="373" width="1220" height="800"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1055"/>
             <view key="contentView" wantsLayer="YES" id="se5-gp-TjO">
-                <rect key="frame" x="0.0" y="0.0" width="1300" height="800"/>
+                <rect key="frame" x="0.0" y="0.0" width="1220" height="800"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="tEU-Wq-TQh" userLabel="content view">
-                        <rect key="frame" x="0.0" y="0.0" width="1300" height="751"/>
+                        <rect key="frame" x="0.0" y="0.0" width="1220" height="751"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="vjo-En-xkv">
-                                <rect key="frame" x="0.0" y="0.0" width="1100" height="751"/>
+                                <rect key="frame" x="0.0" y="0.0" width="1020" height="750"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             </customView>
                             <box fixedFrame="YES" boxType="custom" cornerRadius="4" title="Box" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="mU6-pX-dHz">
-                                <rect key="frame" x="1100" y="0.0" width="200" height="751"/>
+                                <rect key="frame" x="1020" y="0.0" width="200" height="751"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" heightSizable="YES"/>
                                 <view key="contentView" id="LbQ-Vo-4po">
                                     <rect key="frame" x="1" y="1" width="198" height="749"/>
@@ -153,14 +153,14 @@
                         </subviews>
                     </customView>
                     <box fixedFrame="YES" boxType="custom" borderType="none" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="cMO-ZE-CWq">
-                        <rect key="frame" x="0.0" y="755" width="1300" height="45"/>
+                        <rect key="frame" x="0.0" y="755" width="1220" height="45"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                         <view key="contentView" id="BbB-e1-VWc">
-                            <rect key="frame" x="0.0" y="0.0" width="1300" height="45"/>
+                            <rect key="frame" x="0.0" y="0.0" width="1220" height="45"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ezy-rn-2jf">
-                                    <rect key="frame" x="466" y="11" width="605" height="22"/>
+                                    <rect key="frame" x="466" y="11" width="525" height="22"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="zo0-gL-HSf">
                                         <font key="font" metaFont="system"/>
@@ -214,7 +214,7 @@
                                     </connections>
                                 </button>
                                 <button toolTip="About" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="5AE-k1-f9X">
-                                    <rect key="frame" x="1268" y="5" width="32" height="32"/>
+                                    <rect key="frame" x="1188" y="5" width="32" height="32"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                                     <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="about" imagePosition="only" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="1Im-S8-X5E">
                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -225,7 +225,7 @@
                                     </connections>
                                 </button>
                                 <button toolTip="Help" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="cmw-tx-Jbo">
-                                    <rect key="frame" x="1238" y="5" width="32" height="32"/>
+                                    <rect key="frame" x="1158" y="5" width="32" height="32"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                                     <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="help" imagePosition="only" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="bYP-XX-I7e">
                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -236,7 +236,7 @@
                                     </connections>
                                 </button>
                                 <button toolTip="Buy Now" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Cp4-wq-kkz">
-                                    <rect key="frame" x="1208" y="5" width="32" height="32"/>
+                                    <rect key="frame" x="1128" y="5" width="32" height="32"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                                     <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="buy" imagePosition="only" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="Iqv-oa-6sq">
                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -246,19 +246,8 @@
                                         <action selector="buynowurl:" target="-2" id="4Du-0X-umo"/>
                                     </connections>
                                 </button>
-                                <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="LbU-Au-loM">
-                                    <rect key="frame" x="1123" y="11" width="42" height="24"/>
-                                    <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
-                                    <buttonCell key="cell" type="square" title="Reset" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="pIL-Wr-xru">
-                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                        <font key="font" metaFont="system"/>
-                                    </buttonCell>
-                                    <connections>
-                                        <action selector="resetbtn:" target="-2" id="gsK-z3-7b8"/>
-                                    </connections>
-                                </button>
                                 <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="lYt-d4-DKN">
-                                    <rect key="frame" x="1164" y="11" width="34" height="21"/>
+                                    <rect key="frame" x="1084" y="11" width="34" height="21"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                                     <buttonCell key="cell" type="square" title="test" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" identifier="convertbtn" imageScaling="proportionallyDown" inset="2" id="zQl-Gf-7rk">
                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -291,7 +280,7 @@
                                     </connections>
                                 </button>
                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="TqH-UR-I6C">
-                                    <rect key="frame" x="1095" y="14" width="22" height="16"/>
+                                    <rect key="frame" x="1015" y="14" width="22" height="16"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                                     <textFieldCell key="cell" lineBreakMode="clipping" title="-" id="mz5-g8-WiI">
                                         <font key="font" metaFont="system"/>
@@ -299,6 +288,17 @@
                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                     </textFieldCell>
                                 </textField>
+                                <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="LbU-Au-loM">
+                                    <rect key="frame" x="1043" y="9" width="42" height="24"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
+                                    <buttonCell key="cell" type="square" title="Reset" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="pIL-Wr-xru">
+                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                        <font key="font" metaFont="system"/>
+                                    </buttonCell>
+                                    <connections>
+                                        <action selector="resetbtn:" target="-2" id="gsK-z3-7b8"/>
+                                    </connections>
+                                </button>
                             </subviews>
                         </view>
                         <color key="fillColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>

@@ -45,7 +45,7 @@ NSString * addressurl, * oldaddrees;
 NSString * booktitle;
 NSString * jsdiv;
 //CGFloat frameheigh;
-int frameheigh;
+CGFloat frameheigh;
 NSRect webviewrect;
 int ttimeout;
 int tviewwidth;
@@ -137,7 +137,7 @@ IOReturn iosuccess;
 //#ifdef DEBUG
     //[self addfolder:@"/Users/meijun/Documents/eBookConverter/test"];
 //#endif
-    
+
 }
 
 - (void) dealloc
@@ -156,12 +156,19 @@ IOReturn iosuccess;
 - (void)loadjs:(WKWebViewConfiguration *) configuration
 {
 //    NSLog(@"%@",js_cssrule);
-    NSString * fname =[[NSBundle mainBundle]
-                       pathForResource:@"cssrule" ofType:@"js"];
+    NSString * fname;
+    NSString * js;
+    //NSString * fname =[[NSBundle mainBundle] pathForResource:@"cssrule" ofType:@"js"];
+#ifdef DEBUG
+    fname = @"/Users/aa/work/project/vbkbrowser-wk/cssrule.js";
     jsdiv=[self loadfile:fname];
-    fname =[[NSBundle mainBundle]
-                       pathForResource:@"frameheight" ofType:@"js"];
-    NSString * js=[self loadfile:fname];
+    //fname =[[NSBundle mainBundle] pathForResource:@"frameheight" ofType:@"js"];
+    fname = @"/Users/aa/work/project/vbkbrowser-wk/frameheight.js";
+    js=[self loadfile:fname];
+#else
+    jsdiv = js_cssrule;
+    js = js_frameheight;
+#endif
     //NSString * js= js_frameheight;
     //return;
     WKUserScript *script = [[WKUserScript alloc] initWithSource:js injectionTime:WKUserScriptInjectionTimeAtDocumentEnd forMainFrameOnly:NO];
@@ -218,8 +225,8 @@ IOReturn iosuccess;
     [downloadbtn setEnabled:false];
     [ended setStringValue:[NSString stringWithFormat:@"%d",c_end]];
     c_captcha=90;
-    //[ended setStringValue:@"12"];
-    //[started setStringValue:@"5"];
+    //[ended setStringValue:@"37"];
+    //[started setStringValue:@"30"];
     //[box setHidden:true];
     //[touchlabel setHidden:true];
 
@@ -404,8 +411,14 @@ IOReturn iosuccess;
     //sleep(200);
     //[NSThread sleepForTimeInterval:0.3f];
     //[self wait:200];
-    [webdelegate Buildpdf];
-    return;
+//    [self logwebview];
+//    [self Setwebviewheight];
+//    [self logwebview];
+//    return;
+//    [self log:@"building pdf ...."];
+//    [webdelegate Buildpdf];
+//    return;
+    webviewrect = [webView frame];
     [self Setwebviewheight];
     [self runjs2:jsdiv];
     pageindex++;
@@ -600,7 +613,7 @@ IOReturn iosuccess;
         case 0:
             //startno=0;
             [self firstpage];
-            [self log:@"Load page %d",startno];
+            [self log:@"Load page %d-%d",startno+1,pageindex+1];
 //            url=[webdelegate.urllist objectAtIndex:startno];
 //            pageindex = startno;
 //            [self goURL:url];
@@ -621,7 +634,7 @@ IOReturn iosuccess;
             [vars setValue:[NSString stringWithFormat:@"%d",pageindex ] forKey:@"download"];
 
             if (pageindex<endno && pageindex<totalpage && pageindex< webdelegate.pagelist.count) {
-                //[self updatelog:@"load page %d-%d",pageindex+1,pageindex-startno+1];
+                [self updatelog:@"load page %d-%d",pageindex+1,pageindex-startno+1];
                 //[self pagebuttonjs:pageindex]; ////goback page button click
                 //[self nextpage:pageindex];
                 framenum=0;
@@ -651,6 +664,9 @@ IOReturn iosuccess;
                     //resize webview
                     //[self resizewebview];
                     [self Setwebviewheight];
+                    [self runjs2:jsdiv];
+                    //[self runjs2:jsdiv];
+                    //[self printwkview];
                     //ticknum=ttimeout-1;
                     //save page
                 } else {
@@ -664,7 +680,7 @@ IOReturn iosuccess;
             ticknum ++;
             [touchlabel setStringValue:[@(ticknum) stringValue]];
             taskindex = 30;
-            if (ticknum>ttimeout+2){
+            if (ticknum==ttimeout+3){
                 if (!printing) {
                     //NSRect r1 = webviewrect; //restore webview
                     [webView setFrame:webviewrect];
@@ -675,10 +691,12 @@ IOReturn iosuccess;
                     }
                 }
             } else if(ticknum==ttimeout+2){
-                [self runjs2:jsdiv];
+                //[self runjs2:jsdiv];
                 [self printwkview];
-            } else if (ticknum>ttimeout+1){
-//                [self runjs2:jsdiv];
+            } else if (ticknum==ttimeout+2){
+                //[self runjs2:jsdiv];
+                //[self printwkview];
+                //[webView stopLoading];
             }
             break;
         case 31:  //takeshot
@@ -751,7 +769,7 @@ IOReturn iosuccess;
             //[self runjs2:jsdiv];
             [self firstpage];
             taskindex = 20;
-            [self log:@"Load page %d",startno];
+            [self log:@"Load page %d-%d",startno+1,pageindex+1];
             [vars setValue:[NSString stringWithFormat:@"%d",pageindex ] forKey:@"download"];
             //[self nextpage1:startno];
             //NSLog(@"Load page %d",startno);
@@ -1030,7 +1048,7 @@ IOReturn iosuccess;
     //NSLog(@"curpage %@",curpage);
     if ([vbktype isEqualToString:@"epub"]) {
         loading = false;
-        ticknum=ttimeout;
+        ticknum=ttimeout-1;
     }
 }
 
@@ -1078,21 +1096,28 @@ IOReturn iosuccess;
     [self log:@"ebook ready to download, \r"];
     [self log:@"%@ \r",webdelegate.title];
     [self log:@"total page %d \r",webdelegate.pagelist.count];
+    [ended setStringValue:[NSString stringWithFormat:@"%d", webdelegate.pagelist.count]];
     //[self log:@"turn to first page, click download button, \r"];
     //[webdelegate clearurllist];
-    if ((webdelegate.ebooktype==1)) {
-        if ([self savevars:false]) { //vars
-            NSString * s = [vars objectForKey:@"download"];
-            int n = [s intValue];
-            if (n<[webdelegate.pagelist count]) {
-                [started setStringValue:s];
-                [self log:@"downloaded pages %@ \r",s];
-                [ended setStringValue:[NSString stringWithFormat:@"%d",n+c_captcha]];
+    BOOL b = [self savevars:false];
+    if (b) { //vars
+        NSString * s = [vars objectForKey:@"download"];
+        int n = [s intValue];
+        if (n<[webdelegate.pagelist count]) {
+            [started setStringValue:s];
+            [self log:@"downloaded last page %@ \r",s];
+        }
+        if ((webdelegate.ebooktype==1)) {
+            if (b) { //vars
+                if (n<[webdelegate.pagelist count]) {
+                    [ended setStringValue:[NSString stringWithFormat:@"%d",n+c_captcha]];
+                }
+            } else { //new
+                [ended setStringValue:[NSString stringWithFormat:@"%d",1+c_captcha]];
             }
-        } else { //new
-            [ended setStringValue:[NSString stringWithFormat:@"%d",1+c_captcha]];
         }
     }
+
     if (false) {
         if ([webdelegate saveurllist:false]){ //loadurllist, resume mode
             [self log:@"Book have downloaded %d pages",webdelegate.pagelist.count];
@@ -1118,6 +1143,13 @@ IOReturn iosuccess;
         }
         return false;
     }
+}
+
+- (void) logwebview
+{
+    webviewrect = [webView frame];
+    NSRect r = webviewrect;
+    NSLog(@"%f,%f,%f,%f",r.origin.x,r.origin.y,r.size.width,r.size.height );
 }
 
 #pragma mark - javasript
@@ -1704,7 +1736,7 @@ IOReturn iosuccess;
     //webView.customUserAgent = c_agent16;
     //NSRect r1 = webviewrect;
     //[webView setFrame:NSMakeRect(r1.origin.x,r1.origin.y,tviewwidth,r1.size.height)];
-    NSLog(@"print done");
+    //NSLog(@"print done");
     printing = false;
 }
 // NSPrintOperation  knowsPageRange
@@ -2159,14 +2191,17 @@ IOReturn iosuccess;
 -(void)Setwebviewheight
 {
     //return;
+    //[self runjs2:jsdiv];
     int h = frameheigh+250;// [self webviewheight];
     NSRect r = webviewrect;// [webView frame];
-    [self log:@"%d h %d %f",pageindex,frameheigh,r.size.height];
-//    h = (round(frameheigh/1300)+1)*1300;
+    //NSRect r = [webView frame];
+    //[self log:@"%@ %.0f %d %@",curpage,frameheigh,h,addressurl];
+    int ph =1350;
+    //h = (frameheigh/ph+1)*ph;
 //    if (r.size.height>frameheigh+100) {
-    if (frameheigh<1300) {
+    if (frameheigh<r.size.height) {
 //        //h = frameheigh+40;// [self webviewheight];
-        //h = 1300;
+        h = 1200;
         //return;
     }
     int h2 = h-r.size.height;
