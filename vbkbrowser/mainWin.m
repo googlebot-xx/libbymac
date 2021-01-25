@@ -1448,7 +1448,12 @@ IOReturn iosuccess;
 //#toc-container > ul > li.toc-title.title.toc-level.level-1.group > button
 - (int) nextpage:(int) page
 {
-    NSString *res = [self rightkeyjs];
+    if(ebooktype==1) {
+        NSString *res = [self rightkeyjs];
+    } else {
+        NSString * url = [webdelegate pageurl:pageindex];
+        [self goURL:url];
+    }
     return 1;
 }
 
