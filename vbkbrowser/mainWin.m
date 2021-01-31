@@ -421,8 +421,10 @@ IOReturn iosuccess;
     webviewrect = [webView frame];
     [self Setwebviewheight];
     [self runjs2:jsdiv];
-    pageindex++;
-    [self printwkview];
+    //pageindex++;
+    //[self wait:100];
+    //sleep(300);
+    //[self printwkview];
     return;
     working=false;
     //[self pagefilename];
@@ -461,13 +463,15 @@ IOReturn iosuccess;
 
 - (IBAction)resetbtn:(id)sender
 {
+    [self printwkview];
+
     //[self nextbuttonjs];
     //[webdelegate BuildPub:nil];
     //[webdelegate Buildpdf:nil];
     //return;
 #ifdef DEBUG
     //[self loginjs:sender];
-    [regcontroller savekey:@"" skey:@"" suser:@"aa"];
+    //[regcontroller savekey:@"" skey:@"" suser:@"aa"];
 //    [reg savetimes:0];
 #endif
 }
@@ -1045,7 +1049,7 @@ IOReturn iosuccess;
     //frameheigh = [[obj objectForKey:@"scrollHeight"] intValue] ;
     curpage = [obj objectForKey:@"cfi"];
     NSString * vbktype = [obj objectForKey:@"vbktype"];
-    //NSLog(@"curpage %@",curpage);
+    NSLog(@"curpage %@",curpage);
     if ([vbktype isEqualToString:@"epub"]) {
         loading = false;
         ticknum=ttimeout-1;
@@ -1228,7 +1232,7 @@ IOReturn iosuccess;
     //([aMessage rangeOfString:@"title"].location!= NSNotFound)
     //NSLog(@"message %@ %d",item, pageindex);
 #ifdef DEBUG
-    NSLog(@"message %@ %d",item, pageindex);
+    NSLog(@"message %@ %d %@",item, pageindex, data);
 #endif
     if ([item isEqualToString:@"#currentpage"]) {
         [self currentpage:data];
@@ -1291,8 +1295,8 @@ IOReturn iosuccess;
     
 #ifdef DEBUG
             js = @"console = { log: function(msg) { MyApp.consoleLog_(msg); } };\
-            document.getElementById(\"email-field\").value = \"youhdtv@gmail.com\"; \
-            document.getElementById(\"password-field\").value = \"600338qQ@\";  \
+            document.getElementById(\"email-field\").value = \"a03@pwqsoft.com\"; \
+            document.getElementById(\"password-field\").value = \"600338qQ~\";  \
             document.getElementById(\"signin-form\").submit(); \
             MyApp.consoleLog_(\"login ...\"); \
             ";
@@ -2301,6 +2305,8 @@ IOReturn iosuccess;
 }
 
 - (NSString *)runjs2:(NSString *)script {
+    
+    
     __block NSString *resultString = nil;
     __block BOOL finished = NO;
 

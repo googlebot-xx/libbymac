@@ -1,3 +1,8 @@
+function mlog(str)
+{
+	//window.wrtcread(str);
+}
+
 function findiframe(doc,framename)
 {
 	var items = doc.getElementsByTagName('iframe');

@@ -1,3 +1,9 @@
+window.wrtcread = console.log;
+
+function nlog(str)
+{
+	window.wrtcread(str);
+}
 
 function mylog(msg)
 {
@@ -24,19 +30,19 @@ function cleanRules()
       media = "print";
       for (var i = 0; i < ss.length; ++i) {
           // loop through all the rules!
-          //console.log(ss[i].cssRules.length);
+          //nlog(ss[i].cssRules.length);
           var sheet =  ss[i];
           if (!ss[i].cssRules) continue;
           if (sheet.media.mediaText.indexOf("print") !== -1) {
               // css in html
-              //console.log("sheet %s %s",i,sheet.href);
+              //nlog("sheet %s %s",i,sheet.href);
               for (var x = sheet.cssRules.length-1; x >=0; --x) {
                   rule = sheet.cssRules[x];
-                  //console.log(rule);
-                  //console.log("rule %s %s",x,sheet.href);
+                  //nlog(rule);
+                  //nlog("rule %s %s",x,sheet.href);
                   sheet.deleteRule(x);
                 }
-              //console.log("rule nums %d",sheet.cssRules.length);
+              //nlog("rule nums %d",sheet.cssRules.length);
 
           } else {
               // css in css
@@ -49,18 +55,18 @@ function cleanRules()
                     {
                         if (rule.cssText.indexOf("body >")!== -1) {
                         //if (rule.media.mediaText=="print") {
-                                //console.log(rule);
+                                nlog(rule);
                                 ss[i].deleteRule(x);
                             
                         } else {
 							//rule.selectorText = "aaaa";
-							console.log(rule.cssText);
+							//nlog(rule.cssText);
                         }
                         //b=true;
-                        //console.log(rule);
+                        //nlog(rule);
                   } //if
              } //for
-          //console.log('sheet '+sheet.href);
+          //nlog('sheet '+sheet.href);
       } //else
    } //for
 }
@@ -69,7 +75,7 @@ function getpdfpage(cfi) {
     vbktype = window.VST.currentBookData.vbkType;
     if(vbktype!=="pbk") return;
 
-    console.log("pbk book");
+    //nlog("pbk book");
     //return;
     
     var img = document.querySelector("#pbk-page");
@@ -81,7 +87,7 @@ function getpdfpage(cfi) {
     var ctx = canvas.getContext("2d");
     ctx.drawImage(img, 0, 0);
     var dataURL = canvas.toDataURL("image/png");
-    //console.log("#img="+dataURL.length);
+    //nlog("#img="+dataURL.length);
     mylog(cfi+"="+dataURL);
     //var dataURL = canvas.toDataURL('image/jpeg', 1);
     //return dataURL;//.replace(/^data:image\/(png|jpg);base64,/, "");
@@ -113,7 +119,7 @@ function bookinfo() {
         //if (typeof window.VST.currentPageData =="object") {
         if (typeof page =="object") {
             //currentpage.cfi = window.VST.currentPageData.cfiwithoutAssertions;
-            //console.log(vst.currentPageData);
+            //nlog(vst.currentPageData);
             currentpage.cfi = page.cfiwithoutAssertions;
             currentpage.page = page.cfi;
             currentpage.vbktype = vbktype;
@@ -137,8 +143,8 @@ function bookinfo() {
     if (iframe.id.indexOf("next-page") !== -1 ) {
         var page = vst.currentPageData;
         var nextpage = page.nextPage;
-        //console.log("nextpage--currentPageData");
-        //console.log(page);
+        //nlog("nextpage--currentPageData");
+        //nlog(page);
         //mylog("#next-page="+nextpage.cfi);
         getpdfpage("#nextimg"+nextpage.cfi);
     }
@@ -174,7 +180,7 @@ function bookinfo() {
 function oniframeChange() {
     var iframe = window.frameElement ;
     if (iframe.id.indexOf("epub-content") !== -1)
-        console.log('frameElement', lastid);
+        nlog('frameElement', lastid);
 }
 
 function onload () {
@@ -198,10 +204,9 @@ function onload () {
                 //mylog("#recaptcha="+document.documentElement.clientWidth.toString());
              mylog("recaptcha");
     }
-
     //onPrint(() => console.log('printing!'));
     //onPrint(cleanRules);
-    cleanRules();
+    //cleanRules();
 
 }
 
@@ -211,6 +216,7 @@ function onPrint(callback) {
 }
 
 window.addEventListener('load', (event) => {
-        setTimeout(onload, 500);
+   	    setTimeout(cleanRules, 500);
+        setTimeout(onload, 800);
 });
 
