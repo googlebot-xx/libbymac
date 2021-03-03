@@ -55,7 +55,7 @@ function cleanRules()
                     {
                         if (rule.cssText.indexOf("body >")!== -1) {
                         //if (rule.media.mediaText=="print") {
-                                nlog(rule);
+                                //nlog(rule);
                                 ss[i].deleteRule(x);
                             
                         } else {
@@ -115,8 +115,27 @@ function bookinfo() {
 	        //mylog("#body="+document.body.innerHTML.length.toString());
 	        mylog("#height="+document.body.scrollHeight.toString());
 	    }
-        var page = vst.currentPageData;
         //if (typeof window.VST.currentPageData =="object") {
+
+        if(!working){ //book meta
+            if (typeof window.VST.currentBookData =="object") {
+                vsbook.isbn = window.VST.currentBookData.isbn;
+                vsbook.vbkType = window.VST.currentBookData.vbkType;
+                vsbook.title = window.VST.currentBookData.title;
+                //vsbook.pageList = window.VST.Book.pageBreakList;
+                vsbook.pageList = [];// window.VST.Book.pageBreakList;
+                a = window.VST.Book.pages;
+                a.forEach(function(obj) {
+                    var pobj = {};
+                    pobj.cfiWithoutAssertions = obj.getCFIWithoutAssertions();
+                    pobj.path = obj.getPath();
+                    vsbook.pageList[vsbook.pageList.length] = pobj;
+                    //console.log(obj);
+                });                    
+                mylog("#book="+JSON.stringify(vsbook));
+            }
+        }
+        var page = vst.currentPageData;
         if (typeof page =="object") {
             //currentpage.cfi = window.VST.currentPageData.cfiwithoutAssertions;
             //nlog(vst.currentPageData);
@@ -125,15 +144,6 @@ function bookinfo() {
             currentpage.vbktype = vbktype;
             currentpage.scrollHeight = page.scrollHeight;
             mylog("#currentpage="+JSON.stringify(currentpage));
-        }
-        if(!working){ //book meta
-                if (typeof window.VST.currentBookData =="object") {
-                    vsbook.isbn = window.VST.currentBookData.isbn;
-                    vsbook.vbkType = window.VST.currentBookData.vbkType;
-                    vsbook.title = window.VST.currentBookData.title;
-                    vsbook.pageList = window.VST.Book.pageBreakList;
-                    mylog("#book="+JSON.stringify(vsbook));
-                }
         }
         if (vbktype=="pbk") {
             getpdfpage("#img"+page.cfi);
@@ -217,6 +227,6 @@ function onPrint(callback) {
 
 window.addEventListener('load', (event) => {
    	    setTimeout(cleanRules, 500);
-        setTimeout(onload, 800);
+        setTimeout(onload, 1000);
 });
 

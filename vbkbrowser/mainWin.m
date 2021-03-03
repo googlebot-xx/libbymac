@@ -617,7 +617,7 @@ IOReturn iosuccess;
         case 0:
             //startno=0;
             [self firstpage];
-            [self log:@"Load page %d-%d",startno+1,pageindex+1];
+            [self log:@"Load chapter %d-%d",startno+1,pageindex+1];
 //            url=[webdelegate.urllist objectAtIndex:startno];
 //            pageindex = startno;
 //            [self goURL:url];
@@ -638,7 +638,7 @@ IOReturn iosuccess;
             [vars setValue:[NSString stringWithFormat:@"%d",pageindex ] forKey:@"download"];
 
             if (pageindex<endno && pageindex<totalpage && pageindex< webdelegate.pagelist.count) {
-                [self updatelog:@"load page %d-%d",pageindex+1,pageindex-startno+1];
+                [self updatelog:@"load chapter %d-%d",pageindex+1,pageindex-startno+1];
                 //[self pagebuttonjs:pageindex]; ////goback page button click
                 //[self nextpage:pageindex];
                 framenum=0;
@@ -684,7 +684,7 @@ IOReturn iosuccess;
             ticknum ++;
             [touchlabel setStringValue:[@(ticknum) stringValue]];
             taskindex = 30;
-            if (ticknum==ttimeout+3){
+            if (ticknum>=ttimeout+3){
                 if (!printing) {
                     //NSRect r1 = webviewrect; //restore webview
                     [webView setFrame:webviewrect];
@@ -1031,6 +1031,7 @@ IOReturn iosuccess;
 -(void) firstpage
 {
     int i = [webdelegate indexofcfi:curpage];
+//    i = pageindex;
 //    NSDictionary * obj = [webdelegate.pagelist objectAtIndex:pageindex] ;
 //    NSString * url = [webdelegate pageurl:pageindex];
 //    NSString * cfi = [obj objectForKey:@"cfi"];
@@ -1049,7 +1050,7 @@ IOReturn iosuccess;
     //frameheigh = [[obj objectForKey:@"scrollHeight"] intValue] ;
     curpage = [obj objectForKey:@"cfi"];
     NSString * vbktype = [obj objectForKey:@"vbktype"];
-    NSLog(@"curpage %@",curpage);
+    //NSLog(@"curpage %@",curpage);
     if ([vbktype isEqualToString:@"epub"]) {
         loading = false;
         ticknum=ttimeout-1;
@@ -1099,7 +1100,10 @@ IOReturn iosuccess;
     //[self log:@"ebook ready to download, click download button, \r%@",webdelegate.title];
     [self log:@"ebook ready to download, \r"];
     [self log:@"%@ \r",webdelegate.title];
-    [self log:@"total page %d \r",webdelegate.pagelist.count];
+    if ([webdelegate ebooktype]==0)
+        [self log:@"total chapter %d \r",webdelegate.pagelist.count];
+    else
+        [self log:@"total page %d \r",webdelegate.pagelist.count];
     [ended setStringValue:[NSString stringWithFormat:@"%d", webdelegate.pagelist.count]];
     //[self log:@"turn to first page, click download button, \r"];
     //[webdelegate clearurllist];
@@ -1295,8 +1299,8 @@ IOReturn iosuccess;
     
 #ifdef DEBUG
             js = @"console = { log: function(msg) { MyApp.consoleLog_(msg); } };\
-            document.getElementById(\"email-field\").value = \"a03@pwqsoft.com\"; \
-            document.getElementById(\"password-field\").value = \"600338qQ~\";  \
+            document.getElementById(\"email-field\").value = \"matt.erlandsen@gmail.com\"; \
+            document.getElementById(\"password-field\").value = \"iPhone.05121987\";  \
             document.getElementById(\"signin-form\").submit(); \
             MyApp.consoleLog_(\"login ...\"); \
             ";
