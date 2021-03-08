@@ -13,6 +13,7 @@
 {
     NSMutableArray * urllist;
     NSMutableArray * titlelist;
+    NSMutableArray * cfilist;
     NSTimer *timer;
     int tick;
     
@@ -32,6 +33,7 @@
 - (NSString *) nextpage: (int)page;
 - (bool) BuildPub:(NSString *) afile;
 - (void) Buildpdf;
+- (void)Buildpdfpdf;
 - (void)joinPDF;
 - (BOOL) createfolder: (NSString*) folder;
 - (NSString *) cleanfilename: (NSString *) str;
@@ -43,6 +45,7 @@
 - (NSString *) pagefilename:(int) i;
 - (NSString *) pageurl:(int) i;
 - (int) indexofcfi:(NSString *)cfi;
+- (NSString *) cleancfi: (NSString *) url;
 
 
 

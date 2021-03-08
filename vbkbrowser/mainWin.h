@@ -15,6 +15,7 @@
 @class BuyController;
 @class AboutController;
 @class RegController;
+@class HtmlPdfConverter;
 
 @interface mainWin : NSWindowController 
 {
@@ -44,6 +45,7 @@
 - (void)foundjason;
 //- (void)log:(NSString*)msg;
 - (void) log:(NSString *)formatString, ...;
+- (void) updatelog:(NSString *)formatString, ...;
 - (NSString *)pagefilename:(NSString *)aurl;
 -(NSString *)strFrom:(NSString *)str from:(NSString *)from to:(NSString *)to;
 
@@ -57,5 +59,5 @@ extern NSString* ebookdir00;
 extern NSString* js_cssrule;
 extern NSString* js_frameheight;
 extern NSString* js_nextpage;
-
+extern HtmlPdfConverter * pdfconverter;
 //extern RegController * regcontroller;

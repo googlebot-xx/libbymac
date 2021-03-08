@@ -16,7 +16,9 @@
 #import "BuyController.h"
 #import "AboutController.h"
 #import "RegController.h"
+#import "HtmlPdfConverter.h"
 #include <IOKit/pwr_mgt/IOPMLib.h>
+#import <CommonCrypto/CommonCryptor.h>
 
 #define c_agent16 @"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.1 Safari/605.1.15"
 #define c_agent15 @"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.1 Safari/605.1.15"
@@ -40,6 +42,7 @@ static void* keyValueObservingContext = &keyValueObservingContext;
 mainWin * _mainwin;
 BuyController *reg;
 AboutController * aboutcontroller;
+HtmlPdfConverter * pdfconverter;
 NSString* ebookdir00;
 NSString * addressurl, * oldaddrees;
 NSString * booktitle;
@@ -116,6 +119,7 @@ IOReturn iosuccess;
         _mainwin = self;
         vars = [[NSMutableDictionary alloc] init];
         configuration = [[WKWebViewConfiguration alloc] init];
+        pdfconverter = [[HtmlPdfConverter alloc] initWithData];
     }
     
     return self;
@@ -156,18 +160,21 @@ IOReturn iosuccess;
 - (void)loadjs:(WKWebViewConfiguration *) configuration
 {
 //    NSLog(@"%@",js_cssrule);
-    NSString * fname;
+    NSString * fname =[[NSBundle mainBundle] pathForResource:@"page" ofType:@"dat"];
     NSString * js;
+    js=[self decryptfile:@"123456781234567812345678" infile:fname];
+    //NSLog(@"%@",js);
     //NSString * fname =[[NSBundle mainBundle] pathForResource:@"cssrule" ofType:@"js"];
 #ifdef DEBUG
-    fname = @"/Users/aa/work/project/vbkbrowser-wk/cssrule.js";
+    fname = @"/Users/aa/work/project/vbkbrowser-wk copy/cssrule.js";
     jsdiv=[self loadfile:fname];
     //fname =[[NSBundle mainBundle] pathForResource:@"frameheight" ofType:@"js"];
-    fname = @"/Users/aa/work/project/vbkbrowser-wk/frameheight.js";
-    js=[self loadfile:fname];
+//    fname = @"/Users/aa/work/project/vbkbrowser-wk copy/frameheight.js";
+    fname = @"/Users/aa/work/project/vbkbrowser-wk copy/page.js";
+    //js=[self loadfile:fname];
 #else
     jsdiv = js_cssrule;
-    js = js_frameheight;
+    //js = js_frameheight;
 #endif
     //NSString * js= js_frameheight;
     //return;
@@ -238,10 +245,10 @@ IOReturn iosuccess;
 #ifdef DEBUG
     [testbtn setHidden:false];
     [resetbtn setHidden:false];
-    [timeouted setStringValue:@"30"];
+    [timeouted setStringValue:@"60"];
 #else
     [testbtn setHidden:true];
-    [timeouted setStringValue:@"50"];
+    [timeouted setStringValue:@"60"];
 #endif
     
 #ifdef DEBUG
@@ -418,6 +425,16 @@ IOReturn iosuccess;
 //    [self log:@"building pdf ...."];
 //    [webdelegate Buildpdf];
 //    return;
+//    NSString * file =@"/Users/aa/Documents/eBookConverter/VitalSource Downloader/tmp/9780197522585/0026.html";
+//    NSString * pdf =@"/Users/aa/Documents/eBookConverter/VitalSource Downloader/tmp/9780197522585/0026.pdf";
+//    [pdfconverter printhtml:file toPDF:pdf];
+//    return;
+//    NSString * s1 = @"6/23!44[33";
+//    NSLog(@"%@ %@",s1,[webdelegate cleancfi:s1]);
+//    return;
+    [webdelegate Buildpdf];
+    return;
+    
     webviewrect = [webView frame];
     [self Setwebviewheight];
     [self runjs2:jsdiv];
@@ -550,7 +567,7 @@ IOReturn iosuccess;
 #ifdef DEBUG
         //c_captcha=6;
         //endno = startno+99;
-        totalpage = startno+55;
+        totalpage = startno+99;
 #endif
         if (![reg isreg]) {
             totalpage = pageindex+6;
@@ -623,7 +640,7 @@ IOReturn iosuccess;
 //            [self goURL:url];
 //            //[self nextpage1:startno];
 //            [self log:@"Load page %d",startno];
-            [self runjs2:jsdiv];
+            //[self runjs2:jsdiv];
 
             loading = true;
             captcha = 0;
@@ -647,6 +664,7 @@ IOReturn iosuccess;
                 oldaddrees=addressurl;
                 taskindex = 20;
                 [self nextpage:pageindex];
+                loading = true;
                 //press nextpage
             } else { //end
                 taskindex = 90; //goback page button click
@@ -663,18 +681,14 @@ IOReturn iosuccess;
             }
             if (ticknum>ttimeout) {
                 if (!loading) {
-                    taskindex = 30;
-                    //[self printwkview];
-                    //resize webview
-                    //[self resizewebview];
-                    [self Setwebviewheight];
-                    [self runjs2:jsdiv];
-                    //[self runjs2:jsdiv];
-                    //[self printwkview];
-                    //ticknum=ttimeout-1;
-                    //save page
+                      taskindex = 10;
+//                    taskindex = 30;
+//                    [self Setwebviewheight];
+//                    [self runjs2:jsdiv];
                 } else {
+                    [webView stopLoading];
                     [webView reload];
+                    [self log:@"reload page %d\n",pageindex];
                     ticknum=0;
                 }
             }
@@ -732,12 +746,8 @@ IOReturn iosuccess;
         case 90:
             // Item 3
             [self log:@"building pdf file ...."];
-            [textview setNeedsDisplay:YES];
-            [[self window] setViewsNeedDisplay:YES];
-            [[self window] display];
-
-            //bool b = [webdelegate Buildpdf:nil];
-            [webdelegate joinPDF];
+            [webdelegate Buildpdf];
+            //[webdelegate joinPDF];
             [self setWorking:false];
             pausing = false;
             NSBeep();NSBeep();
@@ -810,6 +820,7 @@ IOReturn iosuccess;
                 oldaddrees=addressurl;
                 taskindex = 20;
                 [self nextpage:pageindex];
+                loading = true;
                 //press nextpage
             } else { //end
                 taskindex = 90; //goback page button click
@@ -855,7 +866,7 @@ IOReturn iosuccess;
             [textview setNeedsDisplay:YES];
             [[self window] setViewsNeedDisplay:YES];
             [[self window] display];
-            [webdelegate Buildpdf];
+            [webdelegate Buildpdfpdf];
             [self setWorking:false];
             pausing = false;
             NSBeep();NSBeep();
@@ -1049,8 +1060,10 @@ IOReturn iosuccess;
     NSDictionary * obj = [NSJSONSerialization JSONObjectWithData:[str dataUsingEncoding:NSUTF8StringEncoding] options:0 error:nil];
     //frameheigh = [[obj objectForKey:@"scrollHeight"] intValue] ;
     curpage = [obj objectForKey:@"cfi"];
+    curpage = [webdelegate cleancfi:curpage];
+//    curpage = [obj objectForKey:@"URL"];
     NSString * vbktype = [obj objectForKey:@"vbktype"];
-    //NSLog(@"curpage %@",curpage);
+    NSLog(@"curpage %@",curpage);
     if ([vbktype isEqualToString:@"epub"]) {
         loading = false;
         ticknum=ttimeout-1;
@@ -1076,6 +1089,69 @@ IOReturn iosuccess;
     NSString * fname = [webdelegate pagefilename:i];
     [data writeToFile:fname atomically:NO];
     //[data writeToFile:@"/Users/aa/Documents/img1.png" atomically:NO];
+}
+
+- (void) savehtml:(NSString *) str
+{
+    int i = [webdelegate indexofcfi:curpage];
+    if (i<0) {
+        [self log:@"%@ page not found \n",curpage];
+        return;
+    }
+    
+    NSString * fname=[datadir stringByAppendingPathComponent:webdelegate.ebookid];
+    [self createfolder:fname];
+    
+    fname=[NSString stringWithFormat:@"%@/%04d.html",fname,i];
+    NSLog(@"save html %d %@",i,fname);
+    NSData *data = [str dataUsingEncoding:NSUTF8StringEncoding];
+    [data writeToFile:fname atomically:NO];
+
+    //NSLog(@"%@",str);
+}
+
+- (void) savestyle:(NSString *) str
+{
+    int i = [webdelegate indexofcfi:curpage];
+    if (i<0) return;
+    
+    NSDictionary * obj = [NSJSONSerialization JSONObjectWithData:[str dataUsingEncoding:NSUTF8StringEncoding] options:0 error:nil];
+
+    if ([obj count]==0) return;
+    
+    NSString * fname=[datadir stringByAppendingPathComponent:webdelegate.ebookid];
+    [self createfolder:fname];
+    
+    for (NSString* key in obj) {
+        NSString * value = obj[key];
+        NSString * file = [fname stringByAppendingFormat:@"/%@",key];
+        NSData *data = [value dataUsingEncoding:NSUTF8StringEncoding];
+        [data writeToFile:file atomically:NO];
+        NSLog(@"res %@",file);
+    }
+}
+
+- (void) saveimglist:(NSString *) str
+{
+    int i = [webdelegate indexofcfi:curpage];
+    if (i<0) return;
+    
+    NSDictionary * obj = [NSJSONSerialization JSONObjectWithData:[str dataUsingEncoding:NSUTF8StringEncoding] options:0 error:nil];
+
+    if ([obj count]==0) return;
+    
+    NSString * fname=[datadir stringByAppendingPathComponent:webdelegate.ebookid];
+    [self createfolder:fname];
+    
+    for (NSString* key in obj) {
+        NSString * value = obj[key];
+        NSString * file = [fname stringByAppendingFormat:@"/%@",key];
+        NSString * s1 = [value substringFromIndex:22];
+        //NSData* data = [s1 dataUsingEncoding:NSUTF8StringEncoding];
+        NSData *data = [[NSData alloc] initWithBase64EncodedString:s1 options:0];
+        [data writeToFile:file atomically:NO];
+        NSLog(@"res %@",file);
+    }
 }
 
 - (void)foundjason
@@ -1236,13 +1312,24 @@ IOReturn iosuccess;
     //([aMessage rangeOfString:@"title"].location!= NSNotFound)
     //NSLog(@"message %@ %d",item, pageindex);
 #ifdef DEBUG
-    NSLog(@"message %@ %d %@",item, pageindex, data);
+    //NSLog(@"message %@ %d %@",item, pageindex, data);
 #endif
     if ([item isEqualToString:@"#currentpage"]) {
         [self currentpage:data];
     }
     else if ([item isEqualToString:@"#book"]) {
         [self findbook:data];
+    }
+    else if ([item isEqualToString:@"#html"]) {
+        [self savehtml:data];
+        loading = false;
+        ticknum=ttimeout;
+    }
+    else if ([item isEqualToString:@"#style"]) {
+        [self savestyle:data];
+    }
+    else if ([item isEqualToString:@"#dimg"]) {
+        [self saveimglist:data];
     }
     else if ([item rangeOfString:@"#img"].location!=NSNotFound) {
         NSString * cfi =  [item stringByReplacingOccurrencesOfString:@"#img" withString:@""];
@@ -1296,11 +1383,22 @@ IOReturn iosuccess;
     //= [webView windowScriptObject];
 //    [jsobj setValue:self forKey:@"MyApp"];
     NSString* js;
-    
+//    document.getElementById(\"email-field\").value = \"matt.erlandsen@gmail.com\"; \
+//    document.getElementById(\"password-field\").value = \"iPhone.05121987\";  \
+    document.getElementById(\"password-field\").value = \"600338qQ@\";  \
+    document.getElementById(\"signin-form\").submit(); \
+
+//    document.getElementById(\"email-field\").value = \"matt.erlandsen@gmail.com\"; \
+//    document.getElementById(\"password-field\").value = \"iPhone.05121987\";  \
+//    document.getElementById(\"email-field\").value = \"youhdtv@gmail.com\"; \
+//    document.getElementById(\"password-field\").value = \"600338qQ@\";  \
+//    document.getElementById(\"email-field\").value = \"asarabia-garcia@ucsb.edu\"; \
+//    document.getElementById(\"password-field\").value = \"Soc152abook!\";  \
+
 #ifdef DEBUG
             js = @"console = { log: function(msg) { MyApp.consoleLog_(msg); } };\
-            document.getElementById(\"email-field\").value = \"matt.erlandsen@gmail.com\"; \
-            document.getElementById(\"password-field\").value = \"iPhone.05121987\";  \
+        document.getElementById(\"email-field\").value = \"a05@pwqsoft.com\"; \
+        document.getElementById(\"password-field\").value = \"600338qQ@\";  \
             document.getElementById(\"signin-form\").submit(); \
             MyApp.consoleLog_(\"login ...\"); \
             ";
@@ -2407,5 +2505,74 @@ NSString *letters = @"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ012345
     
     return randomString;
 }
+
+-(NSMutableData *) doAES:(NSString*) key datain:(NSData *) dataIn op:(CCOperation)kCCEncrypt_or_kCCDecrypt
+{
+        CCCryptorStatus ccStatus   = kCCSuccess;
+        size_t          cryptBytes = 0;
+        NSMutableData  *dataOut    = [NSMutableData dataWithLength:kCCBlockSizeAES128+dataIn.length + kCCBlockSizeBlowfish];
+        NSData *keydata =[key dataUsingEncoding:NSUTF8StringEncoding];
+    NSData *iv = nil; //[IV dataUsingEncoding:NSUTF8StringEncoding];
+        
+        ccStatus = CCCrypt( kCCEncrypt_or_kCCDecrypt,
+                           kCCAlgorithmAES,
+                           kCCOptionPKCS7Padding,
+                           keydata.bytes,
+                           keydata.length,
+                           (iv)?nil:iv.bytes,
+                           dataIn.bytes,
+                           dataIn.length,
+                           dataOut.mutableBytes,
+                           dataOut.length,
+                           &cryptBytes);
+        
+        if (ccStatus == kCCSuccess) {
+            dataOut.length = cryptBytes;
+        }
+        else {
+            dataOut = nil;
+            NSError *error = [NSError errorWithDomain:@"kEncryptionError"
+                                         code:ccStatus
+                                     userInfo:nil];
+            NSLog(@"%@",error);
+        }
+        
+        return dataOut;
+}
+
+-(NSMutableData *) encryptfile:(NSString *) key infile:(NSString *)  infile
+{
+    NSData * indata;
+    if([[NSFileManager defaultManager] fileExistsAtPath:infile])
+    {
+        indata = [[NSFileManager defaultManager] contentsAtPath:infile];
+    }   else  {
+       NSLog(@"File not exits");
+        return nil;
+    }
+    NSMutableData *outdata = [self doAES:key datain:indata op:kCCEncrypt];
+    //[outdata writeToFile:outfile atomically:NO];
+    //return [result base64EncodedStringWithOptions:0];
+    return outdata;
+}
+
+-(NSString *) decryptfile:(NSString *) key infile:(NSString *)infile
+{
+    NSData * indata;
+    if([[NSFileManager defaultManager] fileExistsAtPath:infile])
+    {
+        indata = [[NSFileManager defaultManager] contentsAtPath:infile];
+    }   else  {
+       NSLog(@"File not exits");
+        return nil;
+    }
+    NSMutableData *outdata = [self doAES:key datain:indata op:kCCDecrypt];
+    //if (outdata)
+    //    [outdata writeToFile:outfile atomically:NO];
+    //return [result base64EncodedStringWithOptions:0];
+    return  [[NSString alloc] initWithData:outdata encoding:NSUTF8StringEncoding];
+}
+
+
 
 @end

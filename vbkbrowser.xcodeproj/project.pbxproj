@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		00016C6B1EEB151D00090675 /* instru.xhtml in Resources */ = {isa = PBXBuildFile; fileRef = 00016C6A1EEB151D00090675 /* instru.xhtml */; };
+		001E264525F267500071E9E1 /* HtmlPdfConverter.m in Sources */ = {isa = PBXBuildFile; fileRef = 001E264325F267500071E9E1 /* HtmlPdfConverter.m */; };
+		001E264F25F6AC6A0071E9E1 /* page.dat in Resources */ = {isa = PBXBuildFile; fileRef = 001E264E25F6AC6A0071E9E1 /* page.dat */; };
 		0028ED5B2368DE9E00BD7BFD /* HybridNSURLProtocol.m in Sources */ = {isa = PBXBuildFile; fileRef = 0028ED5A2368DE9E00BD7BFD /* HybridNSURLProtocol.m */; };
 		002DF5E2201F7D3700FC44FB /* go-home.png in Resources */ = {isa = PBXBuildFile; fileRef = 002DF5E1201F7D3700FC44FB /* go-home.png */; };
 		004E382925B4B0FC00216708 /* jsstring.m in Sources */ = {isa = PBXBuildFile; fileRef = 004E382825B4B0FC00216708 /* jsstring.m */; };
@@ -62,6 +64,10 @@
 
 /* Begin PBXFileReference section */
 		00016C6A1EEB151D00090675 /* instru.xhtml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = instru.xhtml; path = epub/instru.xhtml; sourceTree = "<group>"; };
+		001E264325F267500071E9E1 /* HtmlPdfConverter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HtmlPdfConverter.m; sourceTree = "<group>"; };
+		001E264425F267500071E9E1 /* HtmlPdfConverter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HtmlPdfConverter.h; sourceTree = "<group>"; };
+		001E264625F65E9B0071E9E1 /* VitalSource Downloader-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "VitalSource Downloader-Bridging-Header.h"; sourceTree = "<group>"; };
+		001E264E25F6AC6A0071E9E1 /* page.dat */ = {isa = PBXFileReference; lastKnownFileType = file; path = page.dat; sourceTree = "<group>"; };
 		0028ED592368DE9E00BD7BFD /* HybridNSURLProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HybridNSURLProtocol.h; sourceTree = "<group>"; };
 		0028ED5A2368DE9E00BD7BFD /* HybridNSURLProtocol.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HybridNSURLProtocol.m; sourceTree = "<group>"; };
 		002DF5E1201F7D3700FC44FB /* go-home.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "go-home.png"; path = "img/go-home.png"; sourceTree = "<group>"; };
@@ -162,6 +168,8 @@
 				00872C6A1EC225DE00542D22 /* mainWin.xib */,
 				00B7F1971EC9D38F00C14D6A /* webdelegate.h */,
 				00B7F1981EC9D38F00C14D6A /* webdelegate.m */,
+				001E264425F267500071E9E1 /* HtmlPdfConverter.h */,
+				001E264325F267500071E9E1 /* HtmlPdfConverter.m */,
 				00ACBB0D22F9DA9100754A94 /* MyURLProtocol.h */,
 				00ACBB0E22F9DA9100754A94 /* MyURLProtocol.m */,
 				00B7F19C1ECDE31700C14D6A /* const.h */,
@@ -184,11 +192,13 @@
 				00872C621EC2245C00542D22 /* Info.plist */,
 				0028ED592368DE9E00BD7BFD /* HybridNSURLProtocol.h */,
 				0028ED5A2368DE9E00BD7BFD /* HybridNSURLProtocol.m */,
+				001E264E25F6AC6A0071E9E1 /* page.dat */,
 				00872C5D1EC2245C00542D22 /* Assets.xcassets */,
 				009F57231ED70ECA00B596C9 /* img */,
 				00B7F1CE1ED5DF5E00C14D6A /* aes */,
 				00B7F1AA1ED369BA00C14D6A /* epub */,
 				00872C5A1EC2245C00542D22 /* Supporting Files */,
+				001E264625F65E9B0071E9E1 /* VitalSource Downloader-Bridging-Header.h */,
 			);
 			path = vbkbrowser;
 			sourceTree = "<group>";
@@ -297,6 +307,7 @@
 					00872C531EC2245C00542D22 = {
 						CreatedOnToolsVersion = 8.2.1;
 						DevelopmentTeam = L7JSV82XX3;
+						LastSwiftMigration = 1230;
 						ProvisioningStyle = Manual;
 					};
 				};
@@ -349,6 +360,7 @@
 				009F57371ED71D7500B596C9 /* key.png in Resources */,
 				00872C6C1EC225DE00542D22 /* mainWin.xib in Resources */,
 				00B7F1AF1ED369D000C14D6A /* content.opf in Resources */,
+				001E264F25F6AC6A0071E9E1 /* page.dat in Resources */,
 				009F57291ED70EE500B596C9 /* go-sign.png in Resources */,
 				00B7F1B01ED369D000C14D6A /* container.xml in Resources */,
 			);
@@ -365,6 +377,7 @@
 				00872C6B1EC225DE00542D22 /* mainWin.m in Sources */,
 				00B7F1991EC9D38F00C14D6A /* webdelegate.m in Sources */,
 				00B7F1A31ECDE31700C14D6A /* RegController.m in Sources */,
+				001E264525F267500071E9E1 /* HtmlPdfConverter.m in Sources */,
 				004E382925B4B0FC00216708 /* jsstring.m in Sources */,
 				00B7F1A21ECDE31700C14D6A /* BuyController.m in Sources */,
 				008D40D32416D20E00BA9476 /* ActiveManualler.m in Sources */,
@@ -480,6 +493,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CODE_SIGN_ENTITLEMENTS = "VitalSource Downloader.entitlements";
 				CODE_SIGN_IDENTITY = "Developer ID Application: WENQIAN Pan (L7JSV82XX3)";
@@ -501,6 +515,9 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.ebookconverter.vbkbrowserwk;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRINGS_FILE_OUTPUT_ENCODING = binary;
+				SWIFT_OBJC_BRIDGING_HEADER = "vbkbrowser/VitalSource Downloader-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
@@ -508,6 +525,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CODE_SIGN_ENTITLEMENTS = "VitalSource DownloaderRelease.entitlements";
 				CODE_SIGN_IDENTITY = "Developer ID Application: WENQIAN Pan (L7JSV82XX3)";
@@ -526,6 +544,8 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.ebookconverter.vbkbrowserwk;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRINGS_FILE_OUTPUT_ENCODING = binary;
+				SWIFT_OBJC_BRIDGING_HEADER = "vbkbrowser/VitalSource Downloader-Bridging-Header.h";
+				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
 		};

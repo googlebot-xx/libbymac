@@ -11,6 +11,7 @@
 #import "const.h"
 #import "MyURLProtocol.h"
 #import "mainWin.h"
+#import "HtmlPdfConverter.h"
 //#import "SSZipArchive.h"
 
 
@@ -39,6 +40,7 @@
         //aboutcontroller = [[AboutController alloc] initWithWindowNibName:@"AboutController"];
         urllist = [[NSMutableArray alloc] init];
         titlelist = [[NSMutableArray alloc] init];
+        cfilist = [[NSMutableArray alloc] init];
         //timer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(timerFired:) userInfo:nil repeats:YES];
         title = @"test epub";
         ebooktype = 0;
@@ -330,10 +332,14 @@ fromDataSource:(WebDataSource *)dataSource
 {
     //build urllist
     [urllist removeAllObjects];
+    [cfilist removeAllObjects];
     for (int i=0; i<[pagelist count]; i++) {
         NSDictionary *urldict = [pagelist objectAtIndex:i];
         //NSString * s1 = [urldict objectForKey:@"cfi"];
         NSString * s1 = [urldict objectForKey:@"cfiWithoutAssertions"];
+        NSString * s2 = [self cleancfi:s1]; //clean cfi
+        //[urldict setValue:s2 forKey:@"cfiWithoutAssertions"];
+        [cfilist addObject:s2];
         if (ebooktype==1)
 //           s1 = [NSString stringWithFormat:@"https://jigsaw.vitalsource.com%@?width=2000",s1];
             s1 = [NSString stringWithFormat:@"https://bookshelf.vitalsource.com/#/books/%@/cfi%@",ebookid,s1];
@@ -358,16 +364,27 @@ fromDataSource:(WebDataSource *)dataSource
 
 - (int) indexofcfi:(NSString *)cfi
 {
-    cfi =  [cfi stringByReplacingOccurrencesOfString:@"!" withString:@""];
-
-    for (int i=0; i<[pagelist count]; i++) {
-        NSDictionary *obj = [pagelist objectAtIndex:i];
-        if ([cfi isEqualToString:[obj objectForKey:@"cfiWithoutAssertions"]])
-//        if ([cfi rangeOfString:[obj objectForKey:@"cfiWithoutAssertions"]].location!=NSNotFound)
-            return i;
-    }
+    //cfi =  [cfi stringByReplacingOccurrencesOfString:@"!" withString:@""];
+    int i = [cfilist indexOfObject:cfi];
     
-    return -1;
+//    for (int i=0; i<[cfilist count]; i++) {
+//        NSDictionary *obj = [pagelist objectAtIndex:i];
+//        NSString * s1 = [obj objectForKey:@"cfiWithoutAssertions"];
+//        if ([cfi isEqualToString:[obj objectForKey:@"cfiWithoutAssertions"]])
+//        //if ([cfi rangeOfString:s1].location!=NSNotFound)
+//            return i;
+//    }
+
+//    for (int i=0; i<[pagelist count]; i++) {
+//        NSDictionary *obj = [pagelist objectAtIndex:i];
+//        NSString * s1 = [obj objectForKey:@"cfiWithoutAssertions"];
+//        if ([cfi isEqualToString:[obj objectForKey:@"cfiWithoutAssertions"]])
+//        //if ([cfi rangeOfString:s1].location!=NSNotFound)
+//            return i;
+//    }
+    
+//    return -1;
+    return i;
 }
 
 - (NSString *) pagefilename:(int) i
@@ -882,7 +899,7 @@ fromDataSource:(WebDataSource *)dataSource
 - (void)joinPDF
 
 {
-    [_mainwin log:@"building pdf ...."];
+    //[_mainwin log:@"building pdf ...."];
 
     _mainwin.outputfile = nil;
 //    NSString * dir = [_mainwin.datadir stringByAppendingPathComponent:ebookid];
@@ -895,6 +912,7 @@ fromDataSource:(WebDataSource *)dataSource
     if (![reg isreg]) {
         num = 10;
     }
+    NSString * dir = [_mainwin.datadir stringByAppendingPathComponent:ebookid];
 
     CFURLRef pdfURLOutput = (__bridge CFURLRef)[NSURL fileURLWithPath:fname];
     NSInteger numberOfPages = 0;
@@ -905,13 +923,16 @@ fromDataSource:(WebDataSource *)dataSource
     NSString * missing = @"";
     for (int i=0; i<num; i++) {
 
-        NSString * htmlpdf = [self pagefilename:i];
+        //NSString * htmlpdf = [self pagefilename:i];
+        NSString* htmlpdf = [NSString stringWithFormat:@"%@/%04d.pdf",dir,i];
+
         if(![self fileexist:htmlpdf]){
             //[self log:@"page pdf not found %@",htmlpdf];
             missing = [missing stringByAppendingFormat:@" %d", i];
             continue;
         }
         //[self log:@"add pdf %@",htmlpdf];
+        [_mainwin updatelog:@"add pdf %d",i];
 
         CFURLRef pdfURL =  CFURLCreateFromFileSystemRepresentation(NULL, [htmlpdf UTF8String],[htmlpdf length], NO);
         
@@ -935,6 +956,7 @@ fromDataSource:(WebDataSource *)dataSource
         totalPages += numberOfPages;
         CGPDFDocumentRelease(pdfRef);
         CFRelease(pdfURL);
+        [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantFuture]];
     }
     if ([missing length]>1)
         [_mainwin log:@"Missging pages %@",missing];
@@ -948,6 +970,36 @@ fromDataSource:(WebDataSource *)dataSource
 }
 
 - (void)Buildpdf
+{
+    [_mainwin log:@"building pdf ...."];
+    NSString * fname = [ebookid stringByAppendingFormat:@" %@.pdf",title];
+    fname =[self cleanfilename:fname];
+    fname = [_mainwin.ebookdir stringByAppendingPathComponent:fname];
+    NSMutableArray * pdflist = [[NSMutableArray alloc] init];
+    NSString * dir = [_mainwin.datadir stringByAppendingPathComponent:ebookid];
+
+    int num = [pagelist count];
+    if (![reg isreg]) {
+        num = 10;
+    }
+    
+    for (int i=0; i<num; i++) {
+        NSString* file = [NSString stringWithFormat:@"%@/%04d.html",dir,i];
+        if (![self fileexist:file])
+            continue;
+        NSString* ext = [NSString stringWithFormat:@".%@",[file pathExtension]];
+        NSString* pdf = [file stringByReplacingOccurrencesOfString:ext withString:@".pdf"];
+        //NSLog(@"html %@",file);
+        [_mainwin updatelog:@"html to pdf %d",i];
+        [pdfconverter printhtml:file toPDF:pdf];
+        //if ([self fileexist:pdf ]) { check later
+        [pdflist addObject:pdf];
+        //}
+    }
+    [self joinPDF];
+}
+
+- (void)Buildpdfpdf
 {
     //[_mainwin log:@"building pdf ...."];
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow: 0.1]];
@@ -1317,6 +1369,15 @@ fromDataSource:(WebDataSource *)dataSource
 {
     NSString * astr;
     NSArray * list = [url componentsSeparatedByString:@"?"];
+    return list[0];
+}
+
+- (NSString *) cleancfi: (NSString *) url
+{
+    NSString *sep = @"![;";
+    NSCharacterSet *set = [NSCharacterSet characterSetWithCharactersInString:sep];
+    NSArray *list=[url componentsSeparatedByCharactersInSet:set];
+
     return list[0];
 }
 

@@ -1,0 +1,15 @@
+"_processTOC",
+this.toc 
+this._goToPage(levelToRender.cfi, levelToRender.page, levelToRender.path)
+key: "_showToc",
+
+VST.Models
+
+location 
+origin: "https://jigsaw.vitalsource.com"
+pathname: "/books/9781498526173/epub/cfi/6/2"
+
+reese84  Object
+secureToken 
+
+window.name: "easyXDM_default2768_provider"
