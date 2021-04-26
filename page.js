@@ -479,12 +479,17 @@ function savepage()
 	//console.log(dimg);
 }
 
-function getpdfpage(cfi) {
+function getpdfpage(imgtag,cfi) {
     vbktype = window.VST.currentBookData.vbkType;
     if(vbktype!=="pbk") return;
 
     //nlog("pbk book");
     //return;
+    if ("undefined" != typeof innerPageData) {
+        jsonstr = JSON.stringify(innerPageData);
+        //console.log("###text="+jsonstr);
+        mylog("#text"+cfi+"="+jsonstr);
+    }
     
     var img = document.querySelector("#pbk-page");
     if(!img) return;
@@ -496,7 +501,7 @@ function getpdfpage(cfi) {
     ctx.drawImage(img, 0, 0);
     var dataURL = canvas.toDataURL("image/png");
     //nlog("#img="+dataURL.length);
-    mylog(cfi+"="+dataURL);
+    mylog(imgtag+cfi+"="+dataURL);
     //var dataURL = canvas.toDataURL('image/jpeg', 1);
     //return dataURL;//.replace(/^data:image\/(png|jpg);base64,/, "");
 }
@@ -556,7 +561,7 @@ function bookinfo() {
             mylog("#currentpage="+JSON.stringify(currentpage));
         }
         if (vbktype=="pbk") {
-            getpdfpage("#img"+page.cfi);
+            getpdfpage('#img',page.cfi);
         }
     }
 
@@ -565,8 +570,8 @@ function bookinfo() {
         var nextpage = page.nextPage;
         //console.log("nextpage--currentPageData");
         //console.log(page);
-        //mylog("#next-page="+nextpage.cfi);
-        getpdfpage("#nextimg"+nextpage.cfi);
+        mylog("#next-page="+nextpage.cfi);
+        getpdfpage('#nextimg',nextpage.cfi);
     }
     node = document.querySelector("#page-content");
     if (vbktype=="epub" && !node) {

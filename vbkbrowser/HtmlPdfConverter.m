@@ -131,9 +131,15 @@ NSDictionary *presets;
 //https://stackoverflow.com/questions/149646/best-way-to-make-nsrunloop-wait-for-a-flag-to-be-set
 -(void)wait
 {
+    //dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, NULL), ^{
     while (bwait)
     {
-        [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.3]];
+            // DATA PROCESSING 1
+        [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
+//        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^ {
+//            // your code here after 1.5 delay - pay attention it will be executed on the main thread
+//        });
+        //[[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.3]];
         //[[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
         //[[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.5]];
         //NSRunLoop *theRL = [NSRunLoop currentRunLoop];
@@ -141,6 +147,8 @@ NSDictionary *presets;
         // Execute code on DefaultRunLoop
 //        [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode                                  beforeDate:[NSDate distantFuture]];
     }
+    //});
+
 }
 
 //https://blog.wilcoxd.com/2012/10/28/modern-cocoa-concurrency-asynchronous-processing-patterns/

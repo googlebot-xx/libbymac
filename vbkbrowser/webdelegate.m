@@ -968,6 +968,15 @@ fromDataSource:(WebDataSource *)dataSource
     CGPDFContextClose(writeContext);
     CGContextRelease(writeContext);
 }
+- (void)doBuildpdf
+{
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, NULL), ^{
+        // DATA PROCESSING 1
+        [self doBuildpdf];
+//        dispatch_async(dispatch_get_main_queue(), ^{
+//        });
+    });
+}
 
 - (void)Buildpdf
 {
@@ -996,14 +1005,28 @@ fromDataSource:(WebDataSource *)dataSource
         [pdflist addObject:pdf];
         //}
     }
-    [self joinPDF];
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, NULL), ^{
+        // DATA PROCESSING 1
+        [self joinPDF];
+    });
+//    [self joinPDF];
 }
 
 - (void)Buildpdfpdf
 {
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, NULL), ^{
+        // DATA PROCESSING 1
+        [self doBuildpdfpdf];
+//        dispatch_async(dispatch_get_main_queue(), ^{
+//        });
+    });
+}
+
+- (void)doBuildpdfpdf
+{
     //[_mainwin log:@"building pdf ...."];
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow: 0.1]];
-    
+    [_mainwin log:@"building pdf ...."];
     _mainwin.outputfile = nil;
 //    NSString * dir = [_mainwin.datadir stringByAppendingPathComponent:ebookid];
 
@@ -1023,6 +1046,7 @@ fromDataSource:(WebDataSource *)dataSource
 
     NSString * missing = @"";
     for (int i=0; i<num; i++) {
+        [_mainwin updatelog:@"pdf page %d",i];
         NSString * path = [self pagefilename:i];
         if(![self fileexist:path]){
             //[self log:@"page pdf not found %@",htmlpdf];
@@ -1039,6 +1063,7 @@ fromDataSource:(WebDataSource *)dataSource
         [page initWithImage: (NSImage *) img];
         [pdf insertPage: page atIndex: [pdf pageCount]];
     }
+    [_mainwin updatelog:@"write pdf file ..."];
     [pdf writeToFile:  fname];
     if ([missing length]>1)
         [_mainwin log:@"Missging pages %@",missing];

@@ -166,12 +166,12 @@ IOReturn iosuccess;
     //NSLog(@"%@",js);
     //NSString * fname =[[NSBundle mainBundle] pathForResource:@"cssrule" ofType:@"js"];
 #ifdef DEBUG
-    fname = @"/Users/aa/work/project/vbkbrowser-wk copy/cssrule.js";
+    fname = @"/Users/aa/work/project/vbkbrowser-wk/cssrule.js";
     jsdiv=[self loadfile:fname];
     //fname =[[NSBundle mainBundle] pathForResource:@"frameheight" ofType:@"js"];
 //    fname = @"/Users/aa/work/project/vbkbrowser-wk copy/frameheight.js";
-    fname = @"/Users/aa/work/project/vbkbrowser-wk copy/page.js";
-    //js=[self loadfile:fname];
+    fname = @"/Users/aa/work/project/vbkbrowser-wk/page.js";
+    js=[self loadfile:fname];
 #else
     jsdiv = js_cssrule;
     //js = js_frameheight;
@@ -432,6 +432,7 @@ IOReturn iosuccess;
 //    NSString * s1 = @"6/23!44[33";
 //    NSLog(@"%@ %@",s1,[webdelegate cleancfi:s1]);
 //    return;
+    //[webdelegate Buildpdfpdf];
     [webdelegate Buildpdf];
     return;
     
@@ -1091,6 +1092,22 @@ IOReturn iosuccess;
     //[data writeToFile:@"/Users/aa/Documents/img1.png" atomically:NO];
 }
 
+- (void) savepdftext:(NSString *) str cfi:(NSString*)cfi
+{
+    //int i = [str length];
+    int i = [webdelegate indexofcfi:cfi];
+    if (i<0) return;
+    
+    //NSString * s1 = [str substringFromIndex:22];
+    //NSData* data = [s1 dataUsingEncoding:NSUTF8StringEncoding];
+    NSData *data = [str dataUsingEncoding:NSUTF8StringEncoding];
+    NSString * fname = [webdelegate pagefilename:i];
+    fname=  [fname stringByReplacingOccurrencesOfString:@"png" withString:@"json"];
+
+    [data writeToFile:fname atomically:NO];
+    //[data writeToFile:@"/Users/aa/Documents/img1.png" atomically:NO];
+}
+
 - (void) savehtml:(NSString *) str
 {
     int i = [webdelegate indexofcfi:curpage];
@@ -1245,25 +1262,29 @@ IOReturn iosuccess;
     va_start(args, formatString);
     NSString * str = [[NSString alloc] initWithFormat:formatString arguments:args];
     va_end(args);
-    
+    dispatch_async(dispatch_get_main_queue(), ^(void){
+
     NSMutableAttributedString *astr = [[NSMutableAttributedString alloc] initWithString:str attributes:
     @{ NSForegroundColorAttributeName: NSColor.controlTextColor}];
     
     [textview.textStorage appendAttributedString:astr];
     [textview.textStorage appendAttributedString:[[NSAttributedString alloc] initWithString:@"\n"]];
     [textview scrollRangeToVisible:NSMakeRange([[textview string] length], 0)];
+    });
 
 }
 
 - (void) updatelog:(NSString *)formatString, ...
 {
-    
+        //Run UI Updates
     va_list args;
     va_start(args, formatString);
     NSString * str = [[NSString alloc] initWithFormat:formatString arguments:args];
     va_end(args);
     
-    NSLayoutManager *layoutManager = [textview layoutManager];
+    dispatch_async(dispatch_get_main_queue(), ^(void){
+
+        NSLayoutManager *layoutManager = [textview layoutManager];
     NSUInteger numberOfLines = 0;
     NSUInteger numberOfGlyphs = [layoutManager numberOfGlyphs]-1;
     NSRange lineRange;
@@ -1277,6 +1298,7 @@ IOReturn iosuccess;
     [textview.textStorage appendAttributedString:astr];
     [textview.textStorage appendAttributedString:[[NSAttributedString alloc] initWithString:@"\n"]];
     [textview scrollRangeToVisible:NSMakeRange([[textview string] length], 0)];
+    });
 
 }
 
@@ -1335,6 +1357,11 @@ IOReturn iosuccess;
         NSString * cfi =  [item stringByReplacingOccurrencesOfString:@"#img" withString:@""];
         //NSLog(@"img  %@ %@",item,cfi);
         [self savepdfimg:data cfi:cfi];
+    }
+    else if ([item rangeOfString:@"#text"].location!=NSNotFound) {
+        NSString * cfi =  [item stringByReplacingOccurrencesOfString:@"#text" withString:@""];
+        //NSLog(@"img  %@ %@",item,cfi);
+        [self savepdftext:data cfi:cfi];
     }
     else if ([item rangeOfString:@"#nextimg"].location!=NSNotFound) {
         NSString * cfi =  [item stringByReplacingOccurrencesOfString:@"#nextimg" withString:@""];
