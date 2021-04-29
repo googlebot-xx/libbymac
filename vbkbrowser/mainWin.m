@@ -432,8 +432,8 @@ IOReturn iosuccess;
 //    NSString * s1 = @"6/23!44[33";
 //    NSLog(@"%@ %@",s1,[webdelegate cleancfi:s1]);
 //    return;
-    //[webdelegate Buildpdfpdf];
-    [webdelegate Buildpdf];
+    [webdelegate Buildpdfpdf];
+    //[webdelegate Buildpdf];
     return;
     
     webviewrect = [webView frame];
@@ -1083,6 +1083,7 @@ IOReturn iosuccess;
     //int i = [str length];
     int i = [webdelegate indexofcfi:cfi];
     if (i<0) return;
+    if ([str length]<30) return;
     
     NSString * s1 = [str substringFromIndex:22];
     //NSData* data = [s1 dataUsingEncoding:NSUTF8StringEncoding];

@@ -1014,6 +1014,8 @@ fromDataSource:(WebDataSource *)dataSource
 
 - (void)Buildpdfpdf
 {
+    //[self Buildpdftext];
+    //return;
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, NULL), ^{
         // DATA PROCESSING 1
         [self doBuildpdfpdf];
@@ -1022,7 +1024,209 @@ fromDataSource:(WebDataSource *)dataSource
     });
 }
 
+- (bool) Buildpdftext
+{
+//    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow: 0.1]];
+    NSString * dir = [_mainwin.ebookdir stringByAppendingPathComponent:@""];
+    NSString * fname = [NSString stringWithFormat:@"%@/111.pdf",dir];
+    CFURLRef pdfURLOutput = (__bridge CFURLRef)[NSURL fileURLWithPath:fname];
+    CGContextRef writeContext = CGPDFContextCreateWithURL(pdfURLOutput, NULL, NULL);
+    CGRect mediaBox = CGRectMake(0,0,612,792);
+
+    NSString * file;
+    CGContextBeginPage(writeContext, &mediaBox);
+    file =@"/Users/aa/Documents/eBookConverter/VitalSource Downloader/tmp/9781635672268/0-0.json";
+    [self WritePDFText:file cgr:mediaBox context:writeContext];
+    //[self WritePDFImg:file cgr:mediaBox context:writeContext];
+    CGContextEndPage(writeContext);
+
+    CGContextBeginPage(writeContext, &mediaBox);
+    file =@"/Users/aa/Documents/eBookConverter/VitalSource Downloader/tmp/9781635672268/4-4.json";
+    [self WritePDFText:file cgr:mediaBox context:writeContext];
+    //[self WritePDFImg:file cgr:mediaBox context:writeContext];
+    CGContextEndPage(writeContext);
+
+    CGContextBeginPage(writeContext, &mediaBox);
+    file =@"/Users/aa/Documents/eBookConverter/VitalSource Downloader/tmp/9781635672268/5-5.json";
+    [self WritePDFText:file cgr:mediaBox context:writeContext];
+    [self WritePDFImg:file cgr:mediaBox context:writeContext];
+    CGContextEndPage(writeContext);
+
+//    CGContextSelectFont(writeContext, "Arial", 36, kCGEncodingMacRoman);
+//    CGContextSetTextDrawingMode(writeContext, kCGTextFill);
+//    CGContextSetRGBFillColor(writeContext, 256, 0, 0, 1);
+//    const char *text="Demo version eBook Converter";
+//    CGContextShowTextAtPoint(writeContext, 30, 550, text, strlen(text));
+//    const char *text2="www.ebook-converter.com";
+//    CGContextShowTextAtPoint(writeContext, 30, 500, text2, strlen(text2));
+    //NSMutableAttributedString * s1 = [[NSMutableAttributedString alloc] initWithString:@"firstsecondthird"];
+
+//    NSMutableAttributedString *attStr = [[NSMutableAttributedString alloc] initWithString:@"ebook first Upon view creation, draw(_:) will run automatically to render the view’s backing layer. Upon view creation, draw(_:) will run automatically to render the view’s backing layer. secondthird"];
+//    //[attStr addAttributes:attribute range:NSMakeRange(0, attStr.length)];
+//    CTFramesetterRef frameSetter = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)attStr);
+//    CGMutablePathRef path = CGPathCreateMutable();
+    
+//    writeContext
+//    context.translateBy(x: 0, y: bounds.size.height)
+//    context.scaleBy(x: 1.0, y: -1.0);
+    //CGContextTranslateCTM(writeContext,0,mediaBox.size.height/2);
+    //CGContextScaleCTM(writeContext,1.0,-1.0);
+
+//    CGRect r1 = CGRectMake(30,200,400,100);
+//    CGPathAddRect(path, NULL, r1);
+//
+//    CTFrameRef frame = CTFramesetterCreateFrame(frameSetter, CFRangeMake(0, 0), path, NULL);
+//    CTFrameDraw(frame, writeContext);
+    
+//    NSString * imgfile = @"/Users/aa/Documents/eBookConverter/HathiTrust Downloader/tmp/mdp.39015022207255/0007.dat";
+//    NSImage *image = [[NSImage alloc]initWithContentsOfFile:imgfile];
+//    CGImageSourceRef source =CGImageSourceCreateWithData((CFDataRef)[image TIFFRepresentation], NULL);
+//    CGImageRef maskRef =  CGImageSourceCreateImageAtIndex(source, 0, NULL);
+//    CGContextDrawImage(writeContext, mediaBox, maskRef);
+    
+//    CGContextEndPage(writeContext);
+    
+    CGPDFContextClose(writeContext);
+    CGContextRelease(writeContext);
+    
+    NSLog(@"pdf ok %@",fname);
+    return true;
+}
+
+-(CGRect) jsonrect:(NSDictionary*)dc bw:(float)bw bh:(float)bh
+{
+    float tl = [[dc objectForKey:@"l"] floatValue]*bw/100;
+    float tt = [[dc objectForKey:@"t"] floatValue]*bh/100;
+    float tr = [[dc objectForKey:@"r"] floatValue]*bw/100;
+    float tb = [[dc objectForKey:@"b"] floatValue]*bh/100;
+//    return CGRectMake(round(tl),round(tt)-round(tb),round(tr),round(tb));
+    return CGRectMake(round(tl),round(tt),round(tr),round(tb));
+}
+
+- (void)WritePDFImg:(NSString *)afile cgr:(CGRect)cgr context:(CGContextRef)writeContext
+{
+    NSString * imgfile =  [afile stringByReplacingOccurrencesOfString:@"json" withString:@"png"];;
+    if (![self fileexist:imgfile]) {
+        return;
+    }
+
+    NSImage *image = [[NSImage alloc]initWithContentsOfFile:imgfile];
+    CGImageSourceRef source =CGImageSourceCreateWithData((CFDataRef)[image TIFFRepresentation], NULL);
+    CGImageRef maskRef =  CGImageSourceCreateImageAtIndex(source, 0, NULL);
+    CGContextDrawImage(writeContext, cgr, maskRef);
+    
+}
+
+- (void)WritePDFText:(NSString *)afile cgr:(CGRect)cgr context:(CGContextRef)writeContext
+{
+    
+    
+    NSString * ftext =  [afile stringByReplacingOccurrencesOfString:@"png" withString:@"json"];
+    if (![self fileexist:ftext]) {
+        return;
+    }
+    NSError* error = nil;
+    NSData* data = [NSData dataWithContentsOfFile:ftext  options:0 error:&error];
+    NSDictionary * dict = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
+    NSString * s1 = [dict objectForKey:@"words"];
+    s1 =  [s1 stringByReplacingOccurrencesOfString:@"\r" withString:@" "];
+    //NSLog(@"%@",s1);
+    float bw,bh;
+//    bw = [[dict objectForKey:@"boundingRectWidth"] floatValue];
+//    bh = [[dict objectForKey:@"boundingRectHeight"] floatValue] ;
+    
+    bw = cgr.size.width;
+    bh = cgr.size.height;
+    
+    //NSLog(@"%3.2f %3.2f",bw,bh);
+    NSDictionary * dt1 = [dict objectForKey:@"glyphs"];
+    NSArray * list = [dt1 objectForKey:@"glyphs"];
+    int n = [s1 length];// [list count];
+    //NSLog(@"%d text %d",n,[s1 length]);
+    
+    int p0 =0;
+    //const unichar *buff = CFStringGetCharactersPtr((__bridge CFStringRef)s1);
+    unichar *buff = malloc(sizeof(unichar) * n);
+    NSRange range = {0,n};
+    [s1 getCharacters:buff range:range];
+    for (int i=1; i<n; i++) {
+        if ((buff[i]==13) ||(buff[i]==32) ||(i==n-1) ) {
+            NSString * cs = [s1 substringWithRange:NSMakeRange(p0, i-p0)];
+            //if ([])
+            //NSDictionary * dc = [list objectAtIndex:i];
+            CGRect r1 = [self jsonrect:[list objectAtIndex:p0] bw:bw bh:bh];
+            CGRect r2 = [self jsonrect:[list objectAtIndex:i] bw:bw bh:bh];
+
+            NSMutableAttributedString *attStr = [[NSMutableAttributedString alloc] initWithString:cs];
+            //[attStr addAttributes:attribute range:NSMakeRange(0, attStr.length)];
+            CTFramesetterRef frameSetter = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)attStr);
+            CGMutablePathRef path = CGPathCreateMutable();
+            CGRect rc = CGRectMake(r1.origin.x,bh-r1.origin.y-r1.size.height,r2.origin.x-r1.origin.x+r2.size.width,r2.size.height);
+            CGPathAddRect(path, NULL, rc);
+            CTFrameRef frame = CTFramesetterCreateFrame(frameSetter, CFRangeMake(0, 0), path, NULL);
+            CTFrameDraw(frame, writeContext);
+            p0 = i+1;
+        }
+    }
+
+}
+
 - (void)doBuildpdfpdf
+{
+    //[_mainwin log:@"building pdf ...."];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow: 0.1]];
+    [_mainwin log:@"building pdf ...."];
+    _mainwin.outputfile = nil;
+//    NSString * dir = [_mainwin.datadir stringByAppendingPathComponent:ebookid];
+
+    NSString * fname = [ebookid stringByAppendingFormat:@" %@.pdf",title];
+    fname =[self cleanfilename:fname];
+    fname = [_mainwin.ebookdir stringByAppendingPathComponent:fname];
+
+    int num = [pagelist count];
+    if (![reg isreg]) {
+        num = 10;
+    }
+
+    CFURLRef pdfURLOutput = (__bridge CFURLRef)[NSURL fileURLWithPath:fname];
+    CGContextRef writeContext = CGPDFContextCreateWithURL(pdfURLOutput, NULL, NULL);
+    CGRect mediaBox = CGRectMake(0,0,612,792);
+
+    NSInteger numberOfPages = 0;
+    int totalPages = 0;
+    // Create the output context
+
+    NSString * missing = @"";
+    for (int i=0; i<num; i++) {
+        [_mainwin updatelog:@"pdf page %d",i];
+        NSString * path = [self pagefilename:i];
+        if(![self fileexist:path]){
+            //[self log:@"page pdf not found %@",htmlpdf];
+            missing = [missing stringByAppendingFormat:@" %d", i];
+            continue;
+        }
+        CGContextBeginPage(writeContext, &mediaBox);
+        [self WritePDFText:path cgr:mediaBox context:writeContext];
+        [self WritePDFImg:path cgr:mediaBox context:writeContext];
+        CGContextEndPage(writeContext);
+
+        //[self log:@"add pdf %@",htmlpdf];
+        totalPages++;
+        
+    }
+    [_mainwin updatelog:@"write pdf file ..."];
+    CGPDFContextClose(writeContext);
+    CGContextRelease(writeContext);
+    if ([missing length]>1)
+        [_mainwin log:@"Missging pages %@",missing];
+    [_mainwin log:@"pdf total page %d",totalPages];
+    [_mainwin log:@"pdf saved  %@",fname];
+    //CFRelease(pdfURLOutput);
+    //
+    //    // Finalize the output file
+}
+
+- (void)Buildpdf5
 {
     //[_mainwin log:@"building pdf ...."];
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow: 0.1]];
