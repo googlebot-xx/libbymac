@@ -57,6 +57,7 @@ function extractHTML(depth,frame,element,crossframe,nosrcframe,framekey,parentpr
     var visible,width,height,currentsrc,parser,htmltext,prefix;
     var doctype,target,text,asciistring,date,pageurl,state;
     var voidElements = new Array("area","base","br","col","command","embed","frame","hr","img","input","keygen","link","menuitem","meta","param","source","track","wbr");  
+    var formatHTML = true;
     /* W3C HTML5 4. */
 
     startTag = "<" + element.localName;

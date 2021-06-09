@@ -1192,7 +1192,6 @@ IOReturn iosuccess;
     //webdelegate.ebooktype = ebooktype;
     
     //[self log:@"ebook ready to download, click download button, \r%@",webdelegate.title];
-    [self log:@"ebook ready to download, \r"];
     [self log:@"%@ \r",webdelegate.title];
     if ([webdelegate ebooktype]==0)
         [self log:@"total chapter %d \r",webdelegate.pagelist.count];
@@ -1219,6 +1218,17 @@ IOReturn iosuccess;
             }
         }
     }
+    [self log:@"====================\r"];
+    [self log:@"do NOT read book in bookshelf app when downloading, it cause login problem.\r"];
+    [self log:@"====================\r"];
+    if ([webdelegate ebooktype]!=0) {
+        [self log:@"Vitalsource has 300-400 pages daily limitation, user should stop when captcha show up, wait 24 hours captcha disappear, restart app to download rest pages.\r"];
+        [self log:@"====================\r"];
+    }
+    
+    [self log:@"ebook ready to download, \r"];
+    [self log:@"===================="];
+
 
     if (false) {
         if ([webdelegate saveurllist:false]){ //loadurllist, resume mode
