@@ -11,20 +11,20 @@
 #define c_company @"eBookConverter"
 #define c_kindle @"Bookshelf"
 #define c_kindlebundle @"com.vitalsource.bookshelf"
-#define c_bundle @"com.ebookconverter.vbkdownload"
+#define c_bundle @"com.ebookconverter.libbyaudio"
 #define c_lib @"Library"
-#define c_app @"VitalSource Downloader"
-#define c_product @"VitalSource Downloader"
-#define c_self @"VitalSource Downloader"
-#define c_order @"http://www.ebook-converter.com/download/order.php?id=46"
-#define c_home @"https://www.ebook-converter.com/download/help.php?id=46"
+#define c_app @"Libby Audio Downloader"
+#define c_product @"Libby Audio Downloader"
+#define c_self @"Libby Audio Downloader"
+#define c_order @"http://www.ebook-converter.com/download/order.php?id=201"
+#define c_home @"https://www.ebook-converter.com/download/help.php?id=221"
 #define c_web @"https://www.ebook-converter.com"
 //#define c_active @"http://www.ebook-converter.com/download/activemac.php?id=%@&pid=%@"
 //#define c_active @"https://www.ebook-converter.com/download/activevsprinter.php?id=%@&pid=%@"
 #define c_active @"https://www.ebook-converter.com/download/api/active200.php?id=%@&pid=%@"
 #define c_activem @"https://www.ebook-converter.com/download/api/activemanlong.php?id=%@&pid=%@"
-#define c_str @"vistaldownload"
-#define c_pid @"46"
+#define c_str @"libbydownload"
+#define c_pid @"221"
 #define c_times 40
 #define c_licensefile @"converter.dat"
 
@@ -32,7 +32,7 @@
 //70 9a3680b8ad7265e2 4e46543bdf65d530
 // 271 c73b3262c1808174 2021-2
 
-#define c_seed @"vitaldownmac"
+#define c_seed @"libbyaudio"
 #define contains(str1, str2) ([str1 rangeOfString: str2 ].location != NSNotFound)
 
 //NSString a = @"PUC MINAS - BRAZIL";

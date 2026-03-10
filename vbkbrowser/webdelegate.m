@@ -23,15 +23,20 @@
 
 @implementation WebDelegate {
 //    NSString * ebookid;
+//    NSString * booktmp;
 }
 
 @synthesize tick;
 @synthesize ticked;
 @synthesize title;
 @synthesize ebookid;
+@synthesize curindex;
+@synthesize booktmp;
 @synthesize ebooktype;
 @synthesize pagelist;
 @synthesize urllist;
+@synthesize mp3file;
+@synthesize epubfile;
 
 - (id)init
 {
@@ -44,7 +49,7 @@
         //timer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(timerFired:) userInfo:nil repeats:YES];
         title = @"test epub";
         ebooktype = 0;
-        ebookid=@"123";
+        ebookid=@"123ddd";
         //_mainwin = self;
     }
     
@@ -66,6 +71,14 @@
     }
 }
 
+#pragma mark - download batch file
+
+- (void) downloadfiles
+{
+
+}
+
+
 #pragma mark - delegate
 
 - (void) clearurllist
@@ -74,85 +87,6 @@
     [titlelist removeAllObjects];
 }
 
-- (id)webView:(WebView *)sender identifierForInitialRequest:(NSURLRequest *)request
-fromDataSource:(WebDataSource *)dataSource
-{
-    //NSString *url = [self urldecode:request];
-    //NSLog(@"Resource %@",url);
-    
-    //[urllist addObject:[request URL]];
-    //[_mainwin log:url];
-    return [request URL];
-}
-
-//- (void)webView:(WebView *)sender resource:(id)identifier didReceiveResponse:(NSURLResponse *)response fromDataSource:(WebDataSource *)dataSource
-//{
-//    NSString *url = [identifier absoluteString];
-//    NSLog(@"didReceiveResponse %@",url);
-//    
-//}
-- (NSURLRequest*) webView:(WebView*)sender resource:(id)identifier willSendRequest:(NSURLRequest*)request
-         redirectResponse:(NSURLResponse*)redirectResponse fromDataSource:(WebDataSource*)dataSource
-{
-     NSString *url = [self urldecode:request];
-     NSString * j_inject=@"xxxxbase64font?id";
-    // NSString * j_inject=@".js";
-    // Am I interested in this request?
-    if ([url rangeOfString:j_inject].location !=NSNotFound) {
-        NSMutableURLRequest* newRequest = [request mutableCopy];
-        [NSURLProtocol setProperty:@YES forKey:@"MyApp" inRequest:newRequest];
-        //NSLog(@"Response %@",url);
-        return newRequest;
-    }
-    else {
-        // Not interested, let it go through normally
-        return request;
-    }
-}
-
-- (void) webView: (WebView *)sender resource:(id)identifier didFinishLoadingFromDataSource:(WebDataSource *)dataSource
-{
-    idurl = [identifier absoluteString];
-    //NSLog(@"didFinishLoadingFromDataSource %@",idurl);
-    //int d = [self PosRight:url substr:@"pages"];
-    NSString * path = [self urltopath:idurl];
-    
-    
-    if (false && [path rangeOfString:@".js"].location !=NSNotFound) {
-        WebResource *wrd = [dataSource subresourceForURL:identifier] ;//] [NSURL URLWithString:identifier]];
-        NSString * str =[[NSString alloc] initWithData:wrd.data encoding:NSUTF8StringEncoding];
-        //NSLog(@"%@",str);
-        //NSString * str=@"console.log('dd')";
-        //wrd.data = [str dataUsingEncoding:NSUTF8StringEncoding];
-        return;
-    }
-    
-    tick = 0;
-    ticked = false;
-    bool isbook = false;
-  
-
-// https://jigsaw.vitalsource.com/books/9781446297650DEMO/images/553246736447566b5831394d716d784c79356d55547130716a5a672b4c70644e2b6b4b7630424e4a5261453d0a/encrypted/1600
-//    if ([url rangeOfString:@"/epub/OEBPS/"].location != NSNotFound) {
-
-    //if ([path rangeOfString:@"/books/"].location == 0) {
-    if ([path rangeOfString:@"/books/"].location !=NSNotFound) {
-        isbook = true;
-    }
-
-    if (isbook) {
-        //NSLog(@"didFinish %d %@ ",tick,idurl);
-        //version 1
-        //NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys: identifier, @"url", dataSource, @"dataSource", nil];
-        
-        
-        //version 2
-        WebResource *wd = [dataSource subresourceForURL:identifier] ;//] [NSURL URLWithString:identifier]];
-        NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys: identifier, @"url", wd, @"dataSource", nil];
-        
-        [self performSelector: @selector(reallyDidFinishLoading:) withObject: dict afterDelay: 0.1];
-    }
-}
 
 - (void) reallyDidFinishLoading: (NSDictionary *)dict
 {
@@ -240,12 +174,14 @@ fromDataSource:(WebDataSource *)dataSource
     }
 }
 
-//OEBPS https://jigsaw.vitalsource.com/books/9781506301587DEMO/epub/OEBPS/images/pg133.jpg
-//OEBPS https://jigsaw.vitalsource.com/books/9781506301587DEMO/epub/OEBPS/images/pg141.jpg
 
-//https://bookshelf.vitalsource.com/#/books/9781635672268/cfi/15!/4/4@0.00:0.00
 - (void) saveurl: (NSString *)url
 {
+    if (![urllist containsObject:url])
+        [urllist addObject:url];
+    //NSLog(@"save url %@",url);
+    return;
+    
     NSString * newurl = [self urlleft:url];
     //NSLog(@"%@",newurl);
     if (_mainwin.working && ![urllist containsObject:newurl]) {
@@ -254,23 +190,51 @@ fromDataSource:(WebDataSource *)dataSource
     }
 }
 
+- (void) savedownloadurl: (NSString *)url
+{
+    [cfilist addObject:url];
+    downnum +=1;
+    //[_mainwin updatelog:@"Load %d/%d", downnum,pagelist.count];
+
+    return;
+    
+    if (![cfilist containsObject:url])
+        [urllist addObject:url];
+    //NSLog(@"save url %@",url);
+    return;
+    NSString * newurl = [self urlleft:url];
+    //NSLog(@"%@",newurl);
+    if (_mainwin.working && ![urllist containsObject:newurl]) {
+        [urllist addObject:newurl];
+        //NSLog(@"save url %@",url);
+    }
+}
+
+- (void) checkbookid: (NSString *)url
+{
+    NSString * aid = [self getbookid:url];
+    if (![ebookid isEqual:aid]) {
+        NSLog(@"new book %@",aid);
+        [urllist removeAllObjects];
+        ebookid = aid;
+    }
+}
+
+
 - (void) findbook:(NSDictionary *)dict
 {
-    NSString * s1 = [dict objectForKey:@"isbn"];
-    if ([ebookid isEqualToString:s1]) return;
-    ebookid = s1;
+//    NSString * s1 = [dict objectForKey:@"isbn"];
+//    if ([ebookid isEqualToString:s1]) return;
+//    ebookid = s1;
     title =  [dict objectForKey:@"title"];
 
-    s1 = [dict objectForKey:@"vbkType"];
-    if ([s1 isEqualToString:@"epub"])
-        ebooktype = 0; //epub
-    else ebooktype = 1; //pdf
-
     pagelist = NULL;
-    pagelist = [dict objectForKey:@"pageList"];
+    pagelist = [dict objectForKey:@"spin"];
+    [cfilist removeAllObjects];
+    NSLog(@"Total %d",pagelist.count);
     //pagelist = [NSArray arrayWithArray: [dict objectForKey:@"pageList"]];
     //NSLog(@"pagelist %d",pagelist.count);
-    [self buildurllist];
+    //[self buildurllist];
     //NSLog(@"page 0 %@",[urllist objectAtIndex:0]);
 
 }
@@ -331,23 +295,52 @@ fromDataSource:(WebDataSource *)dataSource
 - (void) buildurllist
 {
     //build urllist
-    [urllist removeAllObjects];
+//    [urllist removeAllObjects];
     [cfilist removeAllObjects];
     for (int i=0; i<[pagelist count]; i++) {
         NSDictionary *urldict = [pagelist objectAtIndex:i];
         //NSString * s1 = [urldict objectForKey:@"cfi"];
-        NSString * s1 = [urldict objectForKey:@"cfiWithoutAssertions"];
+        NSString * s1 = [urldict objectForKey:@"path"];
         NSString * s2 = [self cleancfi:s1]; //clean cfi
         //[urldict setValue:s2 forKey:@"cfiWithoutAssertions"];
         [cfilist addObject:s2];
-        if (ebooktype==1)
-//           s1 = [NSString stringWithFormat:@"https://jigsaw.vitalsource.com%@?width=2000",s1];
-            s1 = [NSString stringWithFormat:@"https://bookshelf.vitalsource.com/#/books/%@/cfi%@",ebookid,s1];
-        else
-            s1 = [NSString stringWithFormat:@"https://bookshelf.vitalsource.com/#/books/%@/cfi%@",ebookid,s1];
-        //s1 = [NSString stringWithFormat:@"https://jigsaw.vitalsource.com/books/%@/cfi%@",ebookid, s1];
-        [urllist addObject:s1];
+        s1 = [NSString stringWithFormat:@"https://%@/%@",host,s1];
+        //NSLog(@"%@",s1);
+        //[urllist addObject:s1];
     }
+}
+
+- (BOOL) findMissing
+{
+    for (int i=0; i<[urllist count]; i++) {
+        NSString * s1 = [urllist objectAtIndex:i];
+        if (![cfilist containsObject:s1]) {
+            NSString * s3 = [self urltopath:s1];
+            NSString * s2 = [booktmp stringByAppendingPathComponent:s3];
+            //NSLog(@"%@",s1);
+            //NSLog(@"%@",s2);
+            epubfile = s1;
+            mp3file = s2;
+            curindex = i;
+            return TRUE;
+        }
+    }
+    return false;
+    
+    for (int i=0; i<[urllist count]; i++) {
+        NSString * s1 = [urllist objectAtIndex:i];
+        NSString * s3 = [self urltopath:s1];
+        NSString * s2 = [booktmp stringByAppendingPathComponent:s3];
+        if (![self fileexist:s2]) {
+            NSLog(@"%@",s1);
+            NSLog(@"%@",s2);
+            epubfile = s1;
+            mp3file = s2;
+            curindex = i;
+            return TRUE;
+        }
+    }
+    return false;
 }
 
 - (NSString *) pageurl:(int) i
@@ -692,65 +685,6 @@ fromDataSource:(WebDataSource *)dataSource
     
 }
 
-- (void) TocNcx:(NSString *) path
-{
-    NSString *filePath = [[NSBundle mainBundle] pathForResource:@"toc" ofType:@"ncx"];
-    NSData *data = [NSData dataWithContentsOfFile:filePath];
-    NSString *opfstr = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-
-    NSString *demofile = [[NSBundle mainBundle] pathForResource:@"instru" ofType:@"xhtml"];
-    NSData *demodata = [NSData dataWithContentsOfFile:demofile];
-
-    NSString * nvpoint=@"";
-    for (int i=0; i<[pagelist count];i++){
-        NSDictionary *urldict = [pagelist objectAtIndex:i];
-        NSString * fname = [urldict objectForKey:@"path"];
-        fname = [self removelash:fname];
-
-        //NSString * url = [urllist objectAtIndex:i];
-        //NSString * fpath = [self urltopath:url];
-        //NSString * fname = [self getpagepath:fpath] ;
-        //NSLog(@"%@",fname);
-        //NSString * scfi = [[fname lastPathComponent] stringByDeletingPathExtension];
-        //scfi = [scfi stringByDeletingPathExtension];
-        NSString * scfi = [urldict objectForKey:@"chapterTitle"];
-        scfi = [self cleanstring:scfi];
-        //if ([titlelist count]>i)
-        //    scfi = [titlelist objectAtIndex:i];
-        //NSLog(@"%@",scfi);
-        nvpoint= [NSString stringWithFormat:@"%@\r\t\t<navPoint id=\"navpoint%d\" playOrder=\"%d\">",nvpoint,i+1,i+1];
-        nvpoint= [NSString stringWithFormat:@"%@\r\t\t<navLabel>",nvpoint];
-        nvpoint= [NSString stringWithFormat:@"%@\r\t\t\t<text>%@</text>",nvpoint,scfi];
-        nvpoint= [NSString stringWithFormat:@"%@\r\t\t</navLabel>",nvpoint];
-        nvpoint= [NSString stringWithFormat:@"%@\r\t\t<content src=\"%@\"/>",nvpoint,fname];
-        nvpoint= [NSString stringWithFormat:@"%@\r\t\t</navPoint>",nvpoint];
-        
-        NSString * htmlfile = [path stringByAppendingPathComponent:fname];
-        [self CleanHtml:htmlfile];
-        
-        if (false && ![reg isreg])
-        {
-            int j = i % 2;
-            if (i>2 && j==0) { //copy demo page from 4
-            //if (true) { //copy demo page from 4
-                NSString * epubdemo = fname ;//[fpath stringByReplacingOccurrencesOfString:@"/books/" withString:@"/"];
-                epubdemo = [path stringByAppendingPathComponent:epubdemo];
-
-                //NSString * epubfile = [fpath stringByAppendingPathComponent:@""];
-
-                //NSLog(@"%@",epubfile);
-                [demodata writeToFile:epubdemo atomically:YES];
-            
-            }
-        }
-    }
-    opfstr = [opfstr stringByReplacingOccurrencesOfString:@"{navPoint}" withString:nvpoint];
-
-    data = [opfstr dataUsingEncoding:NSUTF8StringEncoding];
-    //NSString * s1 = [NSString stringWithFormat:@"%@/OEBPS/toc.ncx",path];
-    NSString * s1 = [NSString stringWithFormat:@"%@/toc.ncx",path];
-    [data writeToFile:s1 atomically:YES];
-}
 
 - (bool) CleanHtml:(NSString *) filePath
 {
@@ -764,35 +698,6 @@ fromDataSource:(WebDataSource *)dataSource
     return true;
 }
 
-- (bool) BuildPub:(NSString *) afile
-{
-//    [urllist addObject:@"https://jigsaw.vitalsource.com/books/9781506301587DEMO/epub/OEBPS/cover.xlink.xhtml#cfi=/6/2"];
-//    [urllist addObject:@"https://jigsaw.vitalsource.com/books/9781506301587DEMO/epub/OEBPS/ch0001.xlink.xhtml#cfi=/6/4%5B;vnd.vst.idref=ch0001%5D"];
-//    [urllist addObject:@"https://jigsaw.vitalsource.com/books/9781506301587DEMO/epub/OEBPS/ch0005.xlink.xhtml#cfi=/6/6%5B;vnd.vst.idref=ch0005%5D"];
-    _mainwin.outputfile = nil;
-    
-    if ([pagelist count]==0)
-        return false;
-    
-    NSDictionary *urldict = [pagelist objectAtIndex:0];
-    title = [self getbookid:[urldict objectForKey:@"absoluteURL"]];
-    if ([title length]>100) {
-        title = [title substringToIndex:100];
-    }
-    //NSString *bookid = [self getbookid:path];
-
-    [self buildurllist];
-  
-    NSString * idpath = [self getepubfolder:[urldict objectForKey:@"absoluteURL"] path:[urldict objectForKey:@"path"]];
-    NSString * dir = [_mainwin.datadir stringByAppendingPathComponent:idpath];
-
-    //NSLog(@"%@",dir);
-    [self CopyMETAINF:dir];
-    [self ContentOPF:dir];
-    [self TocNcx:dir];
-    return [self zipePub:dir];
-    //return true;
-}
 
 - (bool) zipePub:(NSString *) path
 {
@@ -1278,96 +1183,6 @@ fromDataSource:(WebDataSource *)dataSource
     //    // Finalize the output file
 }
 
-- (bool) Buildpdf4:(NSString *) afile
-{
-
-    //NSString * dir;
-    //title = [titlelist objectAtIndex:0];
-    //NSString * dir = [self getpdftmpfolder:[urllist objectAtIndex:0]];
-    //NSString * dir = [_mainwin.datadir stringByAppendingPathComponent:idpath];
-    //NSLog(dir);
-    //[self pdfimglist];
-    //return true;
-    //NSLog(@"%@",dir);
-    _mainwin.outputfile = nil;
-    NSString * dir = [_mainwin.datadir stringByAppendingPathComponent:ebookid];
-
-    NSArray * alist =  [[NSFileManager defaultManager] contentsOfDirectoryAtPath:dir error:nil];
-    NSString *str              = @".png";
-    NSPredicate *sPredicate    = [NSPredicate predicateWithFormat:@"SELF contains[c] %@",str];
-    NSArray *list    = [alist filteredArrayUsingPredicate:sPredicate];
-    list = [list sortedArrayUsingComparator:
-         ^NSComparisonResult(id file1, id file2)
-         {
-             // compare
-            NSString * p1 = [[(NSString *)file1 lastPathComponent] stringByDeletingPathExtension];
-            NSString * p2 = [[(NSString *)file2 lastPathComponent] stringByDeletingPathExtension];
-            p1 = [[p1 componentsSeparatedByCharactersInSet:
-                          [[NSCharacterSet characterSetWithCharactersInString:@"+0123456789"]
-                          invertedSet]]
-                          componentsJoinedByString:@""];
-            p2 = [[p2 componentsSeparatedByCharactersInSet:
-                          [[NSCharacterSet characterSetWithCharactersInString:@"+0123456789"]
-                          invertedSet]]
-                      componentsJoinedByString:@""];
-            int n1  = [p1 intValue];
-            int n2 =  [p2 intValue];
-            if (n1>n2) {
-              return (NSComparisonResult)NSOrderedDescending;
-            }
-
-            if (n1 < n2) {
-              return (NSComparisonResult)NSOrderedAscending;
-            }
-            return (NSComparisonResult)NSOrderedSame;
-             // Ascending:
-         }];
-    NSLog(@"%@",list);
-    PDFDocument *pdf = [[PDFDocument alloc] init];
-    //NSImage * img = scaledImage;
-    [_mainwin log:@"Load pdf pages %d ...", [list count]];
-    int i = 0;
-    int m =0;
-    for (NSString *url in list) {
-
-        //NSString * path = [self pagenofilename:i];//[self urltopath:url];
-        NSString * path = [dir stringByAppendingPathComponent:url];
-        //NSLog(@"%@", path);
-        
-        NSFileManager *fileManager = [NSFileManager defaultManager];
-        
-        if (![fileManager fileExistsAtPath:path]) {
-            continue;
-        }
-        
-        NSImage *img = [[NSImage alloc]initWithContentsOfFile:path];
-        
-        if (![reg isreg])
-            [self drawtext:img];
-        
-        PDFPage * page;
-        
-        page = [[PDFPage alloc] init];
-        [page initWithImage: (NSImage *) img];
-        [pdf insertPage: page atIndex: [pdf pageCount]];
-        i++;
-        //[page release];
-        //[img release];
-    }
-    //if ([title length]<4) {
-    title = [ebookid stringByAppendingString:title];
-    //}
-    NSString * fname = [NSString stringWithFormat:@"%@.pdf",title];
-    fname =[self cleanfilename:fname];
-    fname = [_mainwin.ebookdir stringByAppendingPathComponent:fname];
-    
-       [pdf writeToFile:  fname];
-    [_mainwin log:@"PDF file saved %@", fname];
-    _mainwin.outputfile = fname;
-    //[pdf release];
-    return true;
-}
-
 - (bool) Buildpdf2:(NSString *) afile
 {
 
@@ -1428,61 +1243,6 @@ fromDataSource:(WebDataSource *)dataSource
     return true;
 }
 
-- (bool) Buildpdf3:(NSString *) afile
-{
-
-    NSString * dir;
-    //title = [titlelist objectAtIndex:0];
-    //NSString * dir = [self getpdftmpfolder:[urllist objectAtIndex:0]];
-    //NSString * dir = [_mainwin.datadir stringByAppendingPathComponent:idpath];
-    //NSLog(dir);
-    //[self pdfimglist];
-    //return true;
-    //NSLog(@"%@",dir);
-    _mainwin.outputfile = nil;
-
-    PDFDocument *pdf = [[PDFDocument alloc] init];
-    //NSImage * img = scaledImage;
-    [_mainwin log:@"Load pdf pages %d ...", [urllist count]];
-    for (NSString *url in urllist) {
-        
-        NSString * path = [_mainwin pagefilename:url ];//[self urltopath:url];
-        //path = [dir stringByAppendingPathComponent:path];
-        //NSLog(@"%@", path);
-        
-        NSFileManager *fileManager = [NSFileManager defaultManager];
-        
-        if (![fileManager fileExistsAtPath:path])
-            continue;
-        
-        NSImage *img = [[NSImage alloc]initWithContentsOfFile:path];
-        
-        if (![reg isreg])
-            [self drawtext:img];
-        
-        PDFPage * page;
-        
-        page = [[PDFPage alloc] init];
-        [page initWithImage: (NSImage *) img];
-        [pdf insertPage: page atIndex: [pdf pageCount]];
-        
-        //[page release];
-        //[img release];
-    }
-    //if ([title length]<4) {
-    title = [ebookid stringByAppendingString:title];
-    //}
-    NSString * fname = [NSString stringWithFormat:@"%@.pdf",title];
-    fname =[self cleanfilename:fname];
-    fname = [_mainwin.ebookdir stringByAppendingPathComponent:fname];
-    
-       [pdf writeToFile:  fname];
-    [_mainwin log:@"PDF file saved %@", fname];
-    _mainwin.outputfile = fname;
-    //[pdf release];
-    return true;
-}
-
 - (void)drawtext: (NSImage *) scaledImage
 {
     [scaledImage lockFocus];
@@ -1533,6 +1293,13 @@ fromDataSource:(WebDataSource *)dataSource
     NSString * fname = urlComponents.path;
     
     return fname;
+}
+
+- (NSString*) urltodomain: (NSString *) url
+{
+    NSURLComponents *urlComponents = [NSURLComponents componentsWithString:url];
+    host  = urlComponents.host;
+    return host;
 }
 
 - (NSString *) urldecode: (NSURLRequest *) request
@@ -1641,11 +1408,12 @@ fromDataSource:(WebDataSource *)dataSource
 - (NSString *) getbookid: (NSString *) path
 {
     NSArray * list = [path componentsSeparatedByString:@"/"];
+    return [list objectAtIndex:[list count]-1];
     
     for (int i=0; i<[list count]; i++) {
         NSString * s1 = [list objectAtIndex:i];
-        if ([s1 isEqualToString:@"books"] && [list count]>i)
-            return [list objectAtIndex:i+1];
+        if ([s1 isEqualToString:@"loan"] && [list count]>i)
+            return [list objectAtIndex:i+2];
         
     }
     //   /api/v0/books/9781506301587DEMO/pages

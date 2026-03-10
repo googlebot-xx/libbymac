@@ -20,19 +20,25 @@
 #include <IOKit/pwr_mgt/IOPMLib.h>
 #import <CommonCrypto/CommonCryptor.h>
 
-#define c_agent16 @"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.1 Safari/605.1.15"
-#define c_agent15 @"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.1 Safari/605.1.15"
-#define c_agent14 @"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_4) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.1 Safari/605.1.15"
+#define c_agent16 @"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.3 Safari/605.1.15"
+#define c_agent15 @"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.3 Safari/605.1.15"
+#define c_agent14 @"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_4) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.3 Safari/605.1.15"
 #define c_end 9998
+
+#define c_domain @"jigsaw.vitalsource.com"
+#define c_session @"_jigsaw_session"
 //#define tviewwidth 1200
 
 // 0.99
 //https://www.vitalsource.com/products/gluten-free-and-wheat-free-guide-with-recipes-speedy-publishing-v9781633835498
 
+//play is in iframe,  js in wkwebview config, run every page, found paly page, sent url message
+//findbook, foundjson show audio info,
+
 static void* keyValueObservingContext = &keyValueObservingContext;
 
 
-@interface mainWin ()< WKNavigationDelegate, WKUIDelegate>
+@interface mainWin ()< WKNavigationDelegate, WKUIDelegate,NSURLSessionDownloadDelegate>
 {
     WKFrameInfo * epubframe;
 }
@@ -70,9 +76,6 @@ IOReturn iosuccess;
     IBOutlet NSButton * downloadbtn;
     IBOutlet NSTextView *textview;
     IBOutlet NSTextField *address;
-    IBOutlet NSTextField *timeouted;
-    IBOutlet NSTextField *started;
-    IBOutlet NSTextField *ended;
 
     IBOutlet id buybtn;
     IBOutlet id helpbtn;
@@ -80,7 +83,7 @@ IOReturn iosuccess;
 
     int taskindex;
     int totalpage;
-    int pageindex;
+    __block  int pageindex;
     int framenum;
     int ticknum;
     int startno;
@@ -88,17 +91,23 @@ IOReturn iosuccess;
     BOOL framewaiting;
     BOOL jswaiting;
     BOOL pausing;
-    BOOL loading;
+    __block  BOOL loading;
     BOOL printing;
     BOOL hasimg;
     int c_captcha;
     NSString * jsmessage;
     CGPoint mousepoint;
     NSString * curpage;
+    NSString * booktmp;
+    NSString * jsresnext;
+    NSString * host;
+    NSString * frameurl;
 
     WebDelegate * webdelegate;
     WebScriptObject * epubwinobj;
     WebFrame * epubcontent;
+    
+    NSMutableArray * cooklist;
     
     WKWebViewConfiguration *configuration;
 }
@@ -160,25 +169,25 @@ IOReturn iosuccess;
 - (void)loadjs:(WKWebViewConfiguration *) configuration
 {
 //    NSLog(@"%@",js_cssrule);
-    NSString * fname =[[NSBundle mainBundle] pathForResource:@"page" ofType:@"dat"];
-    NSString * js;
-    js=[self decryptfile:@"123456781234567812345678" infile:fname];
-    //NSLog(@"%@",js);
-    //NSString * fname =[[NSBundle mainBundle] pathForResource:@"cssrule" ofType:@"js"];
-#ifdef DEBUG
-    fname = @"/Users/aa/work/project/vbkbrowser-wk/cssrule.js";
-    jsdiv=[self loadfile:fname];
-    //fname =[[NSBundle mainBundle] pathForResource:@"frameheight" ofType:@"js"];
-//    fname = @"/Users/aa/work/project/vbkbrowser-wk copy/frameheight.js";
-    fname = @"/Users/aa/work/project/vbkbrowser-wk/page.js";
-    js=[self loadfile:fname];
-#else
-    jsdiv = js_cssrule;
-    //js = js_frameheight;
-#endif
+//    NSString * fname =[[NSBundle mainBundle] pathForResource:@"page" ofType:@"dat"];
+//    NSString * js;
+//    js=[self decryptfile:@"123456781234567812345678" infile:fname];
+//    //NSLog(@"%@",js);
+//    //NSString * fname =[[NSBundle mainBundle] pathForResource:@"cssrule" ofType:@"js"];
+//#ifdef DEBUG
+//    fname = @"/Users/aa/work/project/vbkbrowser-wk/cssrule.js";
+//    jsdiv=[self loadfile:fname];
+//    //fname =[[NSBundle mainBundle] pathForResource:@"frameheight" ofType:@"js"];
+////    fname = @"/Users/aa/work/project/vbkbrowser-wk copy/frameheight.js";
+//    fname = @"/Users/aa/work/project/vbkbrowser-wk/page.js";
+//    js=[self loadfile:fname];
+//#else
+//    jsdiv = js_cssrule;
+//    //js = js_frameheight;
+//#endif
     //NSString * js= js_frameheight;
     //return;
-    WKUserScript *script = [[WKUserScript alloc] initWithSource:js injectionTime:WKUserScriptInjectionTimeAtDocumentEnd forMainFrameOnly:NO];
+    WKUserScript *script = [[WKUserScript alloc] initWithSource:js_bif injectionTime:WKUserScriptInjectionTimeAtDocumentEnd forMainFrameOnly:NO];
     WKUserContentController *userContentController = [[WKUserContentController alloc] init];
     [userContentController addUserScript:script];
     [userContentController addScriptMessageHandler:self name:@"logging"];
@@ -190,13 +199,15 @@ IOReturn iosuccess;
     [self loadjs:configuration];
     //webView = [[WKWebView alloc] initWithFrame:[containerView bounds] configuration:configuration];
     webView = [[WKWebView alloc] initWithFrame:[bview bounds] configuration:configuration];
+    //webView = [[WKWebView alloc] initWithFrame:NSMakeRect([bview bounds].origin.x,[bview bounds].origin.y,600,600) configuration:configuration];
+//    webView = [[Mkwebview alloc] initWithFrame:[bview bounds] configuration:configuration];
 //    webView = [[Mkwebview alloc] initWithFrame:[bview bounds] configuration:configuration];
     [webView setAutoresizingMask:(NSViewWidthSizable | NSViewHeightSizable)];
     #ifdef DEBUG
         [configuration.preferences  setValue:@YES forKey:@"developerExtrasEnabled"];
     #endif
-    //webView.allowsMagnification = YES;
-    //webView.allowsBackForwardNavigationGestures = YES;// NO;
+    webView.allowsMagnification = YES;
+    webView.allowsBackForwardNavigationGestures = YES;// NO;
     webView.navigationDelegate = self;
     webView.UIDelegate = self;
     
@@ -214,10 +225,11 @@ IOReturn iosuccess;
 
     ebookdir00 = ebookdir;
     cachedir = [ebookdir stringByAppendingPathComponent:@"cache"];
-    [self createfolder:cachedir];
+    //[self createfolder:cachedir];
     
-    datadir = [ebookdir stringByAppendingPathComponent:@"tmp"];
-    [self createfolder:datadir];
+//    datadir = [ebookdir stringByAppendingPathComponent:@"tmp"];
+//    [self createfolder:datadir];
+    datadir = ebookdir;
     
     [reg checkkey];
     //[NSString stringWithFormat:@"Ver %@ (%@)\n\n%@",s2,s4,s5];
@@ -230,8 +242,10 @@ IOReturn iosuccess;
     [testbtn setHidden:true];
     [resetbtn setHidden:true];
     [downloadbtn setEnabled:false];
-    [ended setStringValue:[NSString stringWithFormat:@"%d",c_end]];
-    c_captcha=90;
+    c_captcha=15;
+    
+    cooklist = [[NSMutableArray alloc] init];
+
     //[ended setStringValue:@"37"];
     //[started setStringValue:@"30"];
     //[box setHidden:true];
@@ -245,10 +259,8 @@ IOReturn iosuccess;
 #ifdef DEBUG
     [testbtn setHidden:false];
     [resetbtn setHidden:false];
-    [timeouted setStringValue:@"60"];
 #else
     [testbtn setHidden:true];
-    [timeouted setStringValue:@"60"];
 #endif
     
 #ifdef DEBUG
@@ -271,31 +283,18 @@ IOReturn iosuccess;
     //[webView setFrameLoadDelegate:self];
     
     //NSString * us =@"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_1) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/12.0.1   Safari/605.1.15";
-    NSString * us = @"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.1 Safari/605.1.15"; //@" Version/13.0.2 Safari/605.1.15";
+    NSString * us = @"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.3 Safari/605.1.15"; //@" Version/13.0.2 Safari/605.1.15";
     //us = [us stringByAppendingString:@" Version/13.0.2 Safari/605.1.15"];
     NSString * ra = [self randomstr:8];
     //webView.customUserAgent=[NSString stringWithFormat:us,ra] ;
-    webView.customUserAgent= c_agent15;
+    //webView.customUserAgent= c_agent15;
     working = false;
-    
-    //[NSURLProtocol wk_registerScheme:@"http"];
-    //[NSURLProtocol wk_registerScheme:@"https"];
-    //[NSURLProtocol wk_registerScheme2];
-    //[NSURLProtocol registerClass:[MyURLProtocol class]];
-    //[NSURLProtocol registerClass:[HybridNSURLProtocol class]];
-    
-    //[self setssfont];
-    //NSString * aurl = @"https://www.vitalsource.com/bookshelf/home";
-    //NSString * aurl = @"https://www.bing.com";
-    //[webView becomeFirstResponder];
+    loading = false;
     
     [webView addObserver:self forKeyPath:@"title" options:0 context:keyValueObservingContext];
     [webView addObserver:self forKeyPath:@"URL" options:0 context:keyValueObservingContext];
-    //[webView addObserver:self forKeyPath:@"estimatedProgress" options:0 context:keyValueObservingContext];
-    //NSString * aurl = @"http://flyos.net/bt4.htm";
-    //NSString * aurl = @"https://www.vitalsource.com/";
-    NSString * aurl = @"https://www.vitalsource.com/bookshelf/home";
-    //NSString * aurl = @"https://bookshelf.vitalsource.com/#/";
+
+    NSString * aurl = @"https://libbyapp.com/shelf";
     //NSString * aurl = @"http://flyos.net/js/iframe/bt1.html";
     //NSString * aurl = @"https://www.vitalsource.com/bookshelf/home";
     //NSString * aurl = @"https://www.google.com/";
@@ -346,8 +345,8 @@ IOReturn iosuccess;
 - (void)setcache
 {
     //return;
-    int cacheSizeMemory = 4*1024*1024; // 4MB
-    int cacheSizeDisk = 32*1024*1024; // 32MB
+    int cacheSizeMemory = 0; // 4MB
+    int cacheSizeDisk = 128*1024*1024; // 32MB
     NSURLCache *sharedCache = [[NSURLCache alloc] initWithMemoryCapacity:cacheSizeMemory diskCapacity:cacheSizeDisk diskPath:cachedir];
     [NSURLCache setSharedURLCache:sharedCache];
 }
@@ -390,16 +389,42 @@ IOReturn iosuccess;
 
 
 
-
-- (IBAction)testfile:(id)sender
-{
-    //NSString * url =@"https://jigsaw.vitalsource.com/books/9781506301587DEMO/epub/OEBPS/images/pg141.jpg";
-    //[webdelegate saveepubfile:url data:nil];
-    [self pageiframejs:0];
-}
-
 - (IBAction)testbtn:(id)sender
 {
+    [self deletemp3files];
+    return;
+    if ([webdelegate findMissing])
+        [self downloadurl:webdelegate.epubfile];
+    return;
+//    [self nextpage:1];
+//    return;
+    //webView;
+    //[self keydown:32];
+    //webView.unlockFocus;
+    //return;
+    
+    NSString * res;
+    res = [self runjs2:js_keypress];
+//    res = [self runjs2:js_nextpage];
+    NSLog(@"%@", res);
+    return;
+    
+
+    
+    NSString *  s1=@"https://dewey-38382372a2f41b874d40990086c6d07e.listen.libbyapp.com/%7B95782A11-6172-4F0B-8F38-0681F00B12CA%7DFmt425-Part02.mp3";
+    [self downloadurl:s1];
+    return;
+    
+    [self runjs2:@"console.log(window);"];
+    return;
+    pageindex = 0;
+    [self downloadnext];
+    return;
+    
+    [self downloadfile:@"https://dewey-04053b5d185dbe9bee5e34cfe9840b8b.listen.libbyapp.com/%7BC5AA405E-7FDB-415B-B0D8-7091B5BFB4EC%7DFmt425-Part01.mp3?cmpt=eyJzcGluZSI6MH0%3D--b823af714a507d2a08976fb5c4bc2cb51574a8a9"];
+    
+    return;
+
     NSString * url = webView.URL.absoluteString;
     if ([url rangeOfString:@"signin"].location != NSNotFound) {
         [self loginjs:nil];
@@ -422,23 +447,10 @@ IOReturn iosuccess;
 //    [self Setwebviewheight];
 //    [self logwebview];
 //    return;
-//    [self log:@"building pdf ...."];
-//    [webdelegate Buildpdf];
-//    return;
-//    NSString * file =@"/Users/aa/Documents/eBookConverter/VitalSource Downloader/tmp/9780197522585/0026.html";
-//    NSString * pdf =@"/Users/aa/Documents/eBookConverter/VitalSource Downloader/tmp/9780197522585/0026.pdf";
-//    [pdfconverter printhtml:file toPDF:pdf];
-//    return;
-//    NSString * s1 = @"6/23!44[33";
-//    NSLog(@"%@ %@",s1,[webdelegate cleancfi:s1]);
-//    return;
-    [webdelegate Buildpdfpdf];
-    //[webdelegate Buildpdf];
+    [self jskeydown];
+    //[self nextpage:1];
     return;
     
-    webviewrect = [webView frame];
-    [self Setwebviewheight];
-    [self runjs2:jsdiv];
     //pageindex++;
     //[self wait:100];
     //sleep(300);
@@ -493,6 +505,11 @@ IOReturn iosuccess;
 //    [reg savetimes:0];
 #endif
 }
+
+#pragma mark - dispatch group
+//
+
+
 #pragma mark - runloop
 
 - (void) wait: (float) secs
@@ -543,75 +560,45 @@ IOReturn iosuccess;
 - (void) setWorking:(BOOL)aworking
 {
     working = aworking;
-    BOOL bpause=pausing;
     if (aworking) {
 
-        ttimeout= [[timeouted stringValue] intValue];
-        startno = [[started stringValue] intValue];
-        if(startno>0) startno--;
         totalpage = webdelegate.pagelist.count ;
-        if (startno>= totalpage)
-            startno= totalpage-1;
 
-        endno = [[ended stringValue] intValue];
         //webdelegate.ebookid = [webdelegate getbookid:addressurl];
         //startno = [self urlpageno:addressurl];
         //ebooktype = [self ebooktypejs];
         //webdelegate.ebooktype = ebooktype;
         //[vars removeAllObjects];
         //[webdelegate clearurllist];
-        taskindex=0;
-        pageindex=startno;
-        webView.customUserAgent= c_agent16;
+        taskindex=10;
+        pageindex=0;
+        totalpage = webdelegate.pagelist.count;
 //            startno=0;
 
-#ifdef DEBUG
-        //c_captcha=6;
-        //endno = startno+99;
-        totalpage = startno+99;
-#endif
         if (![reg isreg]) {
-            totalpage = pageindex+6;
-            [self log:@"demo version only download %d pages",totalpage];
+            //totalpage = pageindex+6;
+            //[self log:@"demo version only download %d pages",totalpage];
         }
-        [self log:@"Start download, not read book in other browser, wait ...."];
 
-        [self log:@"\r========================="];
-        [self log:@"Close Bookshelf app while downloading,"];
-        [self log:@"=========================\r"];
-        //webdelegate.title = nil;// @"";
-        //[NSThread sleepForTimeInterval:0.5f];
-        //move mouse
-        //[self scrubberjs];
-        webviewrect = [webView frame];
-        //ebooktype = [self ebooktypejs];
-        tviewwidth = webviewrect.size.width;
+        if (![reg isreg]) {
+            [self log:@" "];
+            [self log:@"Demo version limit 6 files download "];
+        }
+        
+        [self log:@" "];
+        [self log:@"Start download "];
+        
 
-        NSRect r = webviewrect;
-        //[webView setFrame:NSMakeRect(r.origin.x,r.origin.y,tviewwidth,r.size.height)];
-        //mousepoint = CGPointMake(r.origin.x+r.size.width-50,[[NSScreen mainScreen] frame].size.height- (r.origin.y+r.size.height/2));
-        //CGWarpMouseCursorPosition(mousepoint);
-        //[NSApplication
-        if (webdelegate.ebooktype==0)
-            tasktimer = [NSTimer scheduledTimerWithTimeInterval:0.6 target:self selector:@selector(epubtaskhandle:) userInfo:nil repeats:NO];
-        else
-            tasktimer = [NSTimer scheduledTimerWithTimeInterval:0.6 target:self selector:@selector(pdftaskhandle:) userInfo:nil repeats:NO];
-        CFStringRef* reasonForActivity= CFSTR("vitalsource Describe Activity Type");
+        CFStringRef* reasonForActivity= CFSTR("libby Describe Activity Type");
 //kIOPMAssertionTypePreventSystemSleep kIOPMAssertionTypeNoDisplaySleep
         iosuccess = IOPMAssertionCreateWithName(kIOPMAssertionTypePreventSystemSleep ,
                                             kIOPMAssertionLevelOn, reasonForActivity, &assertionID);
         
         [downloadbtn setTitle:@"Stop"];
+        tasktimer = [NSTimer scheduledTimerWithTimeInterval:1.5 target:self selector:@selector(epubtaskhandle:) userInfo:nil repeats:NO];
     } else {
         working = false;
-        webView.customUserAgent= c_agent15;
-        NSRect r = webviewrect;
-        [webView setFrame:NSMakeRect(r.origin.x,r.origin.y,r.size.width,r.size.height)];
-        [tasktimer invalidate];
-        //[self log:@"download end"];
         [downloadbtn setTitle:@"Download"];
-        [self savevars:true];
-        //[webdelegate saveurllist:true];
         if (iosuccess==kIOReturnSuccess) {
             iosuccess = IOPMAssertionRelease(assertionID);
         }
@@ -619,398 +606,18 @@ IOReturn iosuccess;
     //NSLog(@"working %d",aworking);
 }
 
-- (void) rundownload
-{
-    [self setWorking:true];
-    
-    taskindex = 0;
+-(void) downloadnext {
+    //NSLog(@"waitselector ...");
+    if (pageindex==totalpage) {
+        taskindex = 20; //goback page button click
+        [self setWorking:!working];
+    }
+    curpage = webdelegate.urllist[pageindex];
+    [self downloadfile:curpage];
+    pageindex +=1;
 }
 
-- (void) epubtaskhandle:(NSTimer*)theTimer
-{
-    if (!working) return;
-    NSString * url=@"";
-    //NSLog(@"task %d tick %d",taskindex,ticknum);
-    switch (taskindex) {
-        case 0:
-            //startno=0;
-            [self firstpage];
-            [self log:@"Load chapter %d-%d",startno+1,pageindex+1];
-//            url=[webdelegate.urllist objectAtIndex:startno];
-//            pageindex = startno;
-//            [self goURL:url];
-//            //[self nextpage1:startno];
-//            [self log:@"Load page %d",startno];
-            //[self runjs2:jsdiv];
 
-            loading = true;
-            captcha = 0;
-            taskindex = 20;
-            oldaddrees = @"";
-            pausing=false;
-            break;
-        case 10:  //click next button
-            // Item 3
-            //if ((framenum>0) || (![addressurl isEqualToString:oldaddrees] )) {
-            pageindex+=1;
-            [vars setValue:[NSString stringWithFormat:@"%d",pageindex ] forKey:@"download"];
-
-            if (pageindex<endno && pageindex<totalpage && pageindex< webdelegate.pagelist.count) {
-                [self updatelog:@"load chapter %d-%d",pageindex+1,pageindex-startno+1];
-                //[self pagebuttonjs:pageindex]; ////goback page button click
-                //[self nextpage:pageindex];
-                framenum=0;
-                ticknum =0;
-                captcha = 0;
-                oldaddrees=addressurl;
-                taskindex = 20;
-                [self nextpage:pageindex];
-                loading = true;
-                //press nextpage
-            } else { //end
-                taskindex = 90; //goback page button click
-            }
-            break;
-        case 20: //wait timeout
-            ticknum++;
-            [touchlabel setStringValue:[@(ticknum) stringValue]];
-            if (captcha>0) {
-                [self downloadbtn:nil ];
-                [self log:@"Captcha, close downloader and wait 5 hours, restart downloader to download rest pages."];
-                NSBeep();
-                NSBeep();
-            }
-            if (ticknum>ttimeout) {
-                if (!loading) {
-                      taskindex = 10;
-//                    taskindex = 30;
-//                    [self Setwebviewheight];
-//                    [self runjs2:jsdiv];
-                } else {
-                    [webView stopLoading];
-                    [webView reload];
-                    [self log:@"reload page %d\n",pageindex];
-                    ticknum=0;
-                }
-            }
-            break;
-        case 30:  //takeshot
-            // Item 3
-            ticknum ++;
-            [touchlabel setStringValue:[@(ticknum) stringValue]];
-            taskindex = 30;
-            if (ticknum>=ttimeout+3){
-                if (!printing) {
-                    //NSRect r1 = webviewrect; //restore webview
-                    [webView setFrame:webviewrect];
-                    //[webView setFrame:NSMakeRect(r1.origin.x,r1.origin.y,tviewwidth,r1.size.height)];
-                    taskindex = 10;
-                    if (webdelegate.ebooktype==2 && pageindex>startno+c_captcha) {
-                        taskindex = 80; //delete cookie
-                    }
-                }
-            } else if(ticknum==ttimeout+2){
-                //[self runjs2:jsdiv];
-                [self printwkview];
-            } else if (ticknum==ttimeout+2){
-                //[self runjs2:jsdiv];
-                //[self printwkview];
-                //[webView stopLoading];
-            }
-            break;
-        case 31:  //takeshot
-            // Item 3
-            ticknum ++;
-            [touchlabel setStringValue:[@(ticknum) stringValue]];
-            if (!printing) {
-                //NSRect r1 = webviewrect; //restore webview
-                [webView setFrame:webviewrect];
-                //[webView setFrame:NSMakeRect(r1.origin.x,r1.origin.y,tviewwidth,r1.size.height)];
-                taskindex = 10;
-                if (webdelegate.ebooktype==2 && pageindex>startno+c_captcha) {
-                    taskindex = 80; //delete cookie
-                }
-            }
-//            if (pageindex>totalpage) {
-//                taskindex = 90; //goback page button click
-//            }
-            break;
-        case 80:
-            // do nothing ...
-            [self setWorking:false];
-            [self log:@"-----------------------------"];
-            [self log:@"Download stop , login and open same book to resume download rest pages",pageindex+startno];
-            [self deletecookie];
-            NSBeep();NSBeep();
-            NSBeep();
-            break;
-        case 90:
-            // Item 3
-            [self log:@"building pdf file ...."];
-            [webdelegate Buildpdf];
-            //[webdelegate joinPDF];
-            [self setWorking:false];
-            pausing = false;
-            NSBeep();NSBeep();
-            NSBeep();
-//            [self setWorking:false];
-//            [self openoutputfile];
-            [[NSWorkspace sharedWorkspace] openFile:ebookdir withApplication:@"Finder"];
-            break;
-        default:
-            break;
-    }
-
-    if (pageindex>4) {
-        //taskindex = 20; //goback page button click
-        //working = false;
-    }
-    if (working)
-        tasktimer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(epubtaskhandle:) userInfo:nil repeats:NO];
-}
-
-- (void) pdftaskhandle:(NSTimer*)theTimer
-{
-    if (!working) return;
-    NSString * url=@"";
-    //NSLog(@"task %d tick %d",taskindex,ticknum);
-    switch (taskindex) {
-        case 0:
-            //startno=0;
-
-            //url=[webdelegate.urllist objectAtIndex:startno];
-            //pageindex = startno;
-            //[self goURL:url];
-            //[self runjs2:jsdiv];
-            [self firstpage];
-            taskindex = 20;
-            [self log:@"Load page %d-%d",startno+1,pageindex+1];
-            [vars setValue:[NSString stringWithFormat:@"%d",pageindex ] forKey:@"download"];
-            //[self nextpage1:startno];
-            //NSLog(@"Load page %d",startno);
-
-            loading = true;
-            captcha = 0;
-            hasimg = false;
-            oldaddrees = @"";
-            pausing=false;
-            break;
-        case 10:  //click next button
-            // Item 3
-            //if ((framenum>0) || (![addressurl isEqualToString:oldaddrees] )) {
-            pageindex+=1;
-            [vars setValue:[NSString stringWithFormat:@"%d",pageindex ] forKey:@"download"];
-            
-            if (captcha) {
-                taskindex = 80; //captcha
-            } else
-            if ([addressurl rangeOfString:@"login"].location != NSNotFound) {
-                taskindex = 80; //login show
-            } else //logout
-            if (webdelegate.ebooktype==1 && pageindex>startno+c_captcha) {
-                taskindex = 80; //delete cookie
-            } else
-            if (pageindex<endno && pageindex<totalpage && pageindex< webdelegate.pagelist.count) {
-                [self updatelog:@"load page %d-%d",pageindex+1,pageindex-startno+1];
-                //[self pagebuttonjs:pageindex]; ////goback page button click
-                //[self nextpage:pageindex];
-                framenum=0;
-                ticknum =0;
-                hasimg = false;
-                captcha = 0;
-                oldaddrees=addressurl;
-                taskindex = 20;
-                [self nextpage:pageindex];
-                loading = true;
-                //press nextpage
-            } else { //end
-                taskindex = 90; //goback page button click
-            }
-            break;
-        case 20: //wait timeout
-            ticknum++;
-            [touchlabel setStringValue:[@(ticknum) stringValue]];
-            if (captcha>0) {
-                [self downloadbtn:nil ];
-                [self log:@"Captcha, close downloader and wait 5 hours, restart downloader to download rest pages."];
-                NSBeep();
-                NSBeep();
-            }
-            if (ticknum>ttimeout) {
-                //NSLog(@"task 20 %d %d",pageindex,[webdelegate.pagelist count]-1);
-                if (!loading || pageindex==[webdelegate.pagelist count]-1) {
-                    taskindex = 10;
-                    //[self printwkview];
-                    //resize webview
-                    //[self resizewebview];
-                    //[self Setwebviewheight];
-                    //ticknum=ttimeout-1;
-                    //save page
-                } else {
-                    [webView reload];
-                    ticknum=0;
-                }
-            }
-            break;
-        case 80:
-            // do nothing ...
-            [self setWorking:false];
-            [self log:@"-----------------------------"];
-            [self log:@"Download stop to avoid captcha , login and open same book to resume download rest pages",pageindex+startno];
-            [self deletecookie];
-            NSBeep();NSBeep();
-            NSBeep();
-            break;
-        case 90:
-            // Item 3
-            [self log:@"building pdf file ...."];
-            [textview setNeedsDisplay:YES];
-            [[self window] setViewsNeedDisplay:YES];
-            [[self window] display];
-            [webdelegate Buildpdfpdf];
-            [self setWorking:false];
-            pausing = false;
-            NSBeep();NSBeep();
-            NSBeep();
-//            [self setWorking:false];
-//            [self openoutputfile];
-            [[NSWorkspace sharedWorkspace] openFile:ebookdir withApplication:@"Finder"];
-            break;
-        default:
-            break;
-    }
-
-    if (pageindex>4) {
-        //taskindex = 20; //goback page button click
-        //working = false;
-    }
-    if (working)
-        tasktimer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(pdftaskhandle:) userInfo:nil repeats:NO];
-}
-
-- (void) epubtaskhandle2:(NSTimer*)theTimer
-{
-    if (!working) return;
-    NSString * url=@"";
-    //NSLog(@"task %d tick %d",taskindex,ticknum);
-    switch (taskindex) {
-        case 0:
-            //startno=0;
-            if (ebooktype == 20) { //pdf
-                tviewwidth = 1200;
-                startno = webdelegate.urllist.count;
-                if (!pausing && startno>0) { //resume download
-                    url=[webdelegate.urllist objectAtIndex:startno-1];
-                    taskindex=20;
-                    [self goURL:url];
-                    [self log:@"Load page %d",startno];
-                    ticknum=0; //test
-                    framewaiting = true;
-                }
-            } else { //epub
-                //move to first page ?
-                ticknum=ttimeout; //test
-                taskindex=20;
-                if (ebooktype != 2)
-                    [webdelegate.urllist removeAllObjects]; //clear log file
-            }
-
-            //NSLog(@"Load page %d",startno);
-
-            captcha = 0;
-            taskindex = 20;
-            oldaddrees = @"";
-            pausing=false;
-            break;
-        case 10:  //click next button
-            // Item 3
-            if ((framenum>0) || (![addressurl isEqualToString:oldaddrees] )) {
-                [self updatelog:@"load page %d-%d",startno, pageindex+1];
-                //[self pagebuttonjs:pageindex]; ////goback page button click
-                //[self nextpage:pageindex];
-                framewaiting = true;
-                framenum=0;
-                ticknum =0;
-                captcha = 0;
-                oldaddrees=addressurl;
-                taskindex = 20;
-                [self nextpage:pageindex];
-                //press nextpage
-            } else { //end
-                taskindex = 90; //goback page button click
-            }
-            break;
-        case 20: //wait timeout
-            ticknum +=1;
-            [touchlabel setStringValue:[@(ticknum) stringValue]];
-            if (captcha>0) {
-                [self downloadbtn:nil ];
-                [self log:@"Captcha, clear captcha and click button to resume."];
-                NSBeep();
-                NSBeep();
-            }
-            if (ticknum>ttimeout) {
-                if (![oldaddrees isEqualToString:addressurl]) {
-                    taskindex = 30;
-                    pageindex+=1;
-                    //resize webview
-                    [self resizewebview];
-                    ticknum=ttimeout-1;
-                    //save page
-                } else {
-                    taskindex = 90;
-                }
-            }
-            break;
-        case 30:  //takeshot
-            // Item 3
-            ticknum +=1;
-            [touchlabel setStringValue:[@(ticknum) stringValue]];
-            if (ticknum>ttimeout) {
-                    taskindex = 10;
-                    [self takeshot];
-                    //save page
-            }
-            if (webdelegate.ebooktype==2 && pageindex>c_captcha) {
-                taskindex = 80; //delete cookie
-            }
-            if (pageindex>totalpage) {
-                taskindex = 90; //goback page button click
-            }
-            break;
-        case 80:
-            // do nothing ...
-            [self setWorking:false];
-            [self log:@"-----------------------------"];
-            [self log:@"Download stop , login and open same book to resume download rest pages",pageindex+startno];
-            [self deletecookie];
-            NSBeep();NSBeep();
-            NSBeep();
-            break;
-        case 90:
-            // Item 3
-            [self log:@"building pdf file ...."];
-            [textview setNeedsDisplay:YES];
-            [webdelegate Buildpdf];
-            [self setWorking:false];
-            pausing = false;
-            NSBeep();NSBeep();
-            NSBeep();
-//            [self setWorking:false];
-//            [self openoutputfile];
-            [[NSWorkspace sharedWorkspace] openFile:ebookdir withApplication:@"Finder"];
-            break;
-        default:
-            break;
-    }
-
-    if (pageindex>4) {
-        //taskindex = 20; //goback page button click
-        //working = false;
-    }
-    if (working)
-        tasktimer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(epubtaskhandle:) userInfo:nil repeats:NO];
-}
 
 -(void) waitselector {
     taskindex = 10;
@@ -1040,22 +647,6 @@ IOReturn iosuccess;
     return -1;
 }
 
--(void) firstpage
-{
-    int i = [webdelegate indexofcfi:curpage];
-//    i = pageindex;
-//    NSDictionary * obj = [webdelegate.pagelist objectAtIndex:pageindex] ;
-//    NSString * url = [webdelegate pageurl:pageindex];
-//    NSString * cfi = [obj objectForKey:@"cfi"];
-    if (i == pageindex) {
-    //if ( [cfi isEqualToString:curpage]) {
-        webView.reload;
-    } else {
-        NSString * url = [webdelegate pageurl:pageindex];
-        [self goURL:url];
-    }
-}
-
 - (void) currentpage:(NSString *) str
 {
     NSDictionary * obj = [NSJSONSerialization JSONObjectWithData:[str dataUsingEncoding:NSUTF8StringEncoding] options:0 error:nil];
@@ -1071,115 +662,50 @@ IOReturn iosuccess;
     }
 }
 
-- (void) findbook:(NSString *) str
+- (void) findmp3:(NSString *) str
 {
+    NSString * url = webView.URL.path;
+    [webdelegate checkbookid:url];
+    [webdelegate saveurl:str];
+    //checkbookid(url);
+}
+
+- (void) findbook:(NSString *) str url:(NSString *)url
+{
+    frameurl = url;
+    host = [webdelegate urltodomain:url];
+    host = [@"https://" stringByAppendingString:host];
     NSDictionary * obj = [NSJSONSerialization JSONObjectWithData:[str dataUsingEncoding:NSUTF8StringEncoding] options:0 error:nil];
     [webdelegate findbook:obj];
     [self foundjason];
 }
 
-- (void) savepdfimg:(NSString *) str cfi:(NSString*)cfi
-{
-    //int i = [str length];
-    int i = [webdelegate indexofcfi:cfi];
-    if (i<0) return;
-    if ([str length]<30) return;
-    
-    NSString * s1 = [str substringFromIndex:22];
-    //NSData* data = [s1 dataUsingEncoding:NSUTF8StringEncoding];
-    NSData *data = [[NSData alloc] initWithBase64EncodedString:s1 options:0];
-    NSString * fname = [webdelegate pagefilename:i];
-    [data writeToFile:fname atomically:NO];
-    //[data writeToFile:@"/Users/aa/Documents/img1.png" atomically:NO];
-}
-
-- (void) savepdftext:(NSString *) str cfi:(NSString*)cfi
-{
-    //int i = [str length];
-    int i = [webdelegate indexofcfi:cfi];
-    if (i<0) return;
-    
-    //NSString * s1 = [str substringFromIndex:22];
-    //NSData* data = [s1 dataUsingEncoding:NSUTF8StringEncoding];
-    NSData *data = [str dataUsingEncoding:NSUTF8StringEncoding];
-    NSString * fname = [webdelegate pagefilename:i];
-    fname=  [fname stringByReplacingOccurrencesOfString:@"png" withString:@"json"];
-
-    [data writeToFile:fname atomically:NO];
-    //[data writeToFile:@"/Users/aa/Documents/img1.png" atomically:NO];
-}
-
-- (void) savehtml:(NSString *) str
-{
-    int i = [webdelegate indexofcfi:curpage];
-    if (i<0) {
-        [self log:@"%@ page not found \n",curpage];
-        return;
-    }
-    
-    NSString * fname=[datadir stringByAppendingPathComponent:webdelegate.ebookid];
-    [self createfolder:fname];
-    
-    fname=[NSString stringWithFormat:@"%@/%04d.html",fname,i];
-    NSLog(@"save html %d %@",i,fname);
-    NSData *data = [str dataUsingEncoding:NSUTF8StringEncoding];
-    [data writeToFile:fname atomically:NO];
-
-    //NSLog(@"%@",str);
-}
-
-- (void) savestyle:(NSString *) str
-{
-    int i = [webdelegate indexofcfi:curpage];
-    if (i<0) return;
-    
-    NSDictionary * obj = [NSJSONSerialization JSONObjectWithData:[str dataUsingEncoding:NSUTF8StringEncoding] options:0 error:nil];
-
-    if ([obj count]==0) return;
-    
-    NSString * fname=[datadir stringByAppendingPathComponent:webdelegate.ebookid];
-    [self createfolder:fname];
-    
-    for (NSString* key in obj) {
-        NSString * value = obj[key];
-        NSString * file = [fname stringByAppendingFormat:@"/%@",key];
-        NSData *data = [value dataUsingEncoding:NSUTF8StringEncoding];
-        [data writeToFile:file atomically:NO];
-        NSLog(@"res %@",file);
-    }
-}
-
-- (void) saveimglist:(NSString *) str
-{
-    int i = [webdelegate indexofcfi:curpage];
-    if (i<0) return;
-    
-    NSDictionary * obj = [NSJSONSerialization JSONObjectWithData:[str dataUsingEncoding:NSUTF8StringEncoding] options:0 error:nil];
-
-    if ([obj count]==0) return;
-    
-    NSString * fname=[datadir stringByAppendingPathComponent:webdelegate.ebookid];
-    [self createfolder:fname];
-    
-    for (NSString* key in obj) {
-        NSString * value = obj[key];
-        NSString * file = [fname stringByAppendingFormat:@"/%@",key];
-        NSString * s1 = [value substringFromIndex:22];
-        //NSData* data = [s1 dataUsingEncoding:NSUTF8StringEncoding];
-        NSData *data = [[NSData alloc] initWithBase64EncodedString:s1 options:0];
-        [data writeToFile:file atomically:NO];
-        NSLog(@"res %@",file);
-    }
-}
 
 - (void)foundjason
 {
-    //NSLog(@"page found");
+    NSLog(@"page found");
     //if ([box isHidden]) {
-    NSString * fname = [datadir stringByAppendingPathComponent:webdelegate.ebookid];
-    if (![webdelegate fileexist:fname]) {
-        [self createfolder:fname];
+    [[textview.textStorage mutableString] setString:@""];
+    NSString * url = webView.URL.path;
+    //webdelegate.ebookid = [webdelegate getbookid:url];
+    totalpage = webdelegate.pagelist.count;
+    [self log:@"Title: %@",webdelegate.title];
+    [self log:@"Book id: %@",webdelegate.ebookid];
+    [self log:@"Total Files: %d \r", totalpage];
+    [self log:@"\rJump to Chapter 1 by click 'TABLE CONTENTS', \rclick Download button to download, \r"];
+    [downloadbtn setEnabled:TRUE];
+    booktmp = [datadir stringByAppendingPathComponent:webdelegate.title];
+    if (![webdelegate fileexist:booktmp]) {
+        [self createfolder:booktmp];
     }
+    webdelegate.booktmp = booktmp;
+
+    return;
+    
+//    NSString * fname = [datadir stringByAppendingPathComponent:webdelegate.ebookid];
+//    if (![webdelegate fileexist:fname]) {
+//        [self createfolder:fname];
+//    }
     
     [downloadbtn setEnabled:true];
     if (pausing) {
@@ -1197,45 +723,16 @@ IOReturn iosuccess;
         [self log:@"total chapter %d \r",webdelegate.pagelist.count];
     else
         [self log:@"total page %d \r",webdelegate.pagelist.count];
-    [ended setStringValue:[NSString stringWithFormat:@"%d", webdelegate.pagelist.count]];
     //[self log:@"turn to first page, click download button, \r"];
     //[webdelegate clearurllist];
-    BOOL b = [self savevars:false];
-    if (b) { //vars
-        NSString * s = [vars objectForKey:@"download"];
-        int n = [s intValue];
-        if (n<[webdelegate.pagelist count]) {
-            [started setStringValue:s];
-            [self log:@"downloaded last page %@ \r",s];
-        }
-        if ((webdelegate.ebooktype==1)) {
-            if (b) { //vars
-                if (n<[webdelegate.pagelist count]) {
-                    [ended setStringValue:[NSString stringWithFormat:@"%d",n+c_captcha]];
-                }
-            } else { //new
-                [ended setStringValue:[NSString stringWithFormat:@"%d",1+c_captcha]];
-            }
-        }
-    }
-    [self log:@"====================\r"];
-    [self log:@"do NOT read book in bookshelf app when downloading, it cause login problem.\r"];
-    [self log:@"====================\r"];
     if ([webdelegate ebooktype]!=0) {
-        [self log:@"Vitalsource has 300-400 pages daily limitation, user should stop when captcha show up, wait 24 hours captcha disappear, restart app to download rest pages.\r"];
-        [self log:@"====================\r"];
-    }
-    
-    [self log:@"ebook ready to download, \r"];
-    [self log:@"===================="];
-
-
-    if (false) {
-        if ([webdelegate saveurllist:false]){ //loadurllist, resume mode
-            [self log:@"Book have downloaded %d pages",webdelegate.pagelist.count];
-            //NSLog(@"PDF resume");
-        } else
-            [self log:@"turn to first page, click download button, \r"];
+//        [self log:@"Vitalsource has daily limitation for pdf book, app will logout after dozen pages downloaded, user should stop when unanthorize show up, wait 24 it will disappear, restart app to download rest pages.\r"];
+//        [self log:@"====================\r"];
+#ifdef RELEASE
+        [self log:@"PDF book not support!\r"];
+        [downloadbtn setEnabled:false];
+        return;
+#endif
     }
 }
 
@@ -1262,6 +759,137 @@ IOReturn iosuccess;
     webviewrect = [webView frame];
     NSRect r = webviewrect;
     NSLog(@"%f,%f,%f,%f",r.origin.x,r.origin.y,r.size.width,r.size.height );
+}
+
+-(void)keypress :(int)keyCode
+{
+    CGEventSourceRef sourceRef =
+    CGEventSourceCreate(kCGEventSourceStateHIDSystemState);
+
+    CGEventRef keyPress = CGEventCreateKeyboardEvent (sourceRef, (CGKeyCode)keyCode, true);
+    CGEventRef keyUnpress = CGEventCreateKeyboardEvent (sourceRef, (CGKeyCode)keyCode, false);
+
+    //CGEventSetFlags(keyPress, modifierFlags);
+    CGEventPost(kCGHIDEventTap, keyPress);
+
+    //unpressing the acualkey
+    CGEventPost(kCGHIDEventTap, keyUnpress);
+
+    CFRelease(keyPress);
+    CFRelease(keyUnpress);
+    CFRelease(sourceRef);
+}
+
+- (void) keydown:(NSInteger)akey
+{
+    CGEventRef keyd = CGEventCreateKeyboardEvent (NULL, (CGKeyCode)akey, true);
+    CGEventRef keyu = CGEventCreateKeyboardEvent (NULL, (CGKeyCode)akey, false);
+    CGEventPost(kCGSessionEventTap, keyd);
+    CGEventPost(kCGSessionEventTap, keyu);
+    CFRelease(keyd);
+    CFRelease(keyu);
+    //[Capture wait:0.5];
+}
+- (void) deletemp3files
+{
+    if ([reg isreg]) {
+        return;
+    }
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    NSURL *directoryURL = [NSURL fileURLWithPath:webdelegate.booktmp];
+    NSError *error = nil;
+
+    NSArray *contents = [fileManager contentsOfDirectoryAtURL:directoryURL
+                                   includingPropertiesForKeys:nil
+                                                      options:NSDirectoryEnumerationSkipsHiddenFiles
+                                                        error:&error];
+
+    NSArray<NSURL *> *sortedURLs = [contents sortedArrayUsingComparator:^NSComparisonResult(NSURL *url1, NSURL *url2) {
+        return [[url1 lastPathComponent] localizedStandardCompare:[url2 lastPathComponent]];
+    }];
+
+    int i = 0;
+    for (NSURL *fileURL in sortedURLs) {
+        i+=1;
+        if (i>6) {
+            [fileManager removeItemAtURL:fileURL error:nil];
+        } else
+            NSLog(@"Found file:%d %@",i,fileURL.path);
+
+    }
+}
+
+- (void) epubtaskhandle:(NSTimer*)theTimer
+{
+    if (!working) return;
+    
+    ticknum +=1;
+    [touchlabel setStringValue:[@(ticknum) stringValue]];
+    switch (taskindex) {
+        case 20:
+            if (ticknum==1) {
+                //play
+                [self runjs2:js_keypress];
+            } else if (ticknum==10 ) {
+                //stop
+                [self runjs2:js_keypress];
+            } else if (ticknum==12 ) {
+                ticknum = 0;
+                taskindex = 10;
+            }
+            [_mainwin updatelog:@"Downloading ..."];
+            break;
+        case 10:
+            // Item 3
+            if (ticknum==1) {
+                if ([self nextpage:1]==0) {
+                    taskindex = 30; //goback page button click
+                }
+
+            } else if (ticknum==5 ) {
+                if ([webdelegate findMissing]) {
+                    [self downloadchapter];
+                };
+
+            } else if (ticknum==6 ) {
+                //taskindex = 30; //goback page button click
+                ticknum = 0;
+            }
+            [_mainwin updatelog:@"Downloading Files %d/%d",pageindex, totalpage];
+            if (![reg isreg]) {
+                if (pageindex>5) {
+                    taskindex=90;
+                }
+            }
+            break;
+
+        case 30:
+            // Item 3
+            if ([webdelegate findMissing]) {
+                [self downloadchapter];
+            } else taskindex = 90; //goback page button click
+            [_mainwin updatelog:@"Downloading Files %d/%d",pageindex, totalpage];
+            break;
+        case 90:
+            // Item 3
+            [self log:@"building file ...."];
+            //[self Buildpdf];
+            [self setWorking:false];
+            [self deletemp3files];
+            //[[NSWorkspace sharedWorkspace] openFile:ebookdir withApplication:@"Finder"];
+            [self log:@"\rdownload end\r"];
+            [self log:@"Audiobook in %@", webdelegate.booktmp];
+
+            break;
+        case 100:
+            [self setWorking:false];
+            [self log:@"Download error,  restart app, re-download book"];
+
+        default:
+            break;
+    }
+    if (working)
+        tasktimer = [NSTimer scheduledTimerWithTimeInterval:1.5 target:self selector:@selector(epubtaskhandle:) userInfo:nil repeats:NO];
 }
 
 #pragma mark - javasript
@@ -1309,6 +937,7 @@ IOReturn iosuccess;
     [textview.textStorage appendAttributedString:astr];
     [textview.textStorage appendAttributedString:[[NSAttributedString alloc] initWithString:@"\n"]];
     [textview scrollRangeToVisible:NSMakeRange([[textview string] length], 0)];
+    
     });
 
 }
@@ -1323,76 +952,73 @@ IOReturn iosuccess;
 }
 
 
+- (NSString *)runjs2:(NSString *)script {
+    
+    
+    __block NSString *resultString = nil;
+    __block BOOL finished = NO;
+
+//    [webView evaluateJavaScript:script completionHandler:^(id result, NSError *error) {
+    [webView evaluateJavaScript:script
+                                 inFrame: epubframe // Your WKFrameInfo object
+                          inContentWorld:[WKContentWorld pageWorld]
+                       completionHandler:^(id result, NSError *error) {
+        if (error == nil) {
+            if (result != nil) {
+                resultString = [NSString stringWithFormat:@"%@", result];
+            }
+        } else {
+            NSLog(@"evaluateJavaScript error : %@", error.localizedDescription);
+        }
+        //NSLog(@"js %@",resultString);
+        finished = YES;
+    }];
+
+    while (!finished)
+    {
+        [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantFuture]];
+    }
+
+    return resultString;
+}
+
+
+
 - (void)userContentController:(WKUserContentController *)userContentController didReceiveScriptMessage:(WKScriptMessage *)message
 {
     // what ever were logged with console.log() in wkwebview arrives here in message.body property
     NSString * msg=message.body;
     epubframe = message.frameInfo;
     NSString * url = epubframe.request.URL.absoluteString;
-    if ([msg isEqualToString:@"recaptcha"]) {
-        captcha=1;
-        NSLog(@"***captcha");
-        return;
-    }
+    //NSLog(@"msg %@ %@",msg, url);
+    NSLog(@"msg %@",msg);
+
+    
     NSRange r1 = [msg rangeOfString:@"="];
     if (r1.location== NSNotFound) return;
     
     NSString * item = [msg substringWithRange:NSMakeRange(0,r1.location)];
     NSString * data = [msg substringWithRange:
                        NSMakeRange(r1.location+1,[msg length]-r1.location-1)];
-    //NSLog(item);
-    //NSLog(data);
+    //NSLog(@"%@",item);
+    //NSLog(@"%@",data);
     //([aMessage rangeOfString:@"title"].location!= NSNotFound)
     //NSLog(@"message %@ %d",item, pageindex);
+    jsmessage = data;
+    if ([item isEqualToString:@"#book"]) {
+        //[webdelegate urltodomain:url];
+        [self findbook:data url:url];
+    } else if ([item isEqualToString:@"#load"]) {
+        [self findmp3:data];
+    } else if ([item isEqualToString:@"#nextpage"]) {
+        jsresnext= data;
+        //[self findmp3:data];
+    }
+    return;
+    
 #ifdef DEBUG
     //NSLog(@"message %@ %d %@",item, pageindex, data);
 #endif
-    if ([item isEqualToString:@"#currentpage"]) {
-        [self currentpage:data];
-    }
-    else if ([item isEqualToString:@"#book"]) {
-        [self findbook:data];
-    }
-    else if ([item isEqualToString:@"#html"]) {
-        [self savehtml:data];
-        loading = false;
-        ticknum=ttimeout;
-    }
-    else if ([item isEqualToString:@"#style"]) {
-        [self savestyle:data];
-    }
-    else if ([item isEqualToString:@"#dimg"]) {
-        [self saveimglist:data];
-    }
-    else if ([item rangeOfString:@"#img"].location!=NSNotFound) {
-        NSString * cfi =  [item stringByReplacingOccurrencesOfString:@"#img" withString:@""];
-        //NSLog(@"img  %@ %@",item,cfi);
-        [self savepdfimg:data cfi:cfi];
-    }
-    else if ([item rangeOfString:@"#text"].location!=NSNotFound) {
-        NSString * cfi =  [item stringByReplacingOccurrencesOfString:@"#text" withString:@""];
-        //NSLog(@"img  %@ %@",item,cfi);
-        [self savepdftext:data cfi:cfi];
-    }
-    else if ([item rangeOfString:@"#nextimg"].location!=NSNotFound) {
-        NSString * cfi =  [item stringByReplacingOccurrencesOfString:@"#nextimg" withString:@""];
-        //NSLog(@"img  %@ %@",item,cfi);
-        [self savepdfimg:data cfi:cfi];
-        loading = false;
-        ticknum=ttimeout;
-    }
-    else if ([item isEqualToString:@"#height"]) {
-        CGFloat height = [data floatValue];
-        frameheigh = height;
-    }
-//    NSArray * list = [msg componentsSeparatedByString:@"="];
-//    if ([list[0] isEqualToString:@"#Height"]) {
-//        CGFloat height = [list[1] floatValue];
-//        if (height>100) {
-//            frameheigh = height;
-//            //NSLog(@"height: %f", frameheigh);
-//        }
-//    }
 }
 
 //https://developer.apple.com/reference/webkit/webframeloaddelegate/1501445-webview?language=objc
@@ -1402,15 +1028,6 @@ IOReturn iosuccess;
     [windowScriptObject setValue:self forKey:@"MyApp"];
 }
 
-- (void)webView:(WebView *)sender didClearWindowObject:(WebScriptObject *)windowObject forFrame:(WebFrame *)frame
-{
-    NSString * framename = [frame name];
-    if ([framename isEqualToString:@"epub-content"]) {
-        epubwinobj = windowObject;
-        //[windowObject setValue:self forKey:@"MyApp"];
-        //NSLog(@"epub winobj get");
-    }
-}
 
 - (void) loginjs:(id)sender
 {
@@ -1433,52 +1050,15 @@ IOReturn iosuccess;
 //    document.getElementById(\"email-field\").value = \"asarabia-garcia@ucsb.edu\"; \
 //    document.getElementById(\"password-field\").value = \"Soc152abook!\";  \
 
+    //a07   600338qQ@~
+    //a06  600338qQ@~
 #ifdef DEBUG
             js = @"console = { log: function(msg) { MyApp.consoleLog_(msg); } };\
-        document.getElementById(\"email-field\").value = \"a05@pwqsoft.com\"; \
-        document.getElementById(\"password-field\").value = \"600338qQ@\";  \
+        document.getElementById(\"email-field\").value = \"a06@pwqsoft.com\"; \
+        document.getElementById(\"password-field\").value = \"600338qQ@~\";  \
             document.getElementById(\"signin-form\").submit(); \
             MyApp.consoleLog_(\"login ...\"); \
             ";
-//        js = @"console = { log: function(msg) { MyApp.consoleLog_(msg); } };\
-//        document.getElementById(\"session_email\").value = \"Mydreamgrade5@gmail.com\"; \
-//        document.getElementById(\"session_password\").value = \"MDSpass@123\";  \
-//        document.getElementById(\"new_session\").submit(); \
-//        MyApp.consoleLog_(\"login ...\"); \
-//        ";
-//    js = @"console = { log: function(msg) { MyApp.consoleLog_(msg); } };\
-//    document.getElementById(\"session_email\").value = \"1558016635_4027@barchen.fr\"; \
-//    document.getElementById(\"session_password\").value = \"by_CwFY3oH1Dz414k2b4!\";  \
-//    document.getElementById(\"new_session\").submit(); \
-//    MyApp.consoleLog_(\"login ...\"); \
-//    ";
-//    js = @"console = { log: function(msg) { MyApp.consoleLog_(msg); } };\
-//    document.getElementById(\"session_email\").value = \"a03@pwqsoft.com\"; \
-//    document.getElementById(\"session_password\").value = \"600338qQ~\";  \
-//    document.getElementById(\"new_session\").submit(); \
-//    MyApp.consoleLog_(\"login ...\"); \
-//    ";
-
-//    js = @"console = { log: function(msg) { MyApp.consoleLog_(msg); } };\
-//    document.getElementById(\"session_email\").value = \"C004px8@rogers.com\"; \
-//    document.getElementById(\"session_password\").value = \"Newman@101\";  \
-//    document.getElementById(\"new_session\").submit(); \
-//    MyApp.consoleLog_(\"login ...\"); \
-//    ";
-
-//    js = @"console = { log: function(msg) { MyApp.consoleLog_(msg); } };\
-//    document.getElementById(\"email-field\").value = \"a02@pwqsoft.com\"; \
-//    document.getElementById(\"password-field\").value = \"600338qQ~\";  \
-//    document.getElementById(\"signin-form\").submit(); \
-//    MyApp.consoleLog_(\"login ...\"); \
-//    ";
-    
-//    js = @"console = { log: function(msg) { MyApp.consoleLog_(msg); } };\
-//    document.getElementById(\"email-field\").value = \"rashadjefferson@gmail.com\"; \
-//    document.getElementById(\"password-field\").value = \"Nkbagroup$\";  \
-//    document.getElementById(\"signin-form\").submit(); \
-//    MyApp.consoleLog_(\"login ...\"); \
-//    ";
     //console.log(\"hellow\");";
     //[jsobj evaluateWebScript: js];
     [webView evaluateJavaScript:js completionHandler:nil];
@@ -1592,13 +1172,12 @@ IOReturn iosuccess;
 //#toc-container > ul > li.toc-title.title.toc-level.level-1.group > button
 - (int) nextpage:(int) page
 {
-    if(ebooktype==1) {
-        NSString *res = [self rightkeyjs];
-    } else {
-        NSString * url = [webdelegate pageurl:pageindex];
-        [self goURL:url];
-    }
-    return 1;
+    NSString * res;
+    res = [self runjs2:js_nextpage];
+    NSDictionary * obj = [NSJSONSerialization JSONObjectWithData:[res dataUsingEncoding:NSUTF8StringEncoding] options:0 error:nil];
+    int n =  [[obj objectForKey:@"nextbtn"] intValue] ;
+    NSLog(@"%@ %d",res,n);
+    return n;
 }
 
 //<button class="navigation-button noButton horizontal-button next-button" style="display: block; outline: medium none;">
@@ -1625,54 +1204,161 @@ IOReturn iosuccess;
     return 1;
 }
 
-- (int) pagebuttonjs2:(int) page
+- (int) bookinfojs
 {
     //NSString* jsString = [NSString stringWithFormat:@"alert('ok');"];
     //[webView stringByEvaluatingJavaScriptFromString:jsString];
-    id win;
     //= [webView windowScriptObject];
-    NSString* js ;
-    js = @"var items =document.getElementsByClassName(\"toc-level level-1 group\"); \
-    if(items.length>%d) { \
-    var buttons =  items[%d].getElementsByTagName(\"button\"); \
-    var node = buttons[0].getElementsByTagName(\"div\")[0];\
-    MyApp.varLog_(\"###title%d=\"+node.getAttribute(\"title\"));\
-    buttons[0].click(); \
-    }    \
-    ";
-    js = [NSString stringWithFormat:js,page,page,page];
-    [win evaluateWebScript: js];
     //NSLog(@"pagebutton %f",p2-p1);
-    return 1;
-}
-
-//https://developer.apple.com/documentation/webkit/wkwebview/3656442-evaluatejavascript
-- (int) pageiframejs:(int) page
-{
-    //NSString* jsString = [NSString stringWithFormat:@"alert('ok');"];
-    //[webView stringByEvaluatingJavaScriptFromString:jsString];
-    id win ;
-    //= [webView windowScriptObject];
-    NSString* js ;
-//    js = @"var items = document.getElementsByTagName(\"iframe\"); \
-//            var x = items[1]; \
-//            var y = (x.contentWindow || x.contentDocument); \
-//            MyApp.consoleLog_('y ');\
-//            if (y.document)y = y.document; \
-//            var html = y.getElementsByTagName(\"html\")[0];\
-//            MyApp.consoleLog_('html doc '+y.innerHTML);\
-//            ";
-//    [win evaluateWebScript: js];
-    js = @" msg = window.location.href; \
-    window.webkit.messageHandlers.logging.postMessage(msg); \
-    ";
-    [webView evaluateJavaScript:js completionHandler:^(NSString *result, NSError *error)
+    [webView evaluateJavaScript:js_bif completionHandler:^(NSString *result, NSError *error)
     {
         //NSLog(@"Error %@",error);
         //NSLog(@"Result %@",result);
     }];
     return 1;
 }
+
+
+#pragma mark - NSURL download mp3
+- (void)downloadfile:(NSString *)amp3 {
+
+    NSURL *url = [NSURL URLWithString:amp3];
+    [self log:@"%@",url];
+
+    // Create an NSURLSession with a default configuration
+    NSURLSessionConfiguration *config = [NSURLSessionConfiguration defaultSessionConfiguration];
+    // Create the session, specifying this view controller as the delegate
+    NSURLSession *session = [NSURLSession sessionWithConfiguration:config delegate:self delegateQueue:nil];
+
+    // Create a download task with the URL and resume it
+    NSURLSessionDownloadTask *downloadTask = [session downloadTaskWithURL:url];
+    [downloadTask resume];
+    [self updatelog:@"Download %d/%d",pageindex,totalpage];
+
+    // Show the progress indicator
+}
+
+- (void)downloadchapter {
+    if (!loading ) {
+        [self downloadurl:webdelegate.epubfile];
+    }
+}
+
+- (void)downloadurl:(NSString *)amp3 {
+
+    //NSURL *url = [NSURL URLWithString:amp3];;
+    NSURL *url = [NSURL URLWithString:amp3];;
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
+    [request setValue:nil forHTTPHeaderField:@"Range"];
+    [request setValue:host forHTTPHeaderField:@"Origin"];
+    [request setValue:frameurl forHTTPHeaderField:@"Referer"];
+
+    loading = true;
+    // 2. Create a download task
+    NSURLSession *session = [NSURLSession sharedSession];
+    NSURLSessionDownloadTask *downloadTask = [session downloadTaskWithRequest:request
+        completionHandler:^(NSURL *location, NSURLResponse *response, NSError *error) {
+        loading = false;
+        if (error) {
+            NSLog(@"Download error: %@", error.localizedDescription);
+            return;
+        }
+        //NSLog(@"download to: %@", location.path);
+
+//         3. Move the file from the temporary 'location' to a permanent folder
+        NSFileManager *fileManager = [NSFileManager defaultManager];
+        NSDictionary *attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:location.path error:nil];
+        
+        if (attributes) {
+            NSNumber *fileSize = attributes[NSFileSize];
+            if ([fileSize intValue] <10) {
+                taskindex=100;
+            }
+        }
+
+
+        NSString * s1 = [datadir stringByAppendingPathComponent:@"111.mp3"];
+        s1 = webdelegate.mp3file;
+        s1 = [@"file://" stringByAppendingString:s1];
+        NSURL *desturl = [NSURL URLWithString:s1];
+        NSError *moveError;
+        if ([fileManager fileExistsAtPath:webdelegate.mp3file])
+            [fileManager removeItemAtPath:webdelegate.mp3file error:nil];
+
+        [fileManager moveItemAtURL:location toURL:desturl error:&moveError];
+        if (moveError) {
+            NSLog(@"File move error: %@", moveError.localizedDescription);
+        } else {
+            NSLog(@"File saved to: %@", desturl.path);
+        }
+        [webdelegate savedownloadurl:webdelegate.epubfile];
+        pageindex +=1;
+        
+    }];
+
+    // 4. Start the task
+    [downloadTask resume];
+}
+
+
+- (void)URLSession:(NSURLSession *)session downloadTask:(NSURLSessionDownloadTask *)downloadTask didFinishDownloadingToURL:(NSURL *)location {
+    // This block is often executed on a background queue, so update UI on the main thread
+    //NSString *downloadsPath = [NSSearchPathForDirectoriesInDomains(NSDownloadsDirectory, NSUserDomainMask, YES) firstObject];
+    NSString * s1 = [self urltopath:curpage];
+    NSString *fileName = [s1 lastPathComponent];
+    //fileName=@"111.mp3";
+    NSURL *destinationURL = [NSURL fileURLWithPath:[booktmp stringByAppendingPathComponent:fileName]];
+
+    NSError *error;
+    //[[NSFileManager defaultManager] copyItemAtPath:location.path toPath:destinationURL.path error:&error];
+    [[NSFileManager defaultManager] moveItemAtURL:location toURL:destinationURL error:&error];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (error) {
+            [self log:@"Error moving file: %@", error.localizedDescription];
+        } else {
+            NSLog(@"File downloaded to: %@", destinationURL.path);
+            [self log:@"File downloaded to: %@", destinationURL.path];
+        }
+    });
+//    dispatch_async(dispatch_get_main_queue(), ^{
+////        self.progressIndicator.hidden = YES;
+////        self.downloadButton.enabled = YES;
+//        NSLog(@"File downloaded to: %@",location.path);
+//        NSLog(@"File downloaded abs to: %@",location.absoluteURL);
+//
+//        // Find a destination to save the file, for example, the Downloads folder
+//        // Move the temporary file from its location to the destination URL copyItem
+////        if ([[NSFileManager defaultManager] moveItemAtURL:location toURL:destinationURL error:&error]) {
+//        if ([[NSFileManager defaultManager] copyItemAtPath:location.path toPath:destinationURL.path error:&error]) {
+////            self.statusLabel.stringValue = [NSString stringWithFormat:@"Downloaded successfully to: %@", destinationURL.path];
+//            NSLog(@"File downloaded to: %@", destinationURL.path);
+//            [self log:@"File downloaded to: %@", destinationURL.path];
+//        } else {
+////            self.statusLabel.stringValue = [NSString stringWithFormat:@"Error saving file: %@", error.localizedDescription];
+//            NSLog(@"Error moving file: %@", error.localizedDescription);
+//            [self log:@"Error moving file: %@", error.localizedDescription];
+//        }
+//    });
+}
+
+- (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didCompleteWithError:(NSError *)error
+{
+    if (error) {
+        NSLog(@"Download finished with error: %@", error);
+    } else {
+        NSLog(@"Download finished successfully.");
+    }
+}
+
+- (NSString*) urltopath: (NSString *) url
+{
+    url = [url stringByReplacingOccurrencesOfString:@"html#" withString:@"html?"];
+    NSURLComponents *urlComponents = [NSURLComponents componentsWithString:url];
+    NSString * fname = urlComponents.path;
+    
+    return fname;
+}
+
 #pragma mark - PDF ebook handle
 
 - (int) nextbuttonjs
@@ -1789,8 +1475,16 @@ IOReturn iosuccess;
 }
 - (void)webView:(WKWebView *)webView didStartProvisionalNavigation:(WKNavigation *)navigation
 {
-    //NSLog(@"didStartProvisionalNavigation: %@", navigation);
+    NSLog(@"didStartProvisionalNavigation: %@", webView.URL);
 }
+
+
+- (void)webView:(WKWebView *)webView didReceiveServerRedirectForProvisionalNavigation:(WKNavigation *)navigation {
+    // didReceiveServerRedirectForProvisionalNavigation.
+    NSURL *aURL = [webView.URL copy];
+    NSLog(@"redirect %s url: %@", __FUNCTION__, aURL);
+}
+
 
 - (NSString *)stringByEvaluatingJavaScriptFromString:(NSString *)script {
     __block NSString *resultString = nil;
@@ -1891,22 +1585,19 @@ IOReturn iosuccess;
 // NSPrintOperation  knowsPageRange
 //NSPrintOperation view's frame was not initialized properly before knowsPageRange: returned. (WKPrintingView)
 //http://mirror.informatimago.com/next/developer.apple.com/documentation/Cocoa/Conceptual/Printing/Tasks/PaginatingViews.html
-
+//https://dewey-b1ca48e0aaf4d04af8c9081f67abbf90.listen.libbyap
 //- (void)webView:(WKWebView *)webView decidePolicyForNavigationAction:(WKNavigationAction *)navigationAction decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler
 //{
-//    NSLog(@"decidePolicyForNavigationAction %@",[navigationAction.request.URL absoluteString]);
+//    NSString * aurl = [navigationAction.request.URL absoluteString];
+//    if ([aurl rangeOfString:@"dewey-"].location!=NSNotFound) {
+//        epubframe = navigationAction.targetFrame;
+//        NSLog(@"decidePolicyForNavigationAction %@",[navigationAction.request.URL absoluteString]);
+//    }
 //
 //    //if (navigationAction._canHandleRequest) {
-//        decisionHandler(WKNavigationActionPolicyAllow);
-//        return;
+//    decisionHandler(WKNavigationActionPolicyAllow);
+//    return;
 //    //}
-//
-////    if (navigationAction._userInitiatedAction && !navigationAction._userInitiatedAction.isConsumed) {
-////        [navigationAction._userInitiatedAction consume];
-////        [[NSWorkspace sharedWorkspace] openURL:navigationAction.request.URL];
-////    }
-//
-////    decisionHandler(WKNavigationActionPolicyCancel);
 //}
 //http://stackoverflow.com/questions/5353278/uiwebviewdelegate-not-monitoring-xmlhttprequest
 #pragma mark - WebPolicyDelegate
@@ -1924,7 +1615,7 @@ IOReturn iosuccess;
 //}
 
 //- (void)webView:(WKWebView *)webView decidePolicyForNavigationResponse:(WKNavigationResponse *)navigationResponse decisionHandler:(void (^)(WKNavigationResponsePolicy))decisionHandler {
-//    NSLog(@"decidePolicyForNavigationResponse");
+//    NSLog(@"decidePolicyForNavigationResponse %@",webView.URL);
 //    decisionHandler(WKNavigationResponsePolicyAllow);
 //}
 //
@@ -2061,34 +1752,19 @@ IOReturn iosuccess;
     }
 }
 
-
 - (void) urlchanged
 {
     //[self updateTextFieldFromURL:webView.URL];
     [address setStringValue:[webView.URL absoluteString ]];
     addressurl = [webView.URL absoluteString ];
     if (working) {
-//        framenum+=1;
-//        if (ebooktype==1) { //epub
-//            if (framenum>2) {
-//                ticknum = ttimeout-ttimeout/10;
-//            } else if (framenum>1) {
-//                ticknum = ttimeout-ttimeout/8;
-//            } else if (framenum>0) {
-//                ticknum = ttimeout-ttimeout/7;
-//            }
-//        } else { //pdf
-//            if (framenum>2) {
-//                ticknum = ttimeout- ttimeout/10;
-//            } else if (framenum>1) {
-//                ticknum = ttimeout- ttimeout/5;
-//            } else if (framenum>0) {
-//                ticknum = ttimeout / 2;
-//            }
-//
-//        }
+
     } else { //find book open
-       if ([addressurl rangeOfString:@"/books/"].location != NSNotFound) {
+       if ([addressurl rangeOfString:@"/loan/"].location == NSNotFound) {
+//           [downloadbtn setEnabled:false];
+//           webdelegate.ebookid = @"111";
+//           [[textview.textStorage mutableString] setString:@""];
+//           [self log:@"\rOpen audiobook \r"];
            //NSLog(@"^^^^^^^^book find");
            //NSLog(@"url changes %@ ",[webView.URL absoluteString ]);
 //           if ([addressurl rangeOfString:@"recent"].location != NSNotFound) {
@@ -2099,9 +1775,9 @@ IOReturn iosuccess;
 //           }
 
        } else {
-           [downloadbtn setEnabled:false];
-           pausing =false;
-           captcha = 0;
+//           [downloadbtn setEnabled:false];
+//           pausing =false;
+//           captcha = 0;
            //[box setHidden:true];
        }
         
@@ -2386,6 +2062,13 @@ IOReturn iosuccess;
 //    }
 }
 
+-(NSString *)jskeydown
+{
+    NSString* rstr=[self runjs2:js_keypress];
+    //NSLog(@"%@",rstr);
+    return rstr;
+}
+
 -(NSString *)rightkeyjs
 {
     NSString* rstr=[self runjs2:js_nextpage];
@@ -2444,13 +2127,17 @@ IOReturn iosuccess;
     return height;
 }
 
-- (NSString *)runjs2:(NSString *)script {
+- (NSString *)runjs3:(NSString *)script {
     
     
     __block NSString *resultString = nil;
     __block BOOL finished = NO;
 
-    [webView evaluateJavaScript:script completionHandler:^(id result, NSError *error) {
+//    [webView evaluateJavaScript:script completionHandler:^(id result, NSError *error) {
+    [webView evaluateJavaScript:script
+                                 inFrame: epubframe // Your WKFrameInfo object
+                          inContentWorld:[WKContentWorld pageWorld]
+                       completionHandler:^(id result, NSError *error) {
         if (error == nil) {
             if (result != nil) {
                 resultString = [NSString stringWithFormat:@"%@", result];

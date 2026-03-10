@@ -30,7 +30,7 @@
 		009F572F1ED7112400B596C9 /* buy.png in Resources */ = {isa = PBXBuildFile; fileRef = 009F572C1ED7112400B596C9 /* buy.png */; };
 		009F57301ED7112400B596C9 /* about.png in Resources */ = {isa = PBXBuildFile; fileRef = 009F572D1ED7112400B596C9 /* about.png */; };
 		009F57311ED7112400B596C9 /* help.png in Resources */ = {isa = PBXBuildFile; fileRef = 009F572E1ED7112400B596C9 /* help.png */; };
-		009F57341ED71C7800B596C9 /* vbkbrowser.icns in Resources */ = {isa = PBXBuildFile; fileRef = 009F57321ED71C7800B596C9 /* vbkbrowser.icns */; };
+		009F57341ED71C7800B596C9 /* Libby Audio Downloader.icns in Resources */ = {isa = PBXBuildFile; fileRef = 009F57321ED71C7800B596C9 /* Libby Audio Downloader.icns */; };
 		009F57351ED71C7800B596C9 /* vbkbrowser48.png in Resources */ = {isa = PBXBuildFile; fileRef = 009F57331ED71C7800B596C9 /* vbkbrowser48.png */; };
 		009F57371ED71D7500B596C9 /* key.png in Resources */ = {isa = PBXBuildFile; fileRef = 009F57361ED71D7500B596C9 /* key.png */; };
 		009F57391ED71DB700B596C9 /* background.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 009F57381ED71DB700B596C9 /* background.jpg */; };
@@ -72,7 +72,7 @@
 		0028ED5A2368DE9E00BD7BFD /* HybridNSURLProtocol.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HybridNSURLProtocol.m; sourceTree = "<group>"; };
 		002DF5E1201F7D3700FC44FB /* go-home.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "go-home.png"; path = "img/go-home.png"; sourceTree = "<group>"; };
 		004E382825B4B0FC00216708 /* jsstring.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = jsstring.m; sourceTree = "<group>"; };
-		00872C541EC2245C00542D22 /* VitalSource Downloader.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "VitalSource Downloader.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		00872C541EC2245C00542D22 /* Libby Audio Downloader.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Libby Audio Downloader.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		00872C571EC2245C00542D22 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		00872C581EC2245C00542D22 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		00872C5B1EC2245C00542D22 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -95,7 +95,7 @@
 		009F572C1ED7112400B596C9 /* buy.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = buy.png; path = img/buy.png; sourceTree = "<group>"; };
 		009F572D1ED7112400B596C9 /* about.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = about.png; path = img/about.png; sourceTree = "<group>"; };
 		009F572E1ED7112400B596C9 /* help.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = help.png; path = img/help.png; sourceTree = "<group>"; };
-		009F57321ED71C7800B596C9 /* vbkbrowser.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = vbkbrowser.icns; path = img/vbkbrowser.icns; sourceTree = "<group>"; };
+		009F57321ED71C7800B596C9 /* Libby Audio Downloader.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = "Libby Audio Downloader.icns"; path = "img/Libby Audio Downloader.icns"; sourceTree = "<group>"; };
 		009F57331ED71C7800B596C9 /* vbkbrowser48.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = vbkbrowser48.png; path = img/vbkbrowser48.png; sourceTree = "<group>"; };
 		009F57361ED71D7500B596C9 /* key.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = key.png; path = img/key.png; sourceTree = "<group>"; };
 		009F57381ED71DB700B596C9 /* background.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = background.jpg; path = img/background.jpg; sourceTree = "<group>"; };
@@ -155,7 +155,7 @@
 		00872C551EC2245C00542D22 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				00872C541EC2245C00542D22 /* VitalSource Downloader.app */,
+				00872C541EC2245C00542D22 /* Libby Audio Downloader.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -227,7 +227,7 @@
 				002DF5E1201F7D3700FC44FB /* go-home.png */,
 				009F57381ED71DB700B596C9 /* background.jpg */,
 				009F57361ED71D7500B596C9 /* key.png */,
-				009F57321ED71C7800B596C9 /* vbkbrowser.icns */,
+				009F57321ED71C7800B596C9 /* Libby Audio Downloader.icns */,
 				009F57331ED71C7800B596C9 /* vbkbrowser48.png */,
 				009F572C1ED7112400B596C9 /* buy.png */,
 				009F572D1ED7112400B596C9 /* about.png */,
@@ -274,9 +274,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		00872C531EC2245C00542D22 /* VitalSource Downloader */ = {
+		00872C531EC2245C00542D22 /* Libby Audio Downloader */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 00872C651EC2245C00542D22 /* Build configuration list for PBXNativeTarget "VitalSource Downloader" */;
+			buildConfigurationList = 00872C651EC2245C00542D22 /* Build configuration list for PBXNativeTarget "Libby Audio Downloader" */;
 			buildPhases = (
 				00872C501EC2245C00542D22 /* Sources */,
 				00872C511EC2245C00542D22 /* Frameworks */,
@@ -287,9 +287,9 @@
 			);
 			dependencies = (
 			);
-			name = "VitalSource Downloader";
+			name = "Libby Audio Downloader";
 			productName = vbkbrowser;
-			productReference = 00872C541EC2245C00542D22 /* VitalSource Downloader.app */;
+			productReference = 00872C541EC2245C00542D22 /* Libby Audio Downloader.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -312,7 +312,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 00872C4F1EC2245B00542D22 /* Build configuration list for PBXProject "vbkbrowser" */;
+			buildConfigurationList = 00872C4F1EC2245B00542D22 /* Build configuration list for PBXProject "Libby Audio Downloader" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -326,7 +326,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				00872C531EC2245C00542D22 /* VitalSource Downloader */,
+				00872C531EC2245C00542D22 /* Libby Audio Downloader */,
 			);
 		};
 /* End PBXProject section */
@@ -353,7 +353,7 @@
 				009F572B1ED70EE500B596C9 /* sign-right.png in Resources */,
 				00B7F1A41ECDE31700C14D6A /* BuyController.xib in Resources */,
 				009F572F1ED7112400B596C9 /* buy.png in Resources */,
-				009F57341ED71C7800B596C9 /* vbkbrowser.icns in Resources */,
+				009F57341ED71C7800B596C9 /* Libby Audio Downloader.icns in Resources */,
 				002DF5E2201F7D3700FC44FB /* go-home.png in Resources */,
 				009F57311ED7112400B596C9 /* help.png in Resources */,
 				00B7F1A91ECDE36E00C14D6A /* RegController.xib in Resources */,
@@ -512,7 +512,7 @@
 				INFOPLIST_FILE = vbkbrowser/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
-				PRODUCT_BUNDLE_IDENTIFIER = com.ebookconverter.vbkbrowserwk;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ebookconverter.libbyaudio;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRINGS_FILE_OUTPUT_ENCODING = binary;
 				SWIFT_OBJC_BRIDGING_HEADER = "vbkbrowser/VitalSource Downloader-Bridging-Header.h";
@@ -541,7 +541,7 @@
 				INFOPLIST_FILE = vbkbrowser/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
-				PRODUCT_BUNDLE_IDENTIFIER = com.ebookconverter.vbkbrowserwk;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ebookconverter.libbyaudio;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRINGS_FILE_OUTPUT_ENCODING = binary;
 				SWIFT_OBJC_BRIDGING_HEADER = "vbkbrowser/VitalSource Downloader-Bridging-Header.h";
@@ -552,7 +552,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		00872C4F1EC2245B00542D22 /* Build configuration list for PBXProject "vbkbrowser" */ = {
+		00872C4F1EC2245B00542D22 /* Build configuration list for PBXProject "Libby Audio Downloader" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				00872C631EC2245C00542D22 /* Debug */,
@@ -561,7 +561,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		00872C651EC2245C00542D22 /* Build configuration list for PBXNativeTarget "VitalSource Downloader" */ = {
+		00872C651EC2245C00542D22 /* Build configuration list for PBXNativeTarget "Libby Audio Downloader" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				00872C661EC2245C00542D22 /* Debug */,

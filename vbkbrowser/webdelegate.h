@@ -21,19 +21,26 @@
     int ebooktype;
     NSString * title;
     NSString * ebookid;
+    NSString * host;
     NSString * epubfile;
+    NSString * mp3file;
     NSArray * pagelist;
+    NSString * booktmp;
+    int curindex;
+    int downnum;
+
 }
 
 - (void) saveepubfile: (NSString *)url data:(NSData *)data;
 - (void) clearurllist;
 - (void) saveurl: (NSString *)url;
+- (void) savedownloadurl: (NSString *)url;
+- (void) checkbookid: (NSString *)url;
 - (NSString*) urltopath: (NSString *) url;
 - (void) savetitle: (NSString *)atitle;
 - (NSString *) nextpage: (int)page;
+- (BOOL) findMissing;
 - (bool) BuildPub:(NSString *) afile;
-- (void) Buildpdf;
-- (void)Buildpdfpdf;
 - (void)joinPDF;
 - (BOOL) createfolder: (NSString*) folder;
 - (NSString *) cleanfilename: (NSString *) str;
@@ -46,15 +53,20 @@
 - (NSString *) pageurl:(int) i;
 - (int) indexofcfi:(NSString *)cfi;
 - (NSString *) cleancfi: (NSString *) url;
+- (NSString*) urltodomain: (NSString *) url;
 
 
 
 @property (nonatomic, assign) int tick;
 @property (nonatomic, assign) int ebooktype;
+@property (nonatomic, assign) int curindex;
 @property (nonatomic, assign) BOOL ticked;
 @property (nonatomic, retain) NSString* title;
 @property (nonatomic, retain) NSString* ebookid;
 @property (nonatomic, retain) NSString* epubfile;
+@property (nonatomic, retain) NSString* mp3file;
+@property (nonatomic, retain) NSString* host;
+@property (nonatomic, retain) NSString* booktmp;
 @property (nonatomic, retain) NSArray* pagelist;
 @property (nonatomic, retain) NSMutableArray* urllist;
 @end
