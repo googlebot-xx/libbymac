@@ -19,8 +19,6 @@
 		00872C611EC2245C00542D22 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 00872C5F1EC2245C00542D22 /* MainMenu.xib */; };
 		00872C6B1EC225DE00542D22 /* mainWin.m in Sources */ = {isa = PBXBuildFile; fileRef = 00872C691EC225DE00542D22 /* mainWin.m */; };
 		00872C6C1EC225DE00542D22 /* mainWin.xib in Resources */ = {isa = PBXBuildFile; fileRef = 00872C6A1EC225DE00542D22 /* mainWin.xib */; };
-		008D40CE2416B19000BA9476 /* v1.png in Resources */ = {isa = PBXBuildFile; fileRef = 008D40CC2416B19000BA9476 /* v1.png */; };
-		008D40CF2416B19000BA9476 /* c1.png in Resources */ = {isa = PBXBuildFile; fileRef = 008D40CD2416B19000BA9476 /* c1.png */; };
 		008D40D32416D20E00BA9476 /* ActiveManualler.m in Sources */ = {isa = PBXBuildFile; fileRef = 008D40D02416D20D00BA9476 /* ActiveManualler.m */; };
 		008D40D42416D20E00BA9476 /* ActiveManualler.xib in Resources */ = {isa = PBXBuildFile; fileRef = 008D40D22416D20E00BA9476 /* ActiveManualler.xib */; };
 		009F57281ED70EE500B596C9 /* share-sign.png in Resources */ = {isa = PBXBuildFile; fileRef = 009F57241ED70EE500B596C9 /* share-sign.png */; };
@@ -30,8 +28,6 @@
 		009F572F1ED7112400B596C9 /* buy.png in Resources */ = {isa = PBXBuildFile; fileRef = 009F572C1ED7112400B596C9 /* buy.png */; };
 		009F57301ED7112400B596C9 /* about.png in Resources */ = {isa = PBXBuildFile; fileRef = 009F572D1ED7112400B596C9 /* about.png */; };
 		009F57311ED7112400B596C9 /* help.png in Resources */ = {isa = PBXBuildFile; fileRef = 009F572E1ED7112400B596C9 /* help.png */; };
-		009F57341ED71C7800B596C9 /* Libby Audio Downloader.icns in Resources */ = {isa = PBXBuildFile; fileRef = 009F57321ED71C7800B596C9 /* Libby Audio Downloader.icns */; };
-		009F57351ED71C7800B596C9 /* vbkbrowser48.png in Resources */ = {isa = PBXBuildFile; fileRef = 009F57331ED71C7800B596C9 /* vbkbrowser48.png */; };
 		009F57371ED71D7500B596C9 /* key.png in Resources */ = {isa = PBXBuildFile; fileRef = 009F57361ED71D7500B596C9 /* key.png */; };
 		009F57391ED71DB700B596C9 /* background.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 009F57381ED71DB700B596C9 /* background.jpg */; };
 		00ACBB0F22F9DA9100754A94 /* MyURLProtocol.m in Sources */ = {isa = PBXBuildFile; fileRef = 00ACBB0E22F9DA9100754A94 /* MyURLProtocol.m */; };
@@ -83,8 +79,6 @@
 		00872C691EC225DE00542D22 /* mainWin.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = mainWin.m; sourceTree = "<group>"; };
 		00872C6A1EC225DE00542D22 /* mainWin.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = mainWin.xib; sourceTree = "<group>"; };
 		00872C6E1EC2288100542D22 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
-		008D40CC2416B19000BA9476 /* v1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = v1.png; path = img/v1.png; sourceTree = "<group>"; };
-		008D40CD2416B19000BA9476 /* c1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = c1.png; path = img/c1.png; sourceTree = "<group>"; };
 		008D40D02416D20D00BA9476 /* ActiveManualler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ActiveManualler.m; sourceTree = "<group>"; };
 		008D40D12416D20D00BA9476 /* ActiveManualler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ActiveManualler.h; sourceTree = "<group>"; };
 		008D40D22416D20E00BA9476 /* ActiveManualler.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ActiveManualler.xib; sourceTree = "<group>"; };
@@ -95,8 +89,6 @@
 		009F572C1ED7112400B596C9 /* buy.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = buy.png; path = img/buy.png; sourceTree = "<group>"; };
 		009F572D1ED7112400B596C9 /* about.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = about.png; path = img/about.png; sourceTree = "<group>"; };
 		009F572E1ED7112400B596C9 /* help.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = help.png; path = img/help.png; sourceTree = "<group>"; };
-		009F57321ED71C7800B596C9 /* Libby Audio Downloader.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = "Libby Audio Downloader.icns"; path = "img/Libby Audio Downloader.icns"; sourceTree = "<group>"; };
-		009F57331ED71C7800B596C9 /* vbkbrowser48.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = vbkbrowser48.png; path = img/vbkbrowser48.png; sourceTree = "<group>"; };
 		009F57361ED71D7500B596C9 /* key.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = key.png; path = img/key.png; sourceTree = "<group>"; };
 		009F57381ED71DB700B596C9 /* background.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = background.jpg; path = img/background.jpg; sourceTree = "<group>"; };
 		00ACBB0D22F9DA9100754A94 /* MyURLProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MyURLProtocol.h; sourceTree = "<group>"; };
@@ -222,13 +214,9 @@
 		009F57231ED70ECA00B596C9 /* img */ = {
 			isa = PBXGroup;
 			children = (
-				008D40CD2416B19000BA9476 /* c1.png */,
-				008D40CC2416B19000BA9476 /* v1.png */,
 				002DF5E1201F7D3700FC44FB /* go-home.png */,
 				009F57381ED71DB700B596C9 /* background.jpg */,
 				009F57361ED71D7500B596C9 /* key.png */,
-				009F57321ED71C7800B596C9 /* Libby Audio Downloader.icns */,
-				009F57331ED71C7800B596C9 /* vbkbrowser48.png */,
 				009F572C1ED7112400B596C9 /* buy.png */,
 				009F572D1ED7112400B596C9 /* about.png */,
 				009F572E1ED7112400B596C9 /* help.png */,
@@ -336,15 +324,12 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				008D40CE2416B19000BA9476 /* v1.png in Resources */,
 				008D40D42416D20E00BA9476 /* ActiveManualler.xib in Resources */,
 				00B7F1B11ED369D000C14D6A /* toc.ncx in Resources */,
 				00872C5E1EC2245C00542D22 /* Assets.xcassets in Resources */,
 				00B7F1B21ED369D000C14D6A /* mimetype in Resources */,
 				009F57281ED70EE500B596C9 /* share-sign.png in Resources */,
 				00872C611EC2245C00542D22 /* MainMenu.xib in Resources */,
-				008D40CF2416B19000BA9476 /* c1.png in Resources */,
-				009F57351ED71C7800B596C9 /* vbkbrowser48.png in Resources */,
 				00B7F1A51ECDE31700C14D6A /* AboutController.xib in Resources */,
 				009F572A1ED70EE500B596C9 /* sign-left.png in Resources */,
 				00016C6B1EEB151D00090675 /* instru.xhtml in Resources */,
@@ -353,7 +338,6 @@
 				009F572B1ED70EE500B596C9 /* sign-right.png in Resources */,
 				00B7F1A41ECDE31700C14D6A /* BuyController.xib in Resources */,
 				009F572F1ED7112400B596C9 /* buy.png in Resources */,
-				009F57341ED71C7800B596C9 /* Libby Audio Downloader.icns in Resources */,
 				002DF5E2201F7D3700FC44FB /* go-home.png in Resources */,
 				009F57311ED7112400B596C9 /* help.png in Resources */,
 				00B7F1A91ECDE36E00C14D6A /* RegController.xib in Resources */,

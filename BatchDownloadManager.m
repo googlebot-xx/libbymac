@@ -1,6 +1,5 @@
 #import "BatchDownloadManager.h"
 
-#import "BatchDownloadManager.h"
 
 // Suppose you have a file at ~/Downloads/batch.txt with lines like:
 // https://example.com/file1.zip
@@ -18,6 +17,8 @@ BatchDownloadManager *mgr = [[BatchDownloadManager alloc] initWithMaxConcurrentD
     NSLog(@"Batch complete. Successes: %@, Failures: %@", successfulDownloads, failedDownloads);
     // You can persist mgr.resumeDataStore if you want to resume failed/interrupted ones later.
 }];
+
+NSURLSession download batch file synchronously objc
 '''
 
 @interface BatchDownloadManager () <NSURLSessionDownloadDelegate>

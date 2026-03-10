@@ -213,6 +213,11 @@ IOReturn iosuccess;
     
     [productcaption setStringValue:c_product];
     
+    NSString * s2 = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleIconFile"];
+    NSImage *img = [NSImage imageNamed:s2];
+    [iconimg setImage:img];
+    [iconimg setImageFrameStyle:NSImageFrameNone];
+    
     NSArray * paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     docdir = [paths objectAtIndex:0];
     
@@ -876,7 +881,7 @@ IOReturn iosuccess;
             //[self Buildpdf];
             [self setWorking:false];
             [self deletemp3files];
-            //[[NSWorkspace sharedWorkspace] openFile:ebookdir withApplication:@"Finder"];
+            [[NSWorkspace sharedWorkspace] openFile:ebookdir withApplication:@"Finder"];
             [self log:@"\rdownload end\r"];
             [self log:@"Audiobook in %@", webdelegate.booktmp];
 

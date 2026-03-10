@@ -16,6 +16,7 @@
                 <outlet property="containerView" destination="tEU-Wq-TQh" id="9Zt-8a-G2C"/>
                 <outlet property="downloadbtn" destination="cnm-yS-MWO" id="gNx-IL-3s0"/>
                 <outlet property="helpbtn" destination="cmw-tx-Jbo" id="J1J-CZ-X4y"/>
+                <outlet property="iconimg" destination="a3R-Fj-uoC" id="be2-pE-gNz"/>
                 <outlet property="productcaption" destination="Y3S-6Q-aNe" id="Iyt-A7-aLW"/>
                 <outlet property="resetbtn" destination="LbU-Au-loM" id="zzj-0t-XqZ"/>
                 <outlet property="testbtn" destination="lYt-d4-DKN" id="7KV-zh-Oha"/>
@@ -111,17 +112,6 @@
                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                     </textFieldCell>
                                 </textField>
-                                <button toolTip="More info about Vitalsource converter PRO" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Z28-KI-l03">
-                                    <rect key="frame" x="0.0" y="-3" width="48" height="48"/>
-                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                    <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="vbkbrowser" imagePosition="only" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="yTC-lq-gNZ">
-                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                        <font key="font" metaFont="system"/>
-                                    </buttonCell>
-                                    <connections>
-                                        <action selector="gohome:" target="-2" id="ijc-sY-jaV"/>
-                                    </connections>
-                                </button>
                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Y3S-6Q-aNe">
                                     <rect key="frame" x="46" y="7" width="271" height="29"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
@@ -231,6 +221,11 @@
                                         <action selector="resetbtn:" target="-2" id="gsK-z3-7b8"/>
                                     </connections>
                                 </button>
+                                <imageView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="a3R-Fj-uoC">
+                                    <rect key="frame" x="3" y="2" width="41" height="41"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                    <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" imageFrameStyle="photo" image="vbkbrowser" id="zKO-05-j1O"/>
+                                </imageView>
                             </subviews>
                         </view>
                         <color key="fillColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -240,7 +235,7 @@
             <connections>
                 <outlet property="delegate" destination="-2" id="0bl-1N-AYu"/>
             </connections>
-            <point key="canvasLocation" x="169" y="-1197"/>
+            <point key="canvasLocation" x="-141" y="-1342"/>
         </window>
     </objects>
     <resources>

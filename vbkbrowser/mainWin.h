@@ -23,6 +23,7 @@
     IBOutlet WKWebView * webView;
 //    IBOutlet Mkwebview * webView;
     IBOutlet NSView *containerView;
+    IBOutlet NSImageView *iconimg;
     
     NSString* datadir;
     NSString* cachedir;
