@@ -227,6 +227,7 @@
 //    if ([ebookid isEqualToString:s1]) return;
 //    ebookid = s1;
     title =  [dict objectForKey:@"title"];
+    title = [self cleanStringForFolderName:title];
 
     pagelist = NULL;
     pagelist = [dict objectForKey:@"spin"];
@@ -1464,6 +1465,27 @@
         return [str substringWithRange:r2];
     }
     return str;
+}
+
+- (NSString *)cleanStringForFolderName:(NSString *)inputString {
+    // 1. Define the characters illegal in folder names (e.g., /, \, :, ?, *, |, <, >, ")
+    NSCharacterSet *illegalCharSet = [NSCharacterSet characterSetWithCharactersInString:@"/\\:?*|\"<>"];
+    
+    // 2. Split the string into components, removing the illegal characters
+    NSArray *components = [inputString componentsSeparatedByCharactersInSet:illegalCharSet];
+    
+    // 3. Join components back together into a clean string
+    NSString *cleanString = [components componentsJoinedByString:@""];
+    
+    // 4. (Optional) Trim leading/trailing whitespace
+    cleanString = [cleanString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    
+    // 5. Ensure the folder name isn't completely empty after cleaning
+    if (cleanString.length == 0) {
+        return @"Untitled_Folder";
+    }
+    
+    return cleanString;
 }
 
 @end

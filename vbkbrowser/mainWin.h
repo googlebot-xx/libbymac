@@ -60,6 +60,7 @@ extern NSString* ebookdir00;
 extern NSString* js_bif;
 extern NSString* js_frameheight;
 extern NSString* js_nextpage;
+extern NSString* js_nextobj;
 extern NSString* js_keypress;
 extern HtmlPdfConverter * pdfconverter;
 //extern RegController * regcontroller;

@@ -71,6 +71,14 @@ NSString* js_nextpage =
            if (nextbtn) nextbtn.click();
        }
 
+       function jump15behind()
+       {
+           //playback-jump playback-jump-behind halo
+           nextbtn= document.querySelector('button.playback-jump-behind');;
+           //console.log(nextbtn);
+           if (nextbtn) nextbtn.click();
+       }
+
        
        function mylog(msg)
        {
@@ -78,11 +86,21 @@ NSString* js_nextpage =
        }
        
        readnextbtn();
-       jump15();
-//       clicknextbtn();
-       setTimeout(clicknextbtn, 3000);
-       JSON.stringify(obj);
+//       jump15();
+////       clicknextbtn();
+//       setTimeout(clicknextbtn, 3000);
+//       JSON.stringify(obj);
 );
+
+NSString* js_nextobj =
+@QUOTE(
+       
+       jump15();
+       setTimeout(clicknextbtn, 3000);
+       setTimeout(jump15behind, 5000);
+       setTimeout(clicknextbtn, 7000);
+       JSON.stringify(obj);
+       );
 
 NSString* js_bif =
 @QUOTE(

@@ -95,6 +95,7 @@ IOReturn iosuccess;
     BOOL printing;
     BOOL hasimg;
     int c_captcha;
+    int clickindex;
     NSString * jsmessage;
     CGPoint mousepoint;
     NSString * curpage;
@@ -577,6 +578,7 @@ IOReturn iosuccess;
         //[webdelegate clearurllist];
         taskindex=10;
         pageindex=0;
+        clickindex=0;
         totalpage = webdelegate.pagelist.count;
 //            startno=0;
 
@@ -1178,9 +1180,19 @@ IOReturn iosuccess;
 - (int) nextpage:(int) page
 {
     NSString * res;
-    res = [self runjs2:js_nextpage];
+    NSString * js;
+    if (clickindex==0) {
+        js = [NSString stringWithFormat:@"%@  clicknextbtn();  JSON.stringify(obj); ", js_nextpage];
+    } else {
+        js = [NSString stringWithFormat:@"%@   %@", js_nextpage,js_nextobj];
+
+    }
+    
+    //res = [self runjs2:js_nextpage];
+    res = [self runjs2:js];
     NSDictionary * obj = [NSJSONSerialization JSONObjectWithData:[res dataUsingEncoding:NSUTF8StringEncoding] options:0 error:nil];
     int n =  [[obj objectForKey:@"nextbtn"] intValue] ;
+    clickindex +=1;
     NSLog(@"%@ %d",res,n);
     return n;
 }
