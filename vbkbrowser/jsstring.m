@@ -84,11 +84,75 @@ NSString* js_nextpage =
        {
            window.webkit.messageHandlers.logging.postMessage(msg);
        }
-       
+
+       function nexttext()
+       {
+           nextbtn =  document.querySelector(".chapter-bar-next-button.chapter-bar-jump-button");
+           var s1 = nextbtn.innerText;
+           //console.log('min:', s1);
+           return parseInt(s1, 10);
+
+//           if (s1) {
+//               s2 = s1.match(/\d+/)[0];
+//               mm = Number(s2);
+//               return mm;
+//           } else return 0;
+       }
+
+       function jumpfile(n)
+       {
+//              if (n<1)
+//              { clicknextbtn(); }
+//              else {
+//                  place=BIF.objects.compass.place;
+//                  BIF.objects.spool.seekBy(place.component.durationMilliseconds-500);
+//              }
+           
+           var spool = BIF.objects.spool;
+           var next = spool.focus.component.next;
+
+           if (next) {
+               spool.seek(next, 0, true);  // 3rd arg = skip "jumping" event
+           } else {
+               // last component — go to 100%
+               BIF.objects.compass.at({ percentageOfBook: 1 }).seek();
+           }
+
+       }
+
        readnextbtn();
-//       jump15();
-////       clicknextbtn();
-//       setTimeout(clicknextbtn, 3000);
+       jumpfile(0);
+       JSON.stringify(obj);
+
+//       place=BIF.objects.compass.place;
+//       BIF.objects.spool.seekBy(place.component.durationMilliseconds-100);
+//       JSON.stringify(obj);
+       
+//       min = nexttext();
+//       console.log('min:', min);
+//       ms = BIF.objects.spool._.proxy.position();
+//       if (min<4)
+//       { clicknextbtn(); }
+//       else {
+//           place=BIF.objects.compass.place;
+//           BIF.objects.spool.seekBy(place.component.durationMilliseconds-500);
+//       }
+//       JSON.stringify(obj);
+//       else if (min<120) {
+//           BIF.objects.spool.seekWithinBook(10000);  // seek to 30s into the book
+//           //jump15();
+//          setTimeout(clicknextbtn, 3000);
+//       } else {
+//          jump15();
+//          setTimeout(clicknextbtn, 3000);
+//          setTimeout(jump15behind, 5000);
+//          setTimeout(clicknextbtn, 7000);
+//
+//       }
+//
+////       jump15();
+//////       clicknextbtn();
+////       setTimeout(clicknextbtn, 3000);
 //       JSON.stringify(obj);
 );
 

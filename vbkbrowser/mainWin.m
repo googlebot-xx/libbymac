@@ -1182,12 +1182,12 @@ IOReturn iosuccess;
     NSString * res;
     NSString * js;
     if (clickindex==0) {
-        js = [NSString stringWithFormat:@"%@  clicknextbtn();  JSON.stringify(obj); ", js_nextpage];
+        js = [NSString stringWithFormat:@"%@  jumpfile(0); JSON.stringify(obj);", js_nextpage];
     } else {
-        js = [NSString stringWithFormat:@"%@   %@", js_nextpage,js_nextobj];
+        js = [NSString stringWithFormat:@"%@  jumpfile(1); JSON.stringify(obj);", js_nextpage];
 
     }
-    
+    js  = js_nextpage;
     //res = [self runjs2:js_nextpage];
     res = [self runjs2:js];
     NSDictionary * obj = [NSJSONSerialization JSONObjectWithData:[res dataUsingEncoding:NSUTF8StringEncoding] options:0 error:nil];
